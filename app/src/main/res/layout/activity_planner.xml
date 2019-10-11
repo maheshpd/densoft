@@ -7,6 +7,15 @@
     android:orientation="vertical"
     tools:context=".PlannerActivity">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/windowBackground">
+
+        <include layout="@layout/toolbar" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <LinearLayout
         android:id="@+id/linear1"
         android:layout_width="match_parent"
@@ -18,34 +27,47 @@
             android:id="@+id/tv_myleave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
             android:layout_weight="1"
-            android:background="@drawable/textview_rounded"
-            android:padding="5dp"
+            android:layout_gravity="center"
             android:text="@string/myleaves"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:background="@drawable/textview_rounded_unselected_left"/>
+
+        <!--<View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/gray"/>-->
 
         <TextView
             android:id="@+id/tv_myplanner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
             android:layout_weight="1"
-            android:background="@drawable/textview_rounded"
-            android:padding="5dp"
+            android:layout_gravity="center"
             android:text="@string/myplanner"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:background="@drawable/textview_unselected"/>
+
+        <!--<View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/gray"/>-->
 
         <TextView
             android:id="@+id/tv_myteam"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
             android:layout_weight="1"
-            android:background="@drawable/textview_rounded"
-            android:padding="5dp"
+            android:layout_gravity="center"
             android:text="@string/myteam"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:background="@drawable/textview_rounded_unselected_right"/>
 
     </LinearLayout>
 
@@ -54,7 +76,8 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="5dp"
+        android:background="@drawable/textview_unselected">
 
         <ImageView
             android:id="@+id/iv_profile"
@@ -98,54 +121,9 @@
 
     </LinearLayout>
 
-    <ScrollView
-        android:id="@+id/scrollview"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:descendantFocusability="beforeDescendants"
-        android:fitsSystemWindows="false"
-        android:focusableInTouchMode="true">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintlayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <CalendarView
-                android:id="@+id/calendar"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginBottom="5dp"
-                app:layout_constraintBottom_toTopOf="@+id/recyclerview"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-            </CalendarView>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                app:layout_constraintTop_toBottomOf="@+id/calendar"
-                tools:listitem="@layout/calendar_details_layout" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </ScrollView>
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground">
-
-        <include layout="@layout/toolbar" />
-
-    </com.google.android.material.appbar.AppBarLayout>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.densoftinfotech.densoftpayroll.PlannerActivity;
 import com.densoftinfotech.densoftpayroll.R;
+import com.densoftinfotech.densoftpayroll.classes.LeaveDetails;
 import com.densoftinfotech.densoftpayroll.classes.QuickActions;
 
 import java.util.ArrayList;
@@ -19,52 +20,51 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class QuickActionsAdapter extends RecyclerView.Adapter<QuickActionsAdapter.MyViewHolder> {
+public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.MyViewHolder> {
 
     Context context;
-    ArrayList<QuickActions> quickActions = new ArrayList<>();
+    ArrayList<LeaveDetails> leaveDetails = new ArrayList<>();
 
-    public QuickActionsAdapter(Context context, ArrayList<QuickActions> quickActions) {
+    public LeaveAdapter(Context context, ArrayList<LeaveDetails> leaveDetails) {
         this.context = context;
-        this.quickActions = quickActions;
+        this.leaveDetails = leaveDetails;
     }
 
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.quickactions_layout, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.leave_layout, parent, false);
         return new MyViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
-        holder.tv_name.setText(quickActions.get(i).getName());
-        holder.iv_icon.setImageResource(quickActions.get(i).getImage());
+        holder.tv_days.setText("" + leaveDetails.get(i).getDays());
+        holder.tv_name_of_leave.setText(leaveDetails.get(i).getName_of_leave());
 
 
-        holder.tv_name.setOnClickListener(new View.OnClickListener() {
+        holder.tv_apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(holder.tv_name.getText().toString().trim().equalsIgnoreCase("Planner")){
-                    Intent i = new Intent(context, PlannerActivity.class);
-                    context.startActivity(i);
-                }
+
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return quickActions.size();
+        return leaveDetails.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.tv_name)
-        TextView tv_name;
-        @BindView(R.id.iv_icon)
-        ImageView iv_icon;
+        @BindView(R.id.tv_days)
+        TextView tv_days;
+        @BindView(R.id.tv_name_of_leave)
+        TextView tv_name_of_leave;
+        @BindView(R.id.tv_apply)
+        TextView tv_apply;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);

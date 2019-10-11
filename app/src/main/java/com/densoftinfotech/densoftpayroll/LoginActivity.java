@@ -35,11 +35,18 @@ public class LoginActivity extends AppCompatActivity {
         preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
         edit = preferences.edit();
 
+        if(preferences.getBoolean("login", false)){
+            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(i);
+            finish();
+        }
+
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (checkfor_noblankparam()) {
                     edit.putBoolean("login", true);
+                    edit.apply();
                     Intent i = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(i);
                     finish();

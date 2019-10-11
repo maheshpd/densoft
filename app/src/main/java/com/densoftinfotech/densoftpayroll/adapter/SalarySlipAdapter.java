@@ -39,8 +39,8 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
         holder.tv_deductions.setText("₹ " + salarySlipDemos.get(i).getDeduction());
         holder.tv_grosspay.setText(context.getResources().getString(R.string.totalgrosspay) + ": ₹ " + ((salarySlipDemos.get(i).getTake_home() + salarySlipDemos.get(i).getDeduction())));
 
-        holder.tv_payfor.setText(context.getResources().getString(R.string.payfor) + salarySlipDemos.get(i).getMonth());
-        holder.tv_paiddays.setText(context.getResources().getString(R.string.paiddays) + salarySlipDemos.get(i).getDays_of_month());
+        holder.tv_payfor.setText(context.getResources().getString(R.string.payfor) + " " + salarySlipDemos.get(i).getMonth());
+        holder.tv_paiddays.setText(context.getResources().getString(R.string.paiddays) + " " + salarySlipDemos.get(i).getDays_of_month());
     }
 
     @Override
