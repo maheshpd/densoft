@@ -29,7 +29,7 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.salaryslip_mainlayout, null);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.salaryslip_mainlayout, parent, false);
         return new MyViewHolder(v);
     }
 
@@ -40,7 +40,7 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
         holder.tv_grosspay.setText(context.getResources().getString(R.string.totalgrosspay) + ": ₹ " + ((salarySlipDemos.get(i).getTake_home() + salarySlipDemos.get(i).getDeduction())));
 
         holder.tv_payfor.setText(context.getResources().getString(R.string.payfor) + salarySlipDemos.get(i).getMonth());
-        holder.tv_grosspay.setText(context.getResources().getString(R.string.paiddays) + salarySlipDemos.get(i).getDays_of_month());
+        holder.tv_paiddays.setText(context.getResources().getString(R.string.paiddays) + salarySlipDemos.get(i).getDays_of_month());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            ButterKnife.bind(itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

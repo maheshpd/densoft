@@ -40,10 +40,10 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        layoutManager_salaryslip = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true);
+        layoutManager_salaryslip = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recycler_view_salaryslip.setLayoutManager(layoutManager_salaryslip);
 
-        layoutManager_quickaction = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true);
+        layoutManager_quickaction = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recycler_view_quickactions.setLayoutManager(layoutManager_quickaction);
 
 

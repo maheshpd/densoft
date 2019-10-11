@@ -31,7 +31,7 @@ public class QuickActionsAdapter extends RecyclerView.Adapter<QuickActionsAdapte
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.quickactions_layout, null);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.quickactions_layout, parent, false);
         return new MyViewHolder(v);
     }
 
@@ -56,7 +56,7 @@ public class QuickActionsAdapter extends RecyclerView.Adapter<QuickActionsAdapte
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            ButterKnife.bind(itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 }
