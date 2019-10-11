@@ -8,3 +8,17 @@
     app:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
 </androidx.appcompat.widget.Toolbar>
+
+
+    <!--
+        <?xml version="1.0" encoding="utf-8"?>
+    <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/abc_action_bar_default_height_material"
+    android:background="?android:attr/windowBackground"
+    app:theme="@style/Theme.AppCompat.Light.NoActionBar"
+    android:elevation="5dp">
+
+    </androidx.appcompat.widget.Toolbar>-->

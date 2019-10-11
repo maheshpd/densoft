@@ -1,6 +1,7 @@
 package com.densoftinfotech.densoftpayroll;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,26 +9,38 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText et_staffid, et_password;
+    @BindView(R.id.et_staffid)
+    EditText et_staffid;
+    @BindView(R.id.et_password)
+    EditText et_password;
+    @BindView(R.id.btn_login)
     Button btn_login;
+
+    SharedPreferences preferences;
+    SharedPreferences.Editor edit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        et_staffid = findViewById(R.id.et_staffid);
-        et_password = findViewById(R.id.et_password);
-        btn_login = findViewById(R.id.btn_login);
+        ButterKnife.bind(this);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+        edit = preferences.edit();
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (checkfor_noblankparam()) {
-                    Intent i = new Intent(LoginActivity.this, PlannerActivity.class);
+                    edit.putBoolean("login", true);
+                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(i);
                     finish();
                 }

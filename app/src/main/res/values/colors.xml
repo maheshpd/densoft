@@ -29,6 +29,9 @@
 
 
     <color name="black">#000000</color>
+    <color name="green_light">#FBFFFC</color>
+    <color name="carddemo">#354CD7</color>
+    <color name="demo1">#5B72F5</color>
 
 
 </resources>

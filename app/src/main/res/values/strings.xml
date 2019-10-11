@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">DensoftPayroll</string>
     <string name="title">Densoft Payroll</string>
+    <string name="densoft">Densoft</string>
     <string name="enterstaffid">Staff Id</string>
     <string name="enterpassword">Password</string>
     <string name="login">Login</string>
@@ -15,4 +16,11 @@
     <string name="leave">Leave</string>
     <string name="late">Late</string>
     <string name="ontask">On Task</string>
+    <string name="quickactions">Quick Actions</string>
+    <string name="takehome">Take Home</string>
+    <string name="deductions">Deductions</string>
+    <string name="totalgrosspay">Total Gross Pay</string>
+    <string name="payfor">Pay For</string>
+    <string name="paiddays">Paid Days</string>
+    <string name="view">View</string>
 </resources>
