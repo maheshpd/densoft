@@ -32,6 +32,37 @@
     <color name="green_light">#FBFFFC</color>
     <color name="carddemo">#354CD7</color>
     <color name="demo1">#5B72F5</color>
+    <color name="blue1">#333DBB</color>
+
+
+    <color name="darkbrownred">#AE2103</color>
+    <color name="lightbrownred">#E46347</color>
+    <color name="darkgreen">#5A7609</color>
+    <color name="lightgreen">#87B308</color>
+    <color name="darkbrown">#7C4F02</color>
+    <color name="lightbrown">#C07A04</color>
+    <color name="darkblue">#009491</color>
+    <color name="lightblue">#5FD3D0</color>
+    <color name="darkpurple">#7338D4</color>
+    <color name="lightpurple">#A182D3</color>
+    <color name="darkpink">#B01D64</color>
+    <color name="lightpink">#E680B1</color>
+    <color name="darkyellow">#D69C17</color>
+    <color name="lightyellow">#F4C861</color>
+    <color name="darkorange">#FF8307</color>
+    <color name="lightorange">#FFB272</color>
+    <color name="darkgray">#7B7B7B</color>
+    <color name="lightgray">#BFBFBF</color>
+    <color name="darkmaroon">#590125</color>
+    <color name="lightmaroon">#8F023C</color>
+    <color name="green1">#003E05</color>
+    <color name="green2">#00790A</color>
+
+
+    <!--pie chart colors-->
+
+    <color name="bluepie">#B1DFE5</color>
+    <color name="purplepie">#E0BBE9</color>
 
 
 </resources>

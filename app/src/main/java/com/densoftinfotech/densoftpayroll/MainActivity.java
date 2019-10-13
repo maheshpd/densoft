@@ -8,6 +8,11 @@ import com.densoftinfotech.densoftpayroll.classes.QuickActions;
 import com.densoftinfotech.densoftpayroll.classes.SalarySlip;
 import com.densoftinfotech.densoftpayroll.demo_class.QuickActionsDemo;
 import com.densoftinfotech.densoftpayroll.demo_class.SalarySlipDemo;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
 
 import java.util.ArrayList;
 
@@ -31,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<SalarySlip> salarySlips = new ArrayList<>();
     ArrayList<QuickActions> quickActions = new ArrayList<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

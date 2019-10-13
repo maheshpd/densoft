@@ -13,6 +13,11 @@ public class SalarySlip {
         this.deduction = deduction;
     }
 
+    public SalarySlip(double take_home, double deduction) {
+        this.take_home = take_home;
+        this.deduction = deduction;
+    }
+
     public String getMonth() {
         return month;
     }
