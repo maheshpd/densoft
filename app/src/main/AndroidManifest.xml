@@ -9,8 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SalarySlipDetailsActivity"></activity>
-        <activity android:name=".SalaryDetails" />
+        <activity android:name=".LeaveApplicationActivity"
+            android:windowSoftInputMode="stateHidden"></activity>
+        <activity android:name=".SalarySlipDetailsActivity" />
+        <activity android:name=".SalaryDetailsActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".PlannerActivity" />
         <activity android:name=".LoginActivity">

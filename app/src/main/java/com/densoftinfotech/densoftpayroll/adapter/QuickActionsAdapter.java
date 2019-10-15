@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.densoftinfotech.densoftpayroll.MainActivity;
 import com.densoftinfotech.densoftpayroll.PlannerActivity;
 import com.densoftinfotech.densoftpayroll.R;
 import com.densoftinfotech.densoftpayroll.classes.QuickActions;
@@ -43,13 +44,12 @@ public class QuickActionsAdapter extends RecyclerView.Adapter<QuickActionsAdapte
         holder.iv_icon.setImageResource(quickActions.get(i).getImage());
 
 
-        holder.tv_name.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(holder.tv_name.getText().toString().trim().equalsIgnoreCase("Planner")){
-                    Intent i = new Intent(context, PlannerActivity.class);
-                    context.startActivity(i);
-                }
+
+                ((MainActivity)context).gotoactivity(quickActions.get(i).getName());
+
             }
         });
     }

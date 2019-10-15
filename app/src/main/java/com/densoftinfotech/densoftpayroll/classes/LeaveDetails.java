@@ -1,6 +1,10 @@
 package com.densoftinfotech.densoftpayroll.classes;
 
-public class LeaveDetails {
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
+public class LeaveDetails implements Serializable {
     int days = 0;
     String name_of_leave = "";
 

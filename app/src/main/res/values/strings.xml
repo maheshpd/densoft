@@ -35,4 +35,20 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="current_date">30</string>
+    <string name="last_date">30</string>
+    <string name="requestforleave">Request for Leave</string>
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+
+    <string name="employeename">Employee Name</string>
+    <string name="templates">Templates</string>
+    <string name="dateofleave">Date of Leave</string>
+    <string name="days">Days</string>
+    <string name="leavecode">Leave Code</string>
+    <string name="description">Description</string>
+    <string name="selectdate">Select Date</string>
+    <string name="netpay">Net Pay</string>
+    <string name="emailpayslip">Email Pay Slip</string>
+
 </resources>

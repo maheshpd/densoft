@@ -1,5 +1,9 @@
 package com.densoftinfotech.densoftpayroll.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +20,7 @@ import android.widget.CalendarView;
 import android.widget.ScrollView;
 import com.densoftinfotech.densoftpayroll.R;
 import com.densoftinfotech.densoftpayroll.adapter.CalendarDetailsAdapter;
+import com.densoftinfotech.densoftpayroll.classes.CalendarCustomView;
 import com.densoftinfotech.densoftpayroll.classes.CalendarDetails;
 import com.densoftinfotech.densoftpayroll.demo_class.CalendarDetailsDemo;
 
@@ -28,12 +34,14 @@ public class MyPlannerFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    @BindView(R.id.calendar)
-    CalendarView calendarview;
+    /*@BindView(R.id.calendar)
+    CalendarView calendarview;*/
     @BindView(R.id.recyclerview_planner)
     RecyclerView recyclerview;
     @BindView(R.id.scrollview)
     ScrollView scrollview;
+    @BindView(R.id.custom_calendar)
+    CalendarCustomView mView;
 
     View v;
     Calendar calendar = Calendar.getInstance();
@@ -41,6 +49,8 @@ public class MyPlannerFragment extends Fragment {
     ArrayList<CalendarDetails> calendarDetails = new ArrayList<>();
     RecyclerView.LayoutManager layoutManager;
     CalendarDetailsAdapter calendarDetailsAdapter;
+
+    //ArrayList<String> status = new ArrayList<>();
 
     public MyPlannerFragment() {
         // Required empty public constructor
@@ -79,6 +89,10 @@ public class MyPlannerFragment extends Fragment {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_my_planner, container, false);
 
+        if(getContext()!=null) {
+            getContext().registerReceiver(broadcastReceiver, new IntentFilter("notifyrecycler"));
+        }
+
         ButterKnife.bind(this, v);
         scrollview.fullScroll(ScrollView.FOCUS_UP);
         recyclerview.setFocusable(false);
@@ -86,13 +100,47 @@ public class MyPlannerFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerview.setLayoutManager(layoutManager);
 
-        for (int i = 0; i < CalendarDetailsDemo.status.length; i++) {
-            calendarDetails.add(new CalendarDetails(CalendarDetailsDemo.status[i], CalendarDetailsDemo.description[i]));
+        return v;
+    }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.hasExtra("status")){
+                int size = intent.getIntExtra("status", 0);
+                Log.d("size by broadcast is ", size + "");
+                checkandadd(size);
+            }
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        if(getContext()!=null){
+            getContext().unregisterReceiver(broadcastReceiver);
+        }
+
+        super.onDestroy();
+    }
+
+
+    private void checkandadd(int days) {
+        calendarDetails.clear();
+
+        for (int i = 0; i < days; i++) {
+            if (days == 28) {
+                calendarDetails.add(new CalendarDetails(CalendarDetailsDemo.status28[i], CalendarDetailsDemo.description28[i]));
+            } else if (days == 29) {
+                calendarDetails.add(new CalendarDetails(CalendarDetailsDemo.status29[i], CalendarDetailsDemo.description29[i]));
+            } else if (days == 30) {
+                calendarDetails.add(new CalendarDetails(CalendarDetailsDemo.status30[i], CalendarDetailsDemo.description30[i]));
+            } else {
+                calendarDetails.add(new CalendarDetails(CalendarDetailsDemo.status31[i], CalendarDetailsDemo.description31[i]));
+            }
         }
 
         calendarDetailsAdapter = new CalendarDetailsAdapter(getActivity(), calendarDetails);
         recyclerview.setAdapter(calendarDetailsAdapter);
 
-        return v;
     }
 }

@@ -5,13 +5,11 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.densoftinfotech.densoftpayroll.PlannerActivity;
+import com.densoftinfotech.densoftpayroll.LeaveApplicationActivity;
 import com.densoftinfotech.densoftpayroll.R;
 import com.densoftinfotech.densoftpayroll.classes.LeaveDetails;
-import com.densoftinfotech.densoftpayroll.classes.QuickActions;
 
 import java.util.ArrayList;
 
@@ -39,7 +37,7 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.MyViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int i) {
         holder.tv_days.setText("" + leaveDetails.get(i).getDays());
         holder.tv_name_of_leave.setText(leaveDetails.get(i).getName_of_leave());
 
@@ -47,7 +45,9 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.MyViewHolder
         holder.tv_apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent i1 = new Intent(context, LeaveApplicationActivity.class);
+                i1.putExtra("leave", leaveDetails.get(i));
+                context.startActivity(i1);
             }
         });
     }

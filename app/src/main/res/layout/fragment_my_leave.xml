@@ -12,6 +12,6 @@
         android:layout_height="match_parent"
         android:padding="10dp"
         app:layout_constraintTop_toBottomOf="@+id/calendar"
-        tools:listitem="@layout/calendar_details_layout" />
+        tools:listitem="@layout/leave_layout" />
 
 </LinearLayout>

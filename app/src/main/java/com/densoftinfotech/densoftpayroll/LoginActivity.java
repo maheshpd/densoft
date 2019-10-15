@@ -8,12 +8,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.densoftinfotech.densoftpayroll.utilities.CommonActivity;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends CommonActivity {
 
     @BindView(R.id.et_staffid)
     EditText et_staffid;
@@ -28,6 +30,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        fullscreen();
         setContentView(R.layout.activity_login);
 
         ButterKnife.bind(this);

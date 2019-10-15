@@ -7,6 +7,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.densoftinfotech.densoftpayroll.R;
 
@@ -18,7 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class CommonActivity extends AppCompatActivity {
-    @BindView(R.id.toolbar)
+
     Toolbar toolbar;
     Context context;
     SharedPreferences preferences;
@@ -34,6 +36,8 @@ public class CommonActivity extends AppCompatActivity {
 
     public void toolbar_common() {
         ButterKnife.bind(this);
+
+        toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getResources().getString(R.string.title));
         toolbar.setTitleMargin(20, 10, 10, 10);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
@@ -41,6 +45,14 @@ public class CommonActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         context = this;
 
+    }
+
+    public void fullscreen(){
+        /*Window w = getWindow();
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);*/
+
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     public void back() {
