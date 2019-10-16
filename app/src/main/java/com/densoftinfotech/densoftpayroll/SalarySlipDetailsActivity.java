@@ -121,6 +121,8 @@ public class SalarySlipDetailsActivity extends CommonActivity {
         data.setValueTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
         //set.setColors(ColorTemplate.COLORFUL_COLORS);
         set.setColors(new int[]{R.color.bluepie, R.color.purplepie}, SalarySlipDetailsActivity.this);
+        piechart.notifyDataSetChanged();
+        piechart.invalidate();
         //piechart.animateXY(5000, 5000);
     }
 

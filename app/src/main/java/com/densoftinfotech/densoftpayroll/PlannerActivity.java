@@ -114,7 +114,7 @@ public class PlannerActivity extends CommonActivity {
     private void select_tv_myplanner() {
         tv_myleave.setBackgroundResource(R.drawable.textview_rounded_unselected_left);
         tv_myleave.setTextColor(getResources().getColor(R.color.black));
-        tv_myplanner.setBackgroundColor(getResources().getColor(R.color.blue));
+        tv_myplanner.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         tv_myplanner.setTextColor(getResources().getColor(R.color.white));
         tv_myteam.setBackgroundResource(R.drawable.textview_rounded_unselected_right);
         tv_myteam.setTextColor(getResources().getColor(R.color.black));

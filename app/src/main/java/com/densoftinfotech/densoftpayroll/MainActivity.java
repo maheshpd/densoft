@@ -82,7 +82,7 @@ public class MainActivity extends CommonActivity {
             Intent i = new Intent(MainActivity.this, PlannerActivity.class);
             startActivity(i);
         }else if(name.equalsIgnoreCase("Salary Details")){
-            Intent i = new Intent(MainActivity.this, SalarySlipDetailsActivity.class);
+            Intent i = new Intent(MainActivity.this, SalaryDetailsActivity.class);
             startActivity(i);
         }
     }

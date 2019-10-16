@@ -111,7 +111,7 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
         entries.add(new PieEntry((float)salarySlipDemos.get(i).getTake_home(), "Take Home"));
         entries.add(new PieEntry((float)salarySlipDemos.get(i).getDeduction(), "Deductions"));
 
-        PieDataSet set = new PieDataSet(entries, "Salary Slip");
+        PieDataSet set = new PieDataSet(entries, "");
         PieData data = new PieData(set);
         holder.piechart.setData(data);
         data.setValueTextColor(ContextCompat.getColor(context,R.color.black));

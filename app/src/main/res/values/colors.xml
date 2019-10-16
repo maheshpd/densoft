@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0998BB</color>
-    <color name="colorPrimaryDark">#2DBEE2</color>
+    <color name="colorPrimary">#11B2DA</color>
+    <color name="colorPrimaryDark">#0998BB</color>
     <color name="colorAccent">#D81B60</color>
 
 
@@ -63,8 +63,8 @@
     <color name="green2">#00790A</color>
 
 
-    <color name="bluetoolbar">#2DBEE2</color>
-    <color name="bluedarktoolbar">#0998BB</color>
+    <!--<color name="bluelighttoolbar">#11B2DA</color>
+    <color name="bluedarktoolbar">#0998BB</color>-->
 
     <!--pie chart colors-->
 

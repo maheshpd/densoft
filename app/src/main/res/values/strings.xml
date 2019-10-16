@@ -50,5 +50,6 @@
     <string name="selectdate">Select Date</string>
     <string name="netpay">Net Pay</string>
     <string name="emailpayslip">Email Pay Slip</string>
+    <string name="payslipfor">Your Pay Slip for</string>
 
 </resources>

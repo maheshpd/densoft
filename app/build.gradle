@@ -37,4 +37,5 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+    implementation 'com.itextpdf:itextg:5.5.10'
 }
