@@ -3,14 +3,34 @@
     package="com.densoftinfotech.densoftpayroll">
 
     <application
+        android:name=".DensoftApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LeaveApplicationActivity"
-            android:windowSoftInputMode="stateHidden"></activity>
+        <activity android:name=".MarkAttendanceActivity"></activity>
+        <!--
+         <service
+            android:name="com.densoftinfotech.densoftpayroll.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        -->
+        <!--
+<service
+            android:name=".MyFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        -->
+        <activity
+            android:name=".LeaveApplicationActivity"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".SalarySlipDetailsActivity" />
         <activity android:name=".SalaryDetailsActivity" />
         <activity android:name=".MainActivity" />
@@ -23,5 +43,9 @@
             </intent-filter>
         </activity>
     </application>
+    <uses-permission android:name="com.densoftinfotech.densoftpayroll.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

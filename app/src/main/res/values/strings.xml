@@ -51,5 +51,9 @@
     <string name="netpay">Net Pay</string>
     <string name="emailpayslip">Email Pay Slip</string>
     <string name="payslipfor">Your Pay Slip for</string>
+    <string name="checkin">Check In</string>
+    <string name="checkout">Check Out</string>
+    <string name="checkintime">Check In on</string>
+    <string name="checkouttime">Check Out on</string>
 
 </resources>

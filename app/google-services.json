@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "814886335820",
+    "firebase_url": "https://densoftpayroll.firebaseio.com",
+    "project_id": "densoftpayroll",
+    "storage_bucket": "densoftpayroll.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814886335820:android:c6a1241025dfcddc810be9",
+        "android_client_info": {
+          "package_name": "com.densoftinfotech.densoftpayroll"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "814886335820-9qs4j7f2prk2lenqt2drg0o65uu35gcj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.densoftinfotech.densoftpayroll",
+            "certificate_hash": "206b989bff895aecf3b17c7f9a891c30a7bac631"
+          }
+        },
+        {
+          "client_id": "814886335820-hap4pkesepensalt83dql8o256tb8puu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPs2O4dAc-tN3s0wFYkvWQBZka6PwGUuQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "814886335820-hap4pkesepensalt83dql8o256tb8puu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

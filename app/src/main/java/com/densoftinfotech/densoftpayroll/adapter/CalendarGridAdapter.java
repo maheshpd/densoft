@@ -58,13 +58,14 @@ public class CalendarGridAdapter extends ArrayAdapter {
         if(displayMonth == currentMonth && displayYear == currentYear){
             //view.setBackgroundColor(context.getResources().getColor(R.color.colorWhite))
 
+            Log.d("here i is ", i + " position is " + position);
             if(i<status.size()) {
                 cellNumber.setTextColor(context.getResources().getColor(R.color.white));
                 setstatus_color(cellNumber, status.get(i));
                 i++;
             }
 
-            //Log.d("here ", position + "");
+
 
         }else{
             //view.setBackgroundResource(R.drawable.textview_rounded_holiday);

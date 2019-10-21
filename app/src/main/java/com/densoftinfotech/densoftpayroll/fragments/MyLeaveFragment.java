@@ -35,7 +35,7 @@ public class MyLeaveFragment extends Fragment {
     LeaveAdapter leaveAdapter;
 
     public MyLeaveFragment() {
-        // Required empty public constructor
+        //Required empty public constructor
     }
 
     public static MyLeaveFragment newInstance(String param1, String param2) {

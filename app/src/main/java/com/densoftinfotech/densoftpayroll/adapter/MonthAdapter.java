@@ -47,12 +47,10 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
         if (holder.tv_month.isSelected()) {
             holder.tv_month.setTextColor(context.getResources().getColor(R.color.white));
             holder.tv_month.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-            ((SalarySlipDetailsActivity)context).gotoselection(i);
+            ((SalarySlipDetailsActivity) context).gotoselection(i);
         } else {
             holder.tv_month.setTextColor(context.getResources().getColor(R.color.gray));
         }
-
-
 
         /*holder.tv_month.setOnClickListener(new View.OnClickListener() {
             @Override

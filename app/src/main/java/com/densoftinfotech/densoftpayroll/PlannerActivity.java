@@ -49,6 +49,7 @@ public class PlannerActivity extends CommonActivity {
         plannerAdapter = new PlannerAdapter(getSupportFragmentManager(), 1);
         viewpager.setAdapter(plannerAdapter);
 
+
         tv_myleave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

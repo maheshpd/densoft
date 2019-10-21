@@ -1,8 +1,13 @@
 package com.densoftinfotech.densoftpayroll;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -13,15 +18,22 @@ import com.densoftinfotech.densoftpayroll.classes.SalarySlip;
 import com.densoftinfotech.densoftpayroll.demo_class.QuickActionsDemo;
 import com.densoftinfotech.densoftpayroll.demo_class.SalarySlipDemo;
 import com.densoftinfotech.densoftpayroll.utilities.CommonActivity;
+import com.densoftinfotech.densoftpayroll.utilities.Constants;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -74,6 +86,24 @@ public class MainActivity extends CommonActivity {
         quickActionsAdapter = new QuickActionsAdapter(MainActivity.this, quickActions);
         recycler_view_quickactions.setAdapter(quickActionsAdapter);
 
+        /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel mChannel = new NotificationChannel(Constants.channel_id, Constants.channel_name, importance);
+            mChannel.setDescription(Constants.channel_description);
+            mChannel.enableLights(true);
+            mChannel.setLightColor(Color.RED);
+            mChannel.enableVibration(true);
+            mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            mNotificationManager.createNotificationChannel(mChannel);
+        }
+
+
+        FirebaseMessaging.getInstance().subscribeToTopic("DensoftUser");*/
+
+
+
     }
 
     public void gotoactivity(String name) {
@@ -83,6 +113,9 @@ public class MainActivity extends CommonActivity {
             startActivity(i);
         }else if(name.equalsIgnoreCase("Salary Details")){
             Intent i = new Intent(MainActivity.this, SalaryDetailsActivity.class);
+            startActivity(i);
+        }else if(name.equalsIgnoreCase("Mark Attendance")){
+            Intent i = new Intent(MainActivity.this, MarkAttendanceActivity.class);
             startActivity(i);
         }
     }
