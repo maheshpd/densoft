@@ -1,42 +1,42 @@
 {
   "project_info": {
-    "project_number": "814886335820",
-    "firebase_url": "https://densoftpayroll.firebaseio.com",
-    "project_id": "densoftpayroll",
-    "storage_bucket": "densoftpayroll.appspot.com"
+    "project_number": "880443224045",
+    "firebase_url": "https://paysmart-9c748.firebaseio.com",
+    "project_id": "paysmart-9c748",
+    "storage_bucket": "paysmart-9c748.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:814886335820:android:c6a1241025dfcddc810be9",
+        "mobilesdk_app_id": "1:880443224045:android:3654c051e633a873f9c1e4",
         "android_client_info": {
-          "package_name": "com.densoftinfotech.densoftpayroll"
+          "package_name": "com.densoftinfotech.densoftpaysmart"
         }
       },
       "oauth_client": [
         {
-          "client_id": "814886335820-9qs4j7f2prk2lenqt2drg0o65uu35gcj.apps.googleusercontent.com",
+          "client_id": "880443224045-fun6apra2hqguhsfpfhiuo9keusna4s7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.densoftinfotech.densoftpayroll",
+            "package_name": "com.densoftinfotech.densoftpaysmart",
             "certificate_hash": "206b989bff895aecf3b17c7f9a891c30a7bac631"
           }
         },
         {
-          "client_id": "814886335820-hap4pkesepensalt83dql8o256tb8puu.apps.googleusercontent.com",
+          "client_id": "880443224045-1hfhcracedg0itf9iakohqud9p86hlho.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDPs2O4dAc-tN3s0wFYkvWQBZka6PwGUuQ"
+          "current_key": "AIzaSyD5GgT8uCiUfAjZPsCjpHjfaSkwwvFIh0o"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "814886335820-hap4pkesepensalt83dql8o256tb8puu.apps.googleusercontent.com",
+              "client_id": "880443224045-1hfhcracedg0itf9iakohqud9p86hlho.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

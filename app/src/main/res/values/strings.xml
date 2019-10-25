@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">DensoftPayroll</string>
-    <string name="title">Densoft Payroll</string>
+    <string name="app_name">Paysmart</string>
+    <string name="title">Paysmart</string>
     <string name="densoft">Densoft</string>
     <string name="enterstaffid">Staff Id</string>
     <string name="enterpassword">Password</string>
@@ -43,7 +43,9 @@
 
     <string name="employeename">Employee Name</string>
     <string name="templates">Templates</string>
-    <string name="dateofleave">Date of Leave</string>
+    <string name="dutiescoveredby">Applicant\'s Duties to be covered by</string>
+    <string name="dateofleavefrom">Date of Leave (From)</string>
+    <string name="dateofleaveto">Date of Leave (To)</string>
     <string name="days">Days</string>
     <string name="leavecode">Leave Code</string>
     <string name="description">Description</string>
@@ -53,7 +55,12 @@
     <string name="payslipfor">Your Pay Slip for</string>
     <string name="checkin">Check In</string>
     <string name="checkout">Check Out</string>
-    <string name="checkintime">Check In on</string>
-    <string name="checkouttime">Check Out on</string>
+    <string name="checkintime">Checked In on</string>
+    <string name="checkouttime">Checked Out on</string>
+    <string name="gpsnotenabled">GPS is not enabled. Kindly enable it from the settings to proceed.</string>
+    <string name="ok">Ok</string>
+    <string name="pleasecontactbranch">Login failed. Please contact your branch</string>
+    <string name="iwishtoapplyfor">I wish to appy for</string>
+    <string name="selectgreaterdate">Please select a date greater than the date you have selected</string>
 
 </resources>

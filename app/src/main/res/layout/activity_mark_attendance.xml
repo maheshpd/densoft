@@ -26,7 +26,8 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:background="@drawable/textview_rounded_selected_right"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_checkin"
@@ -45,7 +46,8 @@
         android:layout_height="wrap_content"
         android:background="@drawable/textview_rounded_selected_left"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/tv_checkout"
@@ -99,6 +101,5 @@
             android:visibility="gone"/>
 
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
