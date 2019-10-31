@@ -1,48 +1,79 @@
-package com.densoftinfotech.densoftpaysmart.classes;
+package com.densoftinfotech.densoftpaysmart.room_database.Staff;
 
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 
-public class StaffDetails{
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-    @SerializedName("StaffId")
+@Entity(tableName = "table_staff_details")
+public class StaffDetailsRoom{
+
+    public StaffDetailsRoom() {
+    }
+
+    @PrimaryKey(autoGenerate =  true)
+    private int id;
+
+    @ColumnInfo(name = "staff_id")
     private String StaffId = "";
 
-    @SerializedName("PName")
+    @ColumnInfo(name = "staff_name")
     private String PName = "";
 
-    @SerializedName("Mobile1")
+    @ColumnInfo(name = "staff_mobileno")
     private String Mobile1 = "";
 
-    @SerializedName("Email1")
+    @ColumnInfo(name = "staff_email")
     private String Email1 = "";
 
-    @SerializedName("DOB")
-    private String DOB = "";
-
-    @SerializedName("Gender")
+    @ColumnInfo(name = "staff_Gender")
     private String Gender = "";
 
-    @SerializedName("JoiningDate")
+    @ColumnInfo(name = "staff_JoiningDate")
     private String JoiningDate = "";
 
-    @SerializedName("CompanyName")
+    @ColumnInfo(name = "staff_companyname")
     private String CompanyName = "";
 
-    @SerializedName("BranchName")
+    @ColumnInfo(name = "staff_branchname")
     private String BranchName = "";
 
-    @SerializedName("Department")
+    @ColumnInfo(name = "staff_department")
     private String Department = "";
 
-    @SerializedName("Designation")
+    @ColumnInfo(name = "staff_designation")
     private String Designation = "";
 
-    @SerializedName("JobCategory")
+    @ColumnInfo(name = "staff_jobcategory")
     private String JobCategory = "";
 
-    @SerializedName("RuleTemplate")
-    private String RuleTemplate = "";
+
+    public StaffDetailsRoom(String staffId, String PName, String mobile1, String email1, String gender, String joiningDate, String companyName, String branchName, String department, String designation, String jobCategory) {
+
+        this.StaffId = staffId;
+        this.PName = PName;
+        this.Mobile1 = mobile1;
+        this.Email1 = email1;
+        this.Gender = gender;
+        this.JoiningDate = joiningDate;
+        this.CompanyName = companyName;
+        this.BranchName = branchName;
+        this.Department = department;
+        this.Designation = designation;
+        this.JobCategory = jobCategory;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getStaffId() {
         return StaffId;
@@ -74,14 +105,6 @@ public class StaffDetails{
 
     public void setEmail1(String email1) {
         Email1 = email1;
-    }
-
-    public String getDOB() {
-        return DOB;
-    }
-
-    public void setDOB(String DOB) {
-        this.DOB = DOB;
     }
 
     public String getGender() {
@@ -140,11 +163,4 @@ public class StaffDetails{
         JobCategory = jobCategory;
     }
 
-    public String getRuleTemplate() {
-        return RuleTemplate;
-    }
-
-    public void setRuleTemplate(String ruleTemplate) {
-        RuleTemplate = ruleTemplate;
-    }
 }

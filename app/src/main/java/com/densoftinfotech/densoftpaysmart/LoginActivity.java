@@ -4,36 +4,40 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+//import com.android.volley.toolbox.StringRequest;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
-import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
-import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetails;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
+
+import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
+import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import androidx.preference.PreferenceManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends CommonActivity {
 
@@ -48,13 +52,17 @@ public class LoginActivity extends CommonActivity {
     SharedPreferences.Editor edit;
 
     //RequestQueue requestQueue;
-    StringRequest request_login;
+    //StringRequest request_login;
+
+    private GetServiceInterface apiInterface;
+
+    ArrayList<StaffDetails> staffDetailsArrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        fullscreen();
+        //fullscreen();
         setContentView(R.layout.activity_login);
 
         ButterKnife.bind(this);
@@ -62,11 +70,12 @@ public class LoginActivity extends CommonActivity {
         preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
         edit = preferences.edit();
 
-        if(preferences.getBoolean("login", false)){
+        if (preferences.getBoolean("login", false)) {
             Intent i = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(i);
             finish();
         }
+
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,83 +90,54 @@ public class LoginActivity extends CommonActivity {
 
     private void get_login_data() {
 
-        edit.putBoolean("login", true);
-        edit.apply();
-        Intent i = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(i);
-        finish();
-        //RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
+        Gson gson = new GsonBuilder().serializeNulls().create();
 
-        /*request_login = new StringRequest(Request.Method.POST, "http://www.google.com",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        Log.d("Response is: ", response.substring(0,500));
-                    }
-                }, new Response.ErrorListener() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URLS.common_url_webroute())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        apiInterface = retrofit.create(GetServiceInterface.class);
+
+        Map<String, Object> params = new HashMap<>();
+
+        params.put("user", et_staffid.getText().toString());
+        params.put("password", et_password.getText().toString());
+
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(params)).toString());
+
+        Call<ArrayList<StaffDetails>> call = apiInterface.request_login(body);
+
+        call.enqueue(new Callback<ArrayList<StaffDetails>>() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("That didn't work!", "oops");
-            }
-        });*/
+            public void onResponse(Call<ArrayList<StaffDetails>> call, Response<ArrayList<StaffDetails>> response) {
+                /*if (!response.isSuccessful()) {
+                    Toast.makeText(LoginActivity.this, "Response Code " + response.code(), Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(LoginActivity.this, "Response " + response.toString(), Toast.LENGTH_SHORT).show();
+                }*/
 
-        /*request_login = new StringRequest(Request.Method.POST, URLS.login_api()*//*"http://167.71.229.74/barcodescanner/tagdata.php"*//*, response -> {
-            try {
-                Log.d("response " , response.toString());
+                staffDetailsArrayList = response.body();
 
-                *//*JSONArray array = new JSONArray(response);
-                JSONObject obj_details = array.optJSONObject(0);
+                /*String content = "";
+                content += "Code: " + response.code() + "\n";
+                content += "mobile: " + staffDetailsArrayList.get(0).getMobile1() + "\n";
+                content += "Staff name: " + staffDetailsArrayList.get(0).getPName() + "\n";
+                content += "Joining Date: " + staffDetailsArrayList.get(0).getJoiningDate() + "\n";
 
-                if(obj_details.has("Patientid")){
-                    StaffDetails staffDetails = new StaffDetails();
-                    staffDetails.setPatientid(obj_details.optString("Patientid"));
-                    staffDetails.setPName(obj_details.optString("PName"));
-                    staffDetails.setMobile1(obj_details.optString("Mobile1"));
-                    staffDetails.setEmail1(obj_details.optString("Email1"));
-                    staffDetails.setDOB(obj_details.optString("DOB"));
-                    staffDetails.setGender(obj_details.optString("Gender"));
-                    staffDetails.setJoiningDate(obj_details.optString("JoiningDate"));
+                Log.d("postres is ", "  content" + content);*/
 
-                    SaveDetails_async saveDetails_async = new SaveDetails_async();
-                    saveDetails_async.execute(staffDetails);
+                SaveDetails_async saveDetails_async = new SaveDetails_async();
+                saveDetails_async.execute();
 
-                }else {
-                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleasecontactbranch), Toast.LENGTH_LONG).show();
-                }*//*
-
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }, error -> Log.d("volley err ", error + "")){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-
-                Map<String, String> params = new HashMap<>();
-
-                params.put("user", et_staffid.getText().toString());
-                params.put("password", et_password.getText().toString());
-                Log.d("param ", params + "");
-                return params;
             }
 
             @Override
-            public String getBodyContentType() {
-                return "application/json";
+            public void onFailure(Call<ArrayList<StaffDetails>> call, Throwable t) {
+                Log.d("failed is ", t.getMessage());
             }
+        });
 
-            *//*@Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-
-                Map<String, String> header = new HashMap<>();
-                header.put("Content-Type", "application/json");
-                return header;
-            }*//*
-
-        };
-
-        requestQueue.add(request_login);*/
 
     }
 
@@ -176,22 +156,36 @@ public class LoginActivity extends CommonActivity {
     }
 
 
-    private class SaveDetails_async extends AsyncTask<StaffDetails, String, Void> {
+    private class SaveDetails_async extends AsyncTask<ArrayList<StaffDetails>, String, Void> {
+
+        StaffDetailsRoom staffDetailsRoom;
 
         @Override
-        protected Void doInBackground(StaffDetails... voids) {
-            Paysmart_roomdatabase.get_PaysmartDatabase(LoginActivity.this).staffDetails_dao().insertAll(voids[0]);
+        protected Void doInBackground(ArrayList<StaffDetails>... voids) {
+
+            /*staffDetailsRoom = new StaffDetailsRoom(voids[0].get(0).getStaffId(), voids[0].get(0).getPName(), voids[0].get(0).getMobile1(), voids[0].get(0).getEmail1(),
+                    voids[0].get(0).getGender(), voids[0].get(0).getJoiningDate(), voids[0].get(0).getCompanyName(), voids[0].get(0).getBranchName(),
+                    voids[0].get(0).getDepartment(), voids[0].get(0).getDesignation(), voids[0].get(0).getJobCategory());*/
+
+            staffDetailsRoom = new StaffDetailsRoom(staffDetailsArrayList.get(0).getStaffId(), staffDetailsArrayList.get(0).getPName(), staffDetailsArrayList.get(0).getMobile1(), staffDetailsArrayList.get(0).getEmail1(),
+                    staffDetailsArrayList.get(0).getGender(), staffDetailsArrayList.get(0).getJoiningDate(), staffDetailsArrayList.get(0).getCompanyName(), staffDetailsArrayList.get(0).getBranchName(),
+                    staffDetailsArrayList.get(0).getDepartment(), staffDetailsArrayList.get(0).getDesignation(), staffDetailsArrayList.get(0).getJobCategory());
+
+            Paysmart_roomdatabase.get_PaysmartDatabase(LoginActivity.this).staffDetails_dao().insertAll(staffDetailsRoom);
+
             return null;
         }
 
         @Override
         protected void onPostExecute(Void s) {
+
             edit.putBoolean("login", true);
             edit.apply();
             Intent i = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(i);
             finish();
-            super.onPostExecute(s);
+
         }
+
     }
 }

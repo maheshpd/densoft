@@ -62,5 +62,11 @@
     <string name="pleasecontactbranch">Login failed. Please contact your branch</string>
     <string name="iwishtoapplyfor">I wish to appy for</string>
     <string name="selectgreaterdate">Please select a date greater than the date you have selected</string>
+    <string name="welcome">Welcome</string>
+    <string name="rs">₹</string>
+    <string name="date">Date</string>
+    <string name="intime">In Time</string>
+    <string name="outtime">Out Time</string>
+    <string name="thumbtime">Thumb Time</string>
 
 </resources>

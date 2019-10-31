@@ -1,52 +1,48 @@
 package com.densoftinfotech.densoftpaysmart.classes;
 
 public class SalarySlip {
-    String month = "";
-    int days_of_month = 0;
-    double take_home = 0;
-    double deduction = 0;
 
-    public SalarySlip(String month, int days_of_month, double take_home, double deduction) {
-        this.month = month;
-        this.days_of_month = days_of_month;
-        this.take_home = take_home;
-        this.deduction = deduction;
+    int ApplyForMonth = 0;
+    int ApplyForYear = 0;
+    String Name = "";
+    double Amount = 0;
+
+    public SalarySlip(int ApplyForMonth, int ApplyForYear, String Name, double Amount) {
+        this.ApplyForMonth = ApplyForMonth;
+        this.ApplyForYear = ApplyForYear;
+        this.Name = Name;
+        this.Amount = Amount;
     }
 
-    public SalarySlip(double take_home, double deduction) {
-        this.take_home = take_home;
-        this.deduction = deduction;
+    public int getApplyForMonth() {
+        return ApplyForMonth;
     }
 
-    public String getMonth() {
-        return month;
+    public void setApplyForMonth(int applyForMonth) {
+        ApplyForMonth = applyForMonth;
     }
 
-    public void setMonth(String month) {
-        this.month = month;
+    public int getApplyForYear() {
+        return ApplyForYear;
     }
 
-    public int getDays_of_month() {
-        return days_of_month;
+    public void setApplyForYear(int applyForYear) {
+        ApplyForYear = applyForYear;
     }
 
-    public void setDays_of_month(int days_of_month) {
-        this.days_of_month = days_of_month;
+    public String getName() {
+        return Name;
     }
 
-    public double getTake_home() {
-        return take_home;
+    public void setName(String name) {
+        Name = name;
     }
 
-    public void setTake_home(double take_home) {
-        this.take_home = take_home;
+    public double getAmount() {
+        return Amount;
     }
 
-    public double getDeduction() {
-        return deduction;
-    }
-
-    public void setDeduction(double deduction) {
-        this.deduction = deduction;
+    public void setAmount(double amount) {
+        Amount = amount;
     }
 }

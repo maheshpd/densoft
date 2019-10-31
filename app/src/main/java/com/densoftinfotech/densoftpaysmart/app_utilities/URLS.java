@@ -2,11 +2,11 @@ package com.densoftinfotech.densoftpaysmart.app_utilities;
 
 public class URLS {
 
-    public static String common_url_webroute(){
+    public final static String common_url_webroute(){
         return "http://" + Constants.ip + "//WebRoute/";
     }
 
-    public static String login_api(){
+    public static final String login_api(){
         return common_url_webroute() + "stafflogin_Api";
     }
 

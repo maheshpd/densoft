@@ -1,27 +1,55 @@
 package com.densoftinfotech.densoftpaysmart;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.densoftinfotech.densoftpaysmart.adapter.MarkAttendanceAdapter;
+import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
+import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
 import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
+import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
+import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
+import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
+import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.itextpdf.text.pdf.parser.Line;
+
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MarkAttendanceActivity extends CommonActivity {
 
@@ -33,9 +61,22 @@ public class MarkAttendanceActivity extends CommonActivity {
     TextView tv_checkintime;
     @BindView(R.id.tv_checkouttime)
     TextView tv_checkouttime;
+    @BindView(R.id.et_month)
+    EditText et_month;
+    @BindView(R.id.recycler_view_markattendance)
+    RecyclerView recycler_view_markattendance;
+    @BindView(R.id.linearLayout11)
+    LinearLayout linearLayout11;
+
     UserLocation userLocation;
     String longitude = "";
     String latitude = "";
+
+    RecyclerView.LayoutManager layoutManager;
+    MarkAttendanceAdapter markAttendanceAdapter;
+
+    GetServiceInterface getServiceInterface;
+    ArrayList<MarkAttendanceDetails> markAttendanceDetails = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +87,9 @@ public class MarkAttendanceActivity extends CommonActivity {
         back();
 
         ButterKnife.bind(this);
+
+        layoutManager = new LinearLayoutManager(MarkAttendanceActivity.this);
+        recycler_view_markattendance.setLayoutManager(layoutManager);
 
         tv_checkin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +102,77 @@ public class MarkAttendanceActivity extends CommonActivity {
             @Override
             public void onClick(View view) {
                 set_check_time(1);
+            }
+        });
+
+        et_month.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                if(!charSequence.toString().trim().equals("")) {
+                    Get_Attendance get_attendance = new Get_Attendance();
+                    get_attendance.execute(charSequence.toString());
+                }else {
+                    linearLayout11.setVisibility(View.GONE);
+                    recycler_view_markattendance.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+    }
+
+    private void get_attendance_details(String staffid, String month_send) {
+
+        Retrofit retrofit = RetrofitClient.getRetrofit();
+
+        getServiceInterface = retrofit.create(GetServiceInterface.class);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("ActionId", "0");
+        params.put("StaffId", staffid);
+        params.put("Month",String.valueOf(month_send));
+        params.put("Year", String.valueOf(2019));
+
+        JSONObject obj = new JSONObject(params);
+        Log.d("params ", obj + "");
+
+        RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
+
+        Call<ArrayList<MarkAttendanceDetails>> call = getServiceInterface.request_attendance(requestBody);
+        call.enqueue(new Callback<ArrayList<MarkAttendanceDetails>>() {
+            @Override
+            public void onResponse(Call<ArrayList<MarkAttendanceDetails>> call, Response<ArrayList<MarkAttendanceDetails>> response) {
+                if(!response.isSuccessful()){
+                    Log.d("response code ", response.code() + " ");
+                }else {
+                    Log.d("response ", response.body() + "");
+
+                    if(response.body()!=null && !response.body().isEmpty()) {
+                        linearLayout11.setVisibility(View.VISIBLE);
+                        recycler_view_markattendance.setVisibility(View.VISIBLE);
+                        markAttendanceDetails = response.body();
+                        markAttendanceAdapter = new MarkAttendanceAdapter(MarkAttendanceActivity.this, markAttendanceDetails);
+                        recycler_view_markattendance.setAdapter(markAttendanceAdapter);
+                    }else {
+                        linearLayout11.setVisibility(View.GONE);
+                        recycler_view_markattendance.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<MarkAttendanceDetails>> call, Throwable t) {
+
             }
         });
 
@@ -106,6 +221,21 @@ public class MarkAttendanceActivity extends CommonActivity {
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class Get_Attendance extends AsyncTask<String, Void, Void > {
+
+        @Override
+        protected Void doInBackground(String... voids) {
+
+            StaffDetailsRoom staffDetails = Paysmart_roomdatabase.get_PaysmartDatabase(MarkAttendanceActivity.this).staffDetails_dao().getAll();
+
+            if(staffDetails!=null){
+                get_attendance_details(staffDetails.getStaffId(), voids[0]);
+            }
+
+            return null;
+        }
     }
 }
 

@@ -90,9 +90,10 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:id="@+id/tv_grosspay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="$50000"
+                android:text="₹ 0"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -117,13 +118,14 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:id="@+id/tv_deductions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="$3000"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:text="₹ 0"/>
 
         </LinearLayout>
 
@@ -144,13 +146,14 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:id="@+id/tv_netpay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="$47000"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:text="₹ 0"/>
 
         </LinearLayout>
 

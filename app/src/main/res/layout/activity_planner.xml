@@ -100,7 +100,7 @@
                 android:id="@+id/tv_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Mr. Abc Def"
+                android:text="@string/welcome"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/blue"
                 android:textStyle="bold" />

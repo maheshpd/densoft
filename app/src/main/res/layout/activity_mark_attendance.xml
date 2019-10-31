@@ -8,7 +8,35 @@
     android:layout_gravity="center">
 
     <include
-        layout="@layout/toolbar"/>
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout9"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/et_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/textview_rounded_header"
+            android:layout_gravity="center"
+            android:hint="Enter month"
+            android:padding="10dp"
+            android:inputType="number"
+            android:maxLines="1"
+            android:maxLength="2"/>
+
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout8"
@@ -20,7 +48,8 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="100dp"
@@ -41,40 +70,37 @@
 
         </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/textview_rounded_selected_left"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/tv_checkout"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:background="@drawable/textview_rounded_selected_left"
             android:layout_gravity="center"
-            android:padding="10dp"
-            android:text="@string/checkout"
-            android:textAlignment="center"
-            android:textColor="@color/white"/>
+            android:layout_marginTop="10dp"
+            android:visibility="gone">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tv_checkout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="10dp"
+                android:text="@string/checkout"
+                android:textAlignment="center"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/linearLayout10"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout8">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout9">
 
 
         <TextView
@@ -83,10 +109,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="10dp"
-            android:textAlignment="center"
             android:text="@string/checkintime"
+            android:textAlignment="center"
             android:textColor="@color/darkbrownred"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_checkouttime"
@@ -95,11 +121,56 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:padding="10dp"
-            android:textAlignment="center"
             android:text="@string/checkouttime"
+            android:textAlignment="center"
             android:textColor="@color/darkbrownred"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout10">
+
+        <TextView
+            android:id="@+id/tv_thumbdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:text="@string/date"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tv_thumbtime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:text="@string/thumbtime"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_markattendance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout11"
+        tools:listitem="@layout/mark_attendance_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -48,12 +48,19 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
-        holder.tv_takehome.setText("₹ " + salarySlipDemos.get(i).getTake_home());
-        holder.tv_deductions.setText("₹ " + salarySlipDemos.get(i).getDeduction());
-        holder.tv_grosspay.setText(context.getResources().getString(R.string.totalgrosspay) + ": ₹ " + ((salarySlipDemos.get(i).getTake_home() + salarySlipDemos.get(i).getDeduction())));
+        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Net Salary"))
+            holder.tv_takehome.setText("₹ " + salarySlipDemos.get(i).getAmount());
 
-        holder.tv_payfor.setText(context.getResources().getString(R.string.payfor) + " " + salarySlipDemos.get(i).getMonth());
-        holder.tv_paiddays.setText(context.getResources().getString(R.string.paiddays) + " " + salarySlipDemos.get(i).getDays_of_month());
+        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Total Deduction"))
+            holder.tv_deductions.setText("₹ " + salarySlipDemos.get(i).getAmount());
+
+        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Gross Salary"))
+            holder.tv_grosspay.setText(context.getResources().getString(R.string.totalgrosspay) + ": ₹ " + ((salarySlipDemos.get(i).getAmount() + salarySlipDemos.get(i).getAmount())));
+
+        holder.tv_payfor.setText(context.getResources().getString(R.string.payfor) + " " + salarySlipDemos.get(i).getApplyForMonth());
+
+        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Payable Days"))
+            holder.tv_paiddays.setText(context.getResources().getString(R.string.paiddays) + " " + salarySlipDemos.get(i).getAmount());
 
 
         setdata(holder, i);
@@ -105,8 +112,11 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
     public void setdata(MyViewHolder holder, int i){
         List<PieEntry> entries = new ArrayList<>();
 
-        entries.add(new PieEntry((float)salarySlipDemos.get(i).getTake_home(), "Take Home"));
-        entries.add(new PieEntry((float)salarySlipDemos.get(i).getDeduction(), "Deductions"));
+        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Net Salary"))
+            entries.add(new PieEntry((float)salarySlipDemos.get(i).getAmount(), "Take Home"));
+
+        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Total Deduction"))
+            entries.add(new PieEntry((float)salarySlipDemos.get(i).getAmount(), "Deductions"));
 
         PieDataSet set = new PieDataSet(entries, "");
         PieData data = new PieData(set);

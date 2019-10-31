@@ -128,10 +128,14 @@ public class CalendarCustomView extends LinearLayout {
         }
         Log.d(TAG, "Number of date " + dayValueInCells.size());
 
-        Log.d(TAG, "Number of days avail " + (mCal.get(Calendar.YEAR)) + " " + (mCal.get(Calendar.MONTH) - 1) + " " + mCal.get(Calendar.DAY_OF_MONTH));
+        Log.d(TAG, "Number of days avail " + (mCal.get(Calendar.YEAR)) + " " + (mCal.get(Calendar.MONTH)) + " " + mCal.get(Calendar.DAY_OF_MONTH));
 
 
-        switch (mCal.get(Calendar.MONTH) - 1) {
+        Intent intent = new Intent("notifyrecycler");
+        intent.putExtra("status", mCal.get(Calendar.MONTH));
+        context.sendBroadcast(intent);
+
+        /*switch (mCal.get(Calendar.MONTH) - 1) {
             case Calendar.JANUARY:
             case Calendar.MARCH:
             case Calendar.MAY:
@@ -161,7 +165,7 @@ public class CalendarCustomView extends LinearLayout {
             default:
                 checkandadd(31);
                 break;
-        }
+        }*/
 
 
         String sDate = formatter.format(cal.getTime());

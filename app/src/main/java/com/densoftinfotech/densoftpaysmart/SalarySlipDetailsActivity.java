@@ -68,7 +68,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
         if (b != null) {
             if (b.containsKey("pos")) {
                 pos = b.getInt("pos");
-                gotoselection(pos);
+                //gotoselection(pos);
             }
         }
 
@@ -94,7 +94,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
 
     }
 
-    public void gotoselection(int i) {
+    /*public void gotoselection(int i) {
 
         for (int i1 = 0; i1 < SalarySlipDemo.month.length; i1++) {
             salarySlips.add(new SalarySlip(SalarySlipDemo.month[i1], SalarySlipDemo.days_of_month[i1], SalarySlipDemo.take_home[i1], SalarySlipDemo.deductions[i1]));
@@ -105,9 +105,9 @@ public class SalarySlipDetailsActivity extends CommonActivity {
 
 
         setdata(i);
-    }
+    }*/
 
-    public void setdata(int i) {
+    /*public void setdata(int i) {
         List<PieEntry> entries = new ArrayList<>();
 
         entries.add(new PieEntry((float) salarySlips.get(i).getTake_home(), "Take Home"));
@@ -123,7 +123,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
         piechart.notifyDataSetChanged();
         piechart.invalidate();
         //piechart.animateXY(5000, 5000);
-    }
+    }*/
 
 
 }

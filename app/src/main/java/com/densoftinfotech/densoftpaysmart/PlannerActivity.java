@@ -1,5 +1,6 @@
 package com.densoftinfotech.densoftpaysmart;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -7,6 +8,9 @@ import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.adapter.PlannerAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
+import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
@@ -25,7 +29,12 @@ public class PlannerActivity extends CommonActivity {
     LinearLayout linear1;
     @BindView(R.id.viewpager)
     ViewPager viewpager;
+    @BindView(R.id.tv_name)
+    TextView tv_name;
+
     PlannerAdapter plannerAdapter;
+
+    private StaffDetailsRoom staffDetailsRoom;
 
 
     @Override
@@ -39,6 +48,9 @@ public class PlannerActivity extends CommonActivity {
 
         plannerAdapter = new PlannerAdapter(getSupportFragmentManager(), 1);
         viewpager.setAdapter(plannerAdapter);
+
+        GetRoomData getRoomData = new GetRoomData();
+        getRoomData.execute();
 
 
         tv_myleave.setOnClickListener(new View.OnClickListener() {
@@ -119,5 +131,22 @@ public class PlannerActivity extends CommonActivity {
         tv_myplanner.setTextColor(getResources().getColor(R.color.black));
         tv_myteam.setBackgroundResource(R.drawable.textview_rounded_selected_right);
         tv_myteam.setTextColor(getResources().getColor(R.color.white));
+    }
+
+
+    private class GetRoomData extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            staffDetailsRoom = Paysmart_roomdatabase.get_PaysmartDatabase(PlannerActivity.this).staffDetails_dao().getAll();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (staffDetailsRoom != null) {
+                tv_name.setText(staffDetailsRoom.getPName());
+            }
+
+        }
     }
 }
