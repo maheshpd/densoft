@@ -2,21 +2,12 @@ package com.densoftinfotech.densoftpaysmart.classes;
 
 public class CalendarDetails {
 
-    String status = "";
     String description = "";
     int date = 0;
 
     public CalendarDetails(String status, String description) {
-        this.status = status;
+
         this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getDescription() {
@@ -153,5 +144,13 @@ public class CalendarDetails {
 
     public void setShiftName(String shiftName) {
         ShiftName = shiftName;
+    }
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
     }
 }

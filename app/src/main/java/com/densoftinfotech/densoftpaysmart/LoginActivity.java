@@ -47,6 +47,8 @@ public class LoginActivity extends CommonActivity {
     EditText et_password;
     @BindView(R.id.btn_login)
     Button btn_login;
+    @BindView(R.id.et_customerid)
+    EditText et_customerid;
 
     SharedPreferences preferences;
     SharedPreferences.Editor edit;
@@ -111,22 +113,8 @@ public class LoginActivity extends CommonActivity {
         call.enqueue(new Callback<ArrayList<StaffDetails>>() {
             @Override
             public void onResponse(Call<ArrayList<StaffDetails>> call, Response<ArrayList<StaffDetails>> response) {
-                /*if (!response.isSuccessful()) {
-                    Toast.makeText(LoginActivity.this, "Response Code " + response.code(), Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(LoginActivity.this, "Response " + response.toString(), Toast.LENGTH_SHORT).show();
-                }*/
 
                 staffDetailsArrayList = response.body();
-
-                /*String content = "";
-                content += "Code: " + response.code() + "\n";
-                content += "mobile: " + staffDetailsArrayList.get(0).getMobile1() + "\n";
-                content += "Staff name: " + staffDetailsArrayList.get(0).getPName() + "\n";
-                content += "Joining Date: " + staffDetailsArrayList.get(0).getJoiningDate() + "\n";
-
-                Log.d("postres is ", "  content" + content);*/
-
                 SaveDetails_async saveDetails_async = new SaveDetails_async();
                 saveDetails_async.execute();
 
@@ -169,7 +157,7 @@ public class LoginActivity extends CommonActivity {
 
             staffDetailsRoom = new StaffDetailsRoom(staffDetailsArrayList.get(0).getStaffId(), staffDetailsArrayList.get(0).getPName(), staffDetailsArrayList.get(0).getMobile1(), staffDetailsArrayList.get(0).getEmail1(),
                     staffDetailsArrayList.get(0).getGender(), staffDetailsArrayList.get(0).getJoiningDate(), staffDetailsArrayList.get(0).getCompanyName(), staffDetailsArrayList.get(0).getBranchName(),
-                    staffDetailsArrayList.get(0).getDepartment(), staffDetailsArrayList.get(0).getDesignation(), staffDetailsArrayList.get(0).getJobCategory());
+                    staffDetailsArrayList.get(0).getDepartment(), staffDetailsArrayList.get(0).getDesignation(), staffDetailsArrayList.get(0).getStaffPhoto());
 
             Paysmart_roomdatabase.get_PaysmartDatabase(LoginActivity.this).staffDetails_dao().insertAll(staffDetailsRoom);
 

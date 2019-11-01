@@ -32,9 +32,20 @@
                 android:textStyle="bold"/>
 
             <EditText
+                android:id="@+id/et_customerid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_rounded"
+                android:hint="@string/customerid"
+                android:padding="15dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"/>
+
+            <EditText
                 android:id="@+id/et_staffid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/edittext_rounded"
                 android:hint="@string/enterstaffid"
                 android:padding="15dp"

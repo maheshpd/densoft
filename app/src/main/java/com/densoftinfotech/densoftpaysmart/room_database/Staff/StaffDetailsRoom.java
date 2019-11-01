@@ -48,11 +48,11 @@ public class StaffDetailsRoom{
     @ColumnInfo(name = "staff_designation")
     private String Designation = "";
 
-    @ColumnInfo(name = "staff_jobcategory")
-    private String JobCategory = "";
+    @ColumnInfo(name = "staff_profileimage")
+    private String StaffPhoto = "";
 
 
-    public StaffDetailsRoom(String staffId, String PName, String mobile1, String email1, String gender, String joiningDate, String companyName, String branchName, String department, String designation, String jobCategory) {
+    public StaffDetailsRoom(String staffId, String PName, String mobile1, String email1, String gender, String joiningDate, String companyName, String branchName, String department, String designation, String StaffPhoto) {
 
         this.StaffId = staffId;
         this.PName = PName;
@@ -64,7 +64,7 @@ public class StaffDetailsRoom{
         this.BranchName = branchName;
         this.Department = department;
         this.Designation = designation;
-        this.JobCategory = jobCategory;
+        this.StaffPhoto = StaffPhoto;
     }
 
     public int getId() {
@@ -155,12 +155,11 @@ public class StaffDetailsRoom{
         Designation = designation;
     }
 
-    public String getJobCategory() {
-        return JobCategory;
+    public String getStaffPhoto() {
+        return StaffPhoto;
     }
 
-    public void setJobCategory(String jobCategory) {
-        JobCategory = jobCategory;
+    public void setStaffPhoto(String staffPhoto) {
+        StaffPhoto = staffPhoto;
     }
-
 }

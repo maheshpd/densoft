@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.R;
+import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,16 +25,16 @@ public class CalendarGridAdapter extends ArrayAdapter {
     private List<Date> monthlyDates;
     private Calendar currentDate;
     Context context;
-    ArrayList<String> status = new ArrayList<>();
+    ArrayList<CalendarDetails> calendarDetails = new ArrayList<>();
     int i = 0;
 
-    public CalendarGridAdapter(Context context, List<Date> monthlyDates, Calendar currentDate, ArrayList<String> status) {
+    public CalendarGridAdapter(Context context, List<Date> monthlyDates, Calendar currentDate, ArrayList<CalendarDetails> calendarDetails) {
         super(context, R.layout.single_cell_layout);
         this.monthlyDates = monthlyDates;
         this.currentDate = currentDate;
         this.context = context;
-        this.status = status;
-
+        this.calendarDetails = calendarDetails;
+        Log.d("calendar size status ", calendarDetails.size() + "");
         mInflater = LayoutInflater.from(context);
     }
     @NonNull
@@ -58,14 +59,12 @@ public class CalendarGridAdapter extends ArrayAdapter {
         if(displayMonth == currentMonth && displayYear == currentYear){
             //view.setBackgroundColor(context.getResources().getColor(R.color.colorWhite))
 
-            Log.d("here i is ", i + " position is " + position);
-            if(i<status.size()) {
+            if(i<calendarDetails.size()) {
                 cellNumber.setTextColor(context.getResources().getColor(R.color.white));
-                setstatus_color(cellNumber, status.get(i));
+                setstatus_color(cellNumber, calendarDetails.get(i).getStatus());
+                Log.d("status check ", calendarDetails.get(i).getStatus());
                 i++;
             }
-
-
 
         }else{
             //view.setBackgroundResource(R.drawable.textview_rounded_holiday);
@@ -78,28 +77,29 @@ public class CalendarGridAdapter extends ArrayAdapter {
         TextView eventIndicator = (TextView)view.findViewById(R.id.event_id);
         Calendar eventCalendar = Calendar.getInstance();*/
 
-
-
         return view;
     }
 
     private void setstatus_color(TextView cellNumber, String s) {
-        if(s.equalsIgnoreCase("Absent")){
+
+        if(s.equalsIgnoreCase("0")){
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_absent);
-        }else if(s.equalsIgnoreCase("Present")){
+        }else if(s.equalsIgnoreCase("1")){
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_present);
-        }else if(s.equalsIgnoreCase("Bunk")){
-            cellNumber.setBackgroundResource(R.drawable.textview_rounded_bunk);
-        }else if(s.equalsIgnoreCase("Leave")){
-            cellNumber.setBackgroundResource(R.drawable.textview_rounded_leave);
-        }else if(s.equalsIgnoreCase("Late")){
-            cellNumber.setBackgroundResource(R.drawable.textview_rounded_late);
-        }else if(s.equalsIgnoreCase("OnTask")){
-            cellNumber.setBackgroundResource(R.drawable.textview_rounded_ontask);
-        }else{
+        }else if(s.equalsIgnoreCase("2")){
+            cellNumber.setBackgroundResource(R.drawable.textview_rounded_lateby);
+        }else if(s.equalsIgnoreCase("3")){
+            cellNumber.setBackgroundResource(R.drawable.textview_rounded_weekoff_holiday);
+        }else if(s.equalsIgnoreCase("4")){
+            cellNumber.setBackgroundResource(R.drawable.textview_rounded_workdone_onholiday);
+        }else if(s.equalsIgnoreCase("5")){
+            cellNumber.setBackgroundResource(R.drawable.textview_rounded_takenleave);
+        }else if(s.equalsIgnoreCase("6")){
+            cellNumber.setBackgroundResource(R.drawable.textview_rounded_overtime);
+        }/*else{
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_holiday);
             cellNumber.setTextColor(context.getResources().getColor(R.color.black));
-        }
+        }*/
     }
 
     @Override
@@ -111,8 +111,9 @@ public class CalendarGridAdapter extends ArrayAdapter {
     public Object getItem(int position) {
         return monthlyDates.get(position);
     }
-    @Override
+
+    /*@Override
     public int getPosition(Object item) {
         return monthlyDates.indexOf(item);
-    }
+    }*/
 }

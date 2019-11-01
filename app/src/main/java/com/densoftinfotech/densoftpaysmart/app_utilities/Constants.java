@@ -8,5 +8,6 @@ public class Constants {
     //public static String ip = "demo.paysmart.net.in";
     public static String db_name = "densoftpaysmart";
     public static final String table_staff_details= "table_staff_details";
+    public static String staffid = "";
 
 }

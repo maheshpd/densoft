@@ -1,6 +1,7 @@
 package com.densoftinfotech.densoftpaysmart.retrofit;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
+import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
 import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
 import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
 import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
@@ -29,5 +30,9 @@ public interface GetServiceInterface {
     @POST("Get_InoutAtt_App")
     Call<ArrayList<MarkAttendanceDetails>>
     request_attendance(@Body RequestBody fields);
+
+    @POST("Get_InoutAtt_App")
+    Call<ArrayList<CalendarDetails>>
+    request_planner(@Body RequestBody fields);
 
 }

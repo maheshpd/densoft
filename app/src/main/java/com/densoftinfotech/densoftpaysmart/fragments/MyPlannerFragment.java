@@ -18,10 +18,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import com.densoftinfotech.densoftpaysmart.MainActivity;
@@ -29,6 +31,7 @@ import com.densoftinfotech.densoftpaysmart.MarkAttendanceActivity;
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.adapter.CalendarDetailsAdapter;
 import com.densoftinfotech.densoftpaysmart.adapter.MarkAttendanceAdapter;
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView;
 import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
 import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
@@ -44,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.Attributes;
 
 public class MyPlannerFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
@@ -121,6 +125,7 @@ public class MyPlannerFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerview.setLayoutManager(layoutManager);
 
+
         return v;
     }
 
@@ -131,8 +136,14 @@ public class MyPlannerFragment extends Fragment {
                 int month = intent.getIntExtra("status", 0);
                 Log.d("month by broadcast ", month + "");
 
-                GetRoomData getRoomData = new GetRoomData();
-                getRoomData.execute(String.valueOf(month));
+                if(month == 0){
+                    GetRoomData getRoomData = new GetRoomData();
+                    getRoomData.execute(String.valueOf(12));
+                }else {
+                    GetRoomData getRoomData = new GetRoomData();
+                    getRoomData.execute(String.valueOf(month));
+                }
+
 
                 //checkandadd(month);
             }
@@ -186,16 +197,20 @@ public class MyPlannerFragment extends Fragment {
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
 
-        Call<ArrayList<MarkAttendanceDetails>> call = getServiceInterface.request_attendance(requestBody);
-        call.enqueue(new Callback<ArrayList<MarkAttendanceDetails>>() {
+        Call<ArrayList<CalendarDetails>> call = getServiceInterface.request_planner(requestBody);
+        call.enqueue(new Callback<ArrayList<CalendarDetails>>() {
             @Override
-            public void onResponse(Call<ArrayList<MarkAttendanceDetails>> call, Response<ArrayList<MarkAttendanceDetails>> response) {
+            public void onResponse(Call<ArrayList<CalendarDetails>> call, Response<ArrayList<CalendarDetails>> response) {
                 if(!response.isSuccessful()){
                     Log.d("response code ", response.code() + " ");
                 }else {
                     Log.d("response ", response.body() + "");
 
                     if(response.body()!=null && !response.body().isEmpty()) {
+                        calendarDetails = response.body();
+
+                        calendarDetailsAdapter = new CalendarDetailsAdapter(getActivity(), calendarDetails);
+                        recyclerview.setAdapter(calendarDetailsAdapter);
 
                     }else {
 
@@ -204,7 +219,7 @@ public class MyPlannerFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ArrayList<MarkAttendanceDetails>> call, Throwable t) {
+            public void onFailure(Call<ArrayList<CalendarDetails>> call, Throwable t) {
 
             }
         });
@@ -217,6 +232,7 @@ public class MyPlannerFragment extends Fragment {
             staffDetailsRoom = Paysmart_roomdatabase.get_PaysmartDatabase(getActivity()).staffDetails_dao().getAll();
             if (staffDetailsRoom != null) {
                 get_attendance_details(staffDetailsRoom.getStaffId(), voids[0]);
+                Constants.staffid = staffDetailsRoom.getStaffId();
             }
             return null;
         }

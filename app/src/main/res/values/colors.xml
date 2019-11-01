@@ -21,6 +21,13 @@
     <color name="ontask">#B779E2</color>
 
 
+    <color name="lateby">#F4C861</color>
+    <color name="weekoff_holiday">#0CACFE</color>
+    <color name="workdone_onholiday">#1CD4BA</color>
+    <color name="takenleave">#B779E2</color>
+    <color name="overtime">#607D8B</color>
+
+
     <!--transparent-->
 
     <color name="full_transparent">#00000000</color>

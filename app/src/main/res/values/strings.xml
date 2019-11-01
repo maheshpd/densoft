@@ -68,5 +68,12 @@
     <string name="intime">In Time</string>
     <string name="outtime">Out Time</string>
     <string name="thumbtime">Thumb Time</string>
+    <string name="customerid">Customer Id</string>
+    <string name="workinghours">Working Hours</string>
+    <string name="overtime">OverTime</string>
+    <string name="holidayname">Holiday Name</string>
+    <string name="lateby">Late By</string>
+    <string name="month">Month</string>
+    <string name="year">Year</string>
 
 </resources>

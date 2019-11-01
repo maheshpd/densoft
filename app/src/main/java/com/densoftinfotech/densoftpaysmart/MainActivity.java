@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -175,14 +176,21 @@ public class MainActivity extends CommonActivity {
                         if(!response.body().isEmpty()){
 
 
+                            int val = 0;
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                                 List<SalarySlip> distinctElements = response.body().stream()
-                                        .filter( distinctByKey(p -> p.getApplyForMonth()) )
-                                        .collect( Collectors.toList() );
+                                        .filter( distinctByKey(SalarySlip::getApplyForMonth) )
+                                        .collect( Collectors.toList());
                                 Log.d("SalarySlipscount ",  distinctElements.size() + "");
+                                val = distinctElements.size();
+                                salarySlips = response.body();
                             }
 
 
+                            for(int i = 0; i<val; i++){
+                                salarySlipAdapter = new SalarySlipAdapter(MainActivity.this, salarySlips);
+                                recycler_view_salaryslip.setAdapter(salarySlipAdapter);
+                            }
 
                             //Set<SalarySlip> salarySlipscount = new HashSet<SalarySlip>(response.body());
 
@@ -244,6 +252,8 @@ public class MainActivity extends CommonActivity {
                 tv_name.setText(getResources().getString(R.string.welcome) + " " + staffDetailsRoom.getPName());
                 tv_title.setText(staffDetailsRoom.getCompanyName());
                 get_salary_data(staffDetailsRoom.getStaffId());
+
+                Picasso.with(MainActivity.this).load(staffDetailsRoom.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
             }
 
         }

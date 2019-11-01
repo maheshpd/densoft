@@ -5,44 +5,31 @@ import com.google.gson.annotations.SerializedName;
 
 public class StaffDetails{
 
-    @SerializedName("StaffId")
     private String StaffId = "";
-
-    @SerializedName("PName")
     private String PName = "";
-
-    @SerializedName("Mobile1")
     private String Mobile1 = "";
-
-    @SerializedName("Email1")
     private String Email1 = "";
-
-    @SerializedName("DOB")
     private String DOB = "";
-
-    @SerializedName("Gender")
     private String Gender = "";
-
-    @SerializedName("JoiningDate")
     private String JoiningDate = "";
-
-    @SerializedName("CompanyName")
     private String CompanyName = "";
-
-    @SerializedName("BranchName")
     private String BranchName = "";
-
-    @SerializedName("Department")
     private String Department = "";
-
-    @SerializedName("Designation")
     private String Designation = "";
+    private String DomainUrl = "";
+    private String StaffPhoto = "";
+    private String AccNo = "";
+    private String AccHolderName = "";
+    private String BankName = "";
+    private String FSCICode = "";
+    private String AccType = "";
+    private String PanCardNo = "";
+    private String AadharCardNo = "";
+    private String PFAccNo = "";
+    private String UANNO = "";
+    private String ESIC = "";
 
-    @SerializedName("JobCategory")
-    private String JobCategory = "";
 
-    @SerializedName("RuleTemplate")
-    private String RuleTemplate = "";
 
     public String getStaffId() {
         return StaffId;
@@ -132,19 +119,99 @@ public class StaffDetails{
         Designation = designation;
     }
 
-    public String getJobCategory() {
-        return JobCategory;
+    public String getDomainUrl() {
+        return DomainUrl;
     }
 
-    public void setJobCategory(String jobCategory) {
-        JobCategory = jobCategory;
+    public void setDomainUrl(String domainUrl) {
+        DomainUrl = domainUrl;
     }
 
-    public String getRuleTemplate() {
-        return RuleTemplate;
+    public String getStaffPhoto() {
+        return StaffPhoto;
     }
 
-    public void setRuleTemplate(String ruleTemplate) {
-        RuleTemplate = ruleTemplate;
+    public void setStaffPhoto(String staffPhoto) {
+        StaffPhoto = staffPhoto;
+    }
+
+    public String getAccNo() {
+        return AccNo;
+    }
+
+    public void setAccNo(String accNo) {
+        AccNo = accNo;
+    }
+
+    public String getAccHolderName() {
+        return AccHolderName;
+    }
+
+    public void setAccHolderName(String accHolderName) {
+        AccHolderName = accHolderName;
+    }
+
+    public String getBankName() {
+        return BankName;
+    }
+
+    public void setBankName(String bankName) {
+        BankName = bankName;
+    }
+
+    public String getFSCICode() {
+        return FSCICode;
+    }
+
+    public void setFSCICode(String FSCICode) {
+        this.FSCICode = FSCICode;
+    }
+
+    public String getAccType() {
+        return AccType;
+    }
+
+    public void setAccType(String accType) {
+        AccType = accType;
+    }
+
+    public String getPanCardNo() {
+        return PanCardNo;
+    }
+
+    public void setPanCardNo(String panCardNo) {
+        PanCardNo = panCardNo;
+    }
+
+    public String getAadharCardNo() {
+        return AadharCardNo;
+    }
+
+    public void setAadharCardNo(String aadharCardNo) {
+        AadharCardNo = aadharCardNo;
+    }
+
+    public String getPFAccNo() {
+        return PFAccNo;
+    }
+
+    public void setPFAccNo(String PFAccNo) {
+        this.PFAccNo = PFAccNo;
+    }
+
+    public String getUANNO() {
+        return UANNO;
+    }
+
+    public void setUANNO(String UANNO) {
+        this.UANNO = UANNO;
+    }
+
+    public String getESIC() {
+        return ESIC;
+    }
+
+    public void setESIC(String ESIC) {
+        this.ESIC = ESIC;
     }
 }

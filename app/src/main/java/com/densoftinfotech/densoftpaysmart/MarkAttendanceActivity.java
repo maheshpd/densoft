@@ -26,8 +26,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.adapter.MarkAttendanceAdapter;
@@ -47,6 +50,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,22 +65,29 @@ public class MarkAttendanceActivity extends CommonActivity {
     TextView tv_checkintime;
     @BindView(R.id.tv_checkouttime)
     TextView tv_checkouttime;
-    @BindView(R.id.et_month)
-    EditText et_month;
     @BindView(R.id.recycler_view_markattendance)
     RecyclerView recycler_view_markattendance;
     @BindView(R.id.linearLayout11)
     LinearLayout linearLayout11;
+    @BindView(R.id.spinner_month)
+    Spinner spinner_month;
+    @BindView(R.id.spinner_year)
+    Spinner spinner_year;
 
     UserLocation userLocation;
     String longitude = "";
     String latitude = "";
+    int year_of_joining = 2000;
+
+    String month, year = "";
 
     RecyclerView.LayoutManager layoutManager;
     MarkAttendanceAdapter markAttendanceAdapter;
 
     GetServiceInterface getServiceInterface;
     ArrayList<MarkAttendanceDetails> markAttendanceDetails = new ArrayList<>();
+    private ArrayList<Integer> years = new ArrayList<>();
+    private static String[] month_short = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +101,11 @@ public class MarkAttendanceActivity extends CommonActivity {
 
         layoutManager = new LinearLayoutManager(MarkAttendanceActivity.this);
         recycler_view_markattendance.setLayoutManager(layoutManager);
+
+        Get_Attendance get_attendance = new Get_Attendance();
+        get_attendance.execute();
+
+
 
         tv_checkin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +121,7 @@ public class MarkAttendanceActivity extends CommonActivity {
             }
         });
 
-        et_month.addTextChangedListener(new TextWatcher() {
+        /*et_month.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -127,11 +143,11 @@ public class MarkAttendanceActivity extends CommonActivity {
             public void afterTextChanged(Editable editable) {
 
             }
-        });
+        });*/
 
     }
 
-    private void get_attendance_details(String staffid, String month_send) {
+    private void get_attendance_details(String staffid, String month_send, String year_send) {
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
 
@@ -140,8 +156,8 @@ public class MarkAttendanceActivity extends CommonActivity {
         Map<String, Object> params = new HashMap<>();
         params.put("ActionId", "0");
         params.put("StaffId", staffid);
-        params.put("Month",String.valueOf(month_send));
-        params.put("Year", String.valueOf(2019));
+        params.put("Month", month_send);
+        params.put("Year", year_send);
 
         JSONObject obj = new JSONObject(params);
         Log.d("params ", obj + "");
@@ -223,19 +239,117 @@ public class MarkAttendanceActivity extends CommonActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class Get_Attendance extends AsyncTask<String, Void, Void > {
+    private class Get_Attendance extends AsyncTask<Void, Void, Void > {
 
         @Override
-        protected Void doInBackground(String... voids) {
+        protected Void doInBackground(Void... voids) {
 
             StaffDetailsRoom staffDetails = Paysmart_roomdatabase.get_PaysmartDatabase(MarkAttendanceActivity.this).staffDetails_dao().getAll();
 
             if(staffDetails!=null){
-                get_attendance_details(staffDetails.getStaffId(), voids[0]);
+                //get_attendance_details(staffDetails.getStaffId(), voids[0]);
+                year_of_joining = Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]);
+
+                getset_spinner_data(year_of_joining, staffDetails.getStaffId());
             }
 
             return null;
         }
+    }
+
+    private void getset_spinner_data(int year_of_joining, String staffid) {
+
+        for(int i = year_of_joining; i<=Calendar.getInstance().get(Calendar.YEAR); i++) {
+            years.add(i);
+        }
+
+        ArrayAdapter<Integer> yearAdapter = new ArrayAdapter<Integer>(MarkAttendanceActivity.this, R.layout.custom_spinnerlayout, R.id.text1, years);
+        spinner_year.setAdapter(yearAdapter);
+
+        spinner_year.setSelection((years.size()-1));
+
+        ArrayAdapter<String> monthAdapter = new ArrayAdapter<String>(MarkAttendanceActivity.this, R.layout.custom_spinnerlayout, R.id.text1, month_short);
+        spinner_month.setAdapter(monthAdapter);
+
+        spinner_month.setSelection(Calendar.getInstance().get(Calendar.MONTH));
+
+        spinner_month.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                month = spinner_month.getItemAtPosition(i).toString();
+                get_monthandyear(staffid, month, year);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        spinner_year.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                year = spinner_year.getItemAtPosition(i).toString();
+                get_monthandyear(staffid, month, year);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
+
+    private void get_monthandyear(String  staffid, String month, String year) {
+
+        if(year.equals("")){
+            year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+        }
+        if(month.equals("")){
+            month = String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
+        }
+
+        switch (month){
+            case "Jan":
+                get_attendance_details(staffid, "1", year);
+                break;
+            case "Feb":
+                get_attendance_details(staffid, "2", year);
+                break;
+            case "Mar":
+                get_attendance_details(staffid, "3", year);
+                break;
+            case "Apr":
+                get_attendance_details(staffid, "4", year);
+                break;
+            case "May":
+                get_attendance_details(staffid, "5", year);
+                break;
+            case "Jun":
+                get_attendance_details(staffid, "6", year);
+                break;
+            case "Jul":
+                get_attendance_details(staffid, "7", year);
+                break;
+            case "Aug":
+                get_attendance_details(staffid, "8", year);
+                break;
+            case "Sep":
+                get_attendance_details(staffid, "9", year);
+                break;
+            case "Oct":
+                get_attendance_details(staffid, "10", year);
+                break;
+            case "Nov":
+                get_attendance_details(staffid, "11", year);
+                break;
+            case "Dec":
+                get_attendance_details(staffid, "12", year);
+                break;
+        }
+
     }
 }
 

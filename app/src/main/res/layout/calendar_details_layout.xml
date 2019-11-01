@@ -4,12 +4,14 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/iv_status"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:layout_margin="5dp" />
+        android:layout_margin="5dp"
+        android:textColor="@color/white"
+        android:textAlignment="center"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,20 +19,174 @@
         android:layout_margin="5dp"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_status"
+        <LinearLayout
+            android:id="@+id/linear_absent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Status"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@color/black"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tv_description"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/absent"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tv_absent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_intime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="" />
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/intime"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tv_intime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_outtime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/outtime"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tv_outtime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_lateby"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/lateby"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tv_lateby"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_workinghours"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/workinghours"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tv_working_hours"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_holidayname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/holidayname"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tv_holiday_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_overtime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/overtime"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tv_overtime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
