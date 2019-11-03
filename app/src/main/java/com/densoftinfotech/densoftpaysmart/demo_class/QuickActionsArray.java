@@ -2,8 +2,8 @@ package com.densoftinfotech.densoftpaysmart.demo_class;
 
 import com.densoftinfotech.densoftpaysmart.R;
 
-public class QuickActionsDemo {
+public class QuickActionsArray {
 
-    public static int[] image = {R.mipmap.salarydemo, R.mipmap.salarydemo, R.mipmap.salarydemo, R.mipmap.salarydemo};
+    public static int[] image = {R.mipmap.salarydetails, R.mipmap.planner, R.mipmap.attendancehistory, R.mipmap.travelclaims};
     public static String[] names = {"Salary Details", "Planner", "Attendance History", "Travel Claims"};
 }

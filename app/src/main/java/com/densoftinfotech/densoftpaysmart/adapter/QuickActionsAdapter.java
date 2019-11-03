@@ -46,7 +46,7 @@ public class QuickActionsAdapter extends RecyclerView.Adapter<QuickActionsAdapte
             @Override
             public void onClick(View view) {
 
-                ((MainActivity)context).gotoactivity(quickActions.get(i).getName());
+                ((MainActivity)context).gotoactivity(quickActions.get(i).getImage());
 
             }
         });

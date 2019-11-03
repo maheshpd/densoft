@@ -1,18 +1,22 @@
 package com.densoftinfotech.densoftpaysmart.classes;
 
-public class SalarySlip {
+import java.util.ArrayList;
+
+public class SalarySlipDistinct {
 
     int ApplyForMonth = 0;
     int ApplyForYear = 0;
     String Name = "";
     double Amount = 0;
 
-    public SalarySlip(String Name, double Amount, int ApplyForMonth, int ApplyForYear) {
-        this.Name = Name;
-        this.Amount = Amount;
+    ArrayList<SalarySlip> salarySlips = new ArrayList<>();
+
+    /*public SalarySlipDistinct(int ApplyForMonth, int ApplyForYear, String Name, double Amount) {
         this.ApplyForMonth = ApplyForMonth;
         this.ApplyForYear = ApplyForYear;
-    }
+        this.Name = Name;
+        this.Amount = Amount;
+    }*/
 
     public int getApplyForMonth() {
         return ApplyForMonth;
@@ -44,5 +48,13 @@ public class SalarySlip {
 
     public void setAmount(double amount) {
         Amount = amount;
+    }
+
+    public ArrayList<SalarySlip> getSalarySlips() {
+        return salarySlips;
+    }
+
+    public void setSalarySlips(ArrayList<SalarySlip> salarySlips) {
+        this.salarySlips = salarySlips;
     }
 }

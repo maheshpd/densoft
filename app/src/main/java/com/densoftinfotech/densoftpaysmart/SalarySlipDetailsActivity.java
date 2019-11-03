@@ -1,12 +1,10 @@
 package com.densoftinfotech.densoftpaysmart;
 
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -15,16 +13,12 @@ import android.widget.TextView;
 import com.densoftinfotech.densoftpaysmart.adapter.MonthAdapter;
 import com.densoftinfotech.densoftpaysmart.adapter.SalarySlipAdapter;
 import com.densoftinfotech.densoftpaysmart.classes.MonthDisplay;
-import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
+import com.densoftinfotech.densoftpaysmart.classes.SalarySlipDistinct;
 import com.densoftinfotech.densoftpaysmart.demo_class.SalarySlipDemo;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SalarySlipDetailsActivity extends CommonActivity {
 
@@ -49,7 +43,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
 
     MonthAdapter monthAdapter;
     ArrayList<MonthDisplay> monthDisplays = new ArrayList<>();
-    ArrayList<SalarySlip> salarySlips = new ArrayList<>();
+    ArrayList<SalarySlipDistinct> salarySlipDistincts = new ArrayList<>();
     SalarySlipAdapter salarySlipAdapter;
 
     Bundle b;
@@ -97,11 +91,11 @@ public class SalarySlipDetailsActivity extends CommonActivity {
     /*public void gotoselection(int i) {
 
         for (int i1 = 0; i1 < SalarySlipDemo.month.length; i1++) {
-            salarySlips.add(new SalarySlip(SalarySlipDemo.month[i1], SalarySlipDemo.days_of_month[i1], SalarySlipDemo.take_home[i1], SalarySlipDemo.deductions[i1]));
+            salarySlipDistincts.add(new SalarySlipDistinct(SalarySlipDemo.month[i1], SalarySlipDemo.days_of_month[i1], SalarySlipDemo.take_home[i1], SalarySlipDemo.deductions[i1]));
         }
-        tv_takehome.setText("₹ " + salarySlips.get(i).getTake_home());
-        tv_deductions.setText("₹ " + salarySlips.get(i).getDeduction());
-        tv_grosspay.setText(getResources().getString(R.string.totalgrosspay) + ": ₹ " + (salarySlips.get(i).getTake_home() + salarySlips.get(pos).getDeduction()));
+        tv_takehome.setText("₹ " + salarySlipDistincts.get(i).getTake_home());
+        tv_deductions.setText("₹ " + salarySlipDistincts.get(i).getDeduction());
+        tv_grosspay.setText(getResources().getString(R.string.totalgrosspay) + ": ₹ " + (salarySlipDistincts.get(i).getTake_home() + salarySlipDistincts.get(pos).getDeduction()));
 
 
         setdata(i);
@@ -110,8 +104,8 @@ public class SalarySlipDetailsActivity extends CommonActivity {
     /*public void setdata(int i) {
         List<PieEntry> entries = new ArrayList<>();
 
-        entries.add(new PieEntry((float) salarySlips.get(i).getTake_home(), "Take Home"));
-        entries.add(new PieEntry((float) salarySlips.get(i).getDeduction(), "Deductions"));
+        entries.add(new PieEntry((float) salarySlipDistincts.get(i).getTake_home(), "Take Home"));
+        entries.add(new PieEntry((float) salarySlipDistincts.get(i).getDeduction(), "Deductions"));
 
         PieDataSet set = new PieDataSet(entries, "");
         PieData data = new PieData(set);

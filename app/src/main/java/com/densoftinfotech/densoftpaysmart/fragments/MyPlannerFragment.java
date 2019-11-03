@@ -9,6 +9,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,6 +24,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
@@ -56,14 +58,14 @@ public class MyPlannerFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    /*@BindView(R.id.calendar)
-    CalendarView calendarview;*/
     @BindView(R.id.recyclerview_planner)
     RecyclerView recyclerview;
     @BindView(R.id.scrollview)
     ScrollView scrollview;
     @BindView(R.id.custom_calendar)
     CalendarCustomView mView;
+    @BindView(R.id.iv_history)
+    ImageView iv_history;
 
     View v;
     Calendar calendar = Calendar.getInstance();
@@ -75,21 +77,9 @@ public class MyPlannerFragment extends Fragment {
 
     private StaffDetailsRoom staffDetailsRoom;
 
-    //ArrayList<String> status = new ArrayList<>();
-
     public MyPlannerFragment() {
         // Required empty public constructor
     }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MyPlannerFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static MyPlannerFragment newInstance(String param1, String param2) {
         MyPlannerFragment fragment = new MyPlannerFragment();
         Bundle args = new Bundle();
@@ -125,6 +115,14 @@ public class MyPlannerFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerview.setLayoutManager(layoutManager);
 
+        iv_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getActivity(), MarkAttendanceActivity.class);
+                getActivity().startActivity(i);
+            }
+        });
+
 
         return v;
     }
@@ -146,6 +144,19 @@ public class MyPlannerFragment extends Fragment {
 
 
                 //checkandadd(month);
+            }else if(intent.hasExtra("scrolltoposition")){
+                //recyclerview.getLayoutManager().smoothScrollToPosition(recyclerview, new RecyclerView.State(), intent.getIntExtra("scrolltoposition", 0));
+                Log.d("month by broadcast ", intent.getIntExtra("scrolltoposition", 0) + "");
+
+                LinearSmoothScroller smoothScroller=new LinearSmoothScroller(getActivity()){
+                    @Override
+                    protected int getVerticalSnapPreference() {
+                        return LinearSmoothScroller.SNAP_TO_START;
+                    }
+                };
+
+                smoothScroller.setTargetPosition(intent.getIntExtra("scrolltoposition", 0));  // pos on which item you want to scroll recycler view
+                recyclerview.getLayoutManager().startSmoothScroll(smoothScroller);
             }
         }
     };
@@ -158,27 +169,6 @@ public class MyPlannerFragment extends Fragment {
 
         super.onDestroy();
     }
-
-
-    /*private void checkandadd(int days) {
-        calendarDetails.clear();
-
-        for (int i = 0; i < days; i++) {
-            if (days == 28) {
-                calendarDetails.add(new CalendarDetails(CalendarDetailsDemo.status28[i], CalendarDetailsDemo.description28[i]));
-            } else if (days == 29) {
-                calendarDetails.add(new CalendarDetails(CalendarDetailsDemo.status29[i], CalendarDetailsDemo.description29[i]));
-            } else if (days == 30) {
-                calendarDetails.add(new CalendarDetails(CalendarDetailsDemo.status30[i], CalendarDetailsDemo.description30[i]));
-            } else {
-                calendarDetails.add(new CalendarDetails(CalendarDetailsDemo.status31[i], CalendarDetailsDemo.description31[i]));
-            }
-        }
-
-        calendarDetailsAdapter = new CalendarDetailsAdapter(getActivity(), calendarDetails);
-        recyclerview.setAdapter(calendarDetailsAdapter);
-
-    }*/
 
     private void get_attendance_details(String staffid, String month_send) {
 

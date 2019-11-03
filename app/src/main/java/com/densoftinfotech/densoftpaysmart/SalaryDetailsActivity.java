@@ -7,34 +7,24 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-import android.app.DatePickerDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.View;
-import android.widget.DatePicker;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
-import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
-import com.densoftinfotech.densoftpaysmart.demo_class.SalarySlipDemo;
+import com.densoftinfotech.densoftpaysmart.classes.SalarySlipDistinct;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,10 +42,15 @@ public class SalaryDetailsActivity extends CommonActivity {
     TextView tv_deductions;
     @BindView(R.id.tv_netpay)
     TextView tv_netpay;
+    @BindView(R.id.spinner_month)
+    Spinner spinner_month;
+    @BindView(R.id.spinner_year)
+    Spinner spinner_year;
 
     GetServiceInterface getServiceInterface;
 
     int month_send = 0; int year_send = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,15 +65,13 @@ public class SalaryDetailsActivity extends CommonActivity {
 
 
         Date d = new Date();
-        CharSequence s  = DateFormat.format("dd/MM/yyyy", d.getTime());
+        CharSequence s  = DateFormat.format("MM/yyyy", d.getTime());
         tv_selecteddate.setText(getResources().getString(R.string.payslipfor) + " " + s);
-        month_send = d.getMonth();
-        year_send = d.getYear();
 
         GetSalary_Async getSalary_async = new GetSalary_Async();
         getSalary_async.execute();
 
-        tv_pickdate.setOnClickListener(new View.OnClickListener() {
+        /*tv_pickdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(SalaryDetailsActivity.this, new DatePickerDialog.OnDateSetListener() {
@@ -99,7 +92,7 @@ public class SalaryDetailsActivity extends CommonActivity {
                 }, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
             }
-        });
+        });*/
 
     }
 
@@ -119,11 +112,11 @@ public class SalaryDetailsActivity extends CommonActivity {
         Log.d("params ", obj + "");
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
-        Call<ArrayList<SalarySlip>> call = getServiceInterface.request_salary(requestBody);
+        Call<ArrayList<SalarySlipDistinct>> call = getServiceInterface.request_salary(requestBody);
 
-        call.enqueue(new Callback<ArrayList<SalarySlip>>() {
+        call.enqueue(new Callback<ArrayList<SalarySlipDistinct>>() {
             @Override
-            public void onResponse(Call<ArrayList<SalarySlip>> call, Response<ArrayList<SalarySlip>> response) {
+            public void onResponse(Call<ArrayList<SalarySlipDistinct>> call, Response<ArrayList<SalarySlipDistinct>> response) {
                 if(!response.isSuccessful()){
                     Log.d("response code ", response.code() + " ");
                 }else {
@@ -139,7 +132,7 @@ public class SalaryDetailsActivity extends CommonActivity {
             }
 
             @Override
-            public void onFailure(Call<ArrayList<SalarySlip>> call, Throwable t) {
+            public void onFailure(Call<ArrayList<SalarySlipDistinct>> call, Throwable t) {
                 Log.d("failed ", t.getMessage() + "");
             }
         });
@@ -147,19 +140,19 @@ public class SalaryDetailsActivity extends CommonActivity {
 
     }
 
-    private void set_responsedata(ArrayList<SalarySlip> salarySlips) {
-        for(int i = 0; i<salarySlips.size(); i++){
-            if(salarySlips.get(i).getName().equalsIgnoreCase("Gross Salary")){
-                tv_grosspay.setText(getResources().getString(R.string.rs) + " " +salarySlips.get(i).getAmount());
+    private void set_responsedata(ArrayList<SalarySlipDistinct> salarySlipDistincts) {
+        for(int i = 0; i< salarySlipDistincts.size(); i++){
+            if(salarySlipDistincts.get(i).getName().equalsIgnoreCase("Gross Salary")){
+                tv_grosspay.setText(getResources().getString(R.string.rs) + " " + salarySlipDistincts.get(i).getAmount());
             }
-            if(salarySlips.get(i).getName().equalsIgnoreCase("Total Deduction")){
-                tv_deductions.setText(getResources().getString(R.string.rs) + " " +salarySlips.get(i).getAmount());
+            if(salarySlipDistincts.get(i).getName().equalsIgnoreCase("Total Deduction")){
+                tv_deductions.setText(getResources().getString(R.string.rs) + " " + salarySlipDistincts.get(i).getAmount());
             }
-            if(salarySlips.get(i).getName().equalsIgnoreCase("Net Salary")){
-                tv_netpay.setText(getResources().getString(R.string.rs) + " " +salarySlips.get(i).getAmount());
+            if(salarySlipDistincts.get(i).getName().equalsIgnoreCase("Net Salary")){
+                tv_netpay.setText(getResources().getString(R.string.rs) + " " + salarySlipDistincts.get(i).getAmount());
             }
-            if(salarySlips.get(i).getName().equalsIgnoreCase("Payable Days")){
-                //tv_grosspay.setText(getResources().getString(R.string.rs) + " " +salarySlips.get(i).getAmount());
+            if(salarySlipDistincts.get(i).getName().equalsIgnoreCase("Payable Days")){
+                //tv_grosspay.setText(getResources().getString(R.string.rs) + " " +salarySlipDistincts.get(i).getAmount());
             }
         }
     }

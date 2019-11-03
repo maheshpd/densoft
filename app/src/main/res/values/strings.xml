@@ -75,5 +75,8 @@
     <string name="lateby">Late By</string>
     <string name="month">Month</string>
     <string name="year">Year</string>
+    <string name="weekoff_holiday">WeekOff Holiday</string>
+    <string name="takenleave">Taken Leave</string>
+    <string name="workdone_onholiday">Workdone on Weekoff/Holiday</string>
 
 </resources>

@@ -13,6 +13,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.densoftinfotech.densoftpaysmart.R;
@@ -131,7 +132,10 @@ public class CalendarCustomView extends LinearLayout {
         calendarGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Toast.makeText(context, "Clicked " + position, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Clicked " + position, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent("notifyrecycler");
+                intent.putExtra("scrolltoposition", position);
+                context.sendBroadcast(intent);
             }
         });
 

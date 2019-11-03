@@ -51,8 +51,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_holidayname.setVisibility(View.GONE);
             holder.linear_overtime.setVisibility(View.GONE);
 
-        }
-        else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("1")) {
+        } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("1")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.present));
             holder.linear_absent.setVisibility(View.GONE);
             holder.linear_intime.setVisibility(View.VISIBLE);
@@ -61,8 +60,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.GONE);
             holder.linear_holidayname.setVisibility(View.GONE);
             holder.linear_overtime.setVisibility(View.GONE);
-        }
-        else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("2")) {
+        } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("2")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.lateby));
             holder.linear_absent.setVisibility(View.GONE);
             holder.linear_intime.setVisibility(View.VISIBLE);
@@ -71,8 +69,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.VISIBLE);
             holder.linear_holidayname.setVisibility(View.GONE);
             holder.linear_overtime.setVisibility(View.GONE);
-        }
-        else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("3")) {
+        } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("3")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.weekoff_holiday));
             holder.linear_absent.setVisibility(View.GONE);
             holder.linear_intime.setVisibility(View.GONE);
@@ -81,8 +78,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.GONE);
             holder.linear_holidayname.setVisibility(View.VISIBLE);
             holder.linear_overtime.setVisibility(View.GONE);
-        }
-        else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("4")) {
+        } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("4")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.workdone_onholiday));
             holder.linear_absent.setVisibility(View.GONE);
             holder.linear_intime.setVisibility(View.VISIBLE);
@@ -91,8 +87,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.GONE);
             holder.linear_holidayname.setVisibility(View.VISIBLE);
             holder.linear_overtime.setVisibility(View.GONE);
-        }
-        else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("5")) {
+        } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("5")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.takenleave));
             holder.linear_absent.setVisibility(View.GONE);
             holder.linear_intime.setVisibility(View.GONE);
@@ -101,8 +96,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.GONE);
             holder.linear_holidayname.setVisibility(View.VISIBLE);
             holder.linear_overtime.setVisibility(View.GONE);
-        }
-        else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("6")) {
+        } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("6")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.overtime));
             holder.linear_absent.setVisibility(View.GONE);
             holder.linear_intime.setVisibility(View.VISIBLE);
@@ -154,8 +148,9 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
         }
     }
 
-    private void setdata(MyViewHolder holder, int position){
+    private void setdata(MyViewHolder holder, int position) {
 
+        holder.tv_status.setText("" + (position + 1));
         holder.tv_intime.setText(": " + calendarDetails.get(position).getInTime());
         holder.tv_outtime.setText(": " + calendarDetails.get(position).getOutTime());
         holder.tv_working_hours.setText(": " + calendarDetails.get(position).getWorkingHour());

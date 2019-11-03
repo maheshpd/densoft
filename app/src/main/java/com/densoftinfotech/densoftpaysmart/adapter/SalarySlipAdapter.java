@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.SalarySlipDetailsActivity;
 import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
+import com.densoftinfotech.densoftpaysmart.classes.SalarySlipDistinct;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -29,14 +30,14 @@ import butterknife.ButterKnife;
 public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.MyViewHolder> {
 
     Context context;
-    ArrayList<SalarySlip> salarySlipDemos = new ArrayList<>();
+    ArrayList<SalarySlip> salarySlips = new ArrayList<>();
     public static int[] background_gradient = {R.drawable.gradient_2, R.drawable.gradient_12, R.drawable.gradient_4,
             R.drawable.gradient_11, R.drawable.gradient_5, R.drawable.gradient_6 , R.drawable.gradient_3, R.drawable.gradient_7,
             R.drawable.gradient_8, R.drawable.gradient_9, R.drawable.gradient_10, R.drawable.gradient_13};
 
-    public SalarySlipAdapter(Context context, ArrayList<SalarySlip> salarySlipDemos) {
+    public SalarySlipAdapter(Context context, ArrayList<SalarySlip> salarySlips) {
         this.context = context;
-        this.salarySlipDemos = salarySlipDemos;
+        this.salarySlips = salarySlips;
     }
 
     @NonNull
@@ -48,19 +49,14 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
-        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Net Salary"))
-            holder.tv_takehome.setText("₹ " + salarySlipDemos.get(i).getAmount());
 
-        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Total Deduction"))
-            holder.tv_deductions.setText("₹ " + salarySlipDemos.get(i).getAmount());
+        holder.tv_name1.setText(salarySlips.get(i).getName());
+        holder.tv_name1_value.setText("₹ " + salarySlips.get(i).getAmount());
+        holder.tv_name2.setText(salarySlips.get(i).getName());
+        holder.tv_name2_value.setText("₹ " + salarySlips.get(i).getAmount());
 
-        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Gross Salary"))
-            holder.tv_grosspay.setText(context.getResources().getString(R.string.totalgrosspay) + ": ₹ " + ((salarySlipDemos.get(i).getAmount() + salarySlipDemos.get(i).getAmount())));
-
-        holder.tv_payfor.setText(context.getResources().getString(R.string.payfor) + " " + salarySlipDemos.get(i).getApplyForMonth());
-
-        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Payable Days"))
-            holder.tv_paiddays.setText(context.getResources().getString(R.string.paiddays) + " " + salarySlipDemos.get(i).getAmount());
+        holder.tv_payfor.setText(context.getResources().getString(R.string.payfor) + " " + salarySlips.get(i).getApplyForMonth());
+        holder.tv_paiddays.setText(context.getResources().getString(R.string.paiddays) + " " + salarySlips.get(i).getAmount());
 
 
         setdata(holder, i);
@@ -79,15 +75,21 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
 
     @Override
     public int getItemCount() {
-        return salarySlipDemos.size();
+        return salarySlips.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.tv_takehome)
-        TextView tv_takehome;
-        @BindView(R.id.tv_deductions)
-        TextView tv_deductions;
+        @BindView(R.id.tv_name1)
+        TextView tv_name1;
+        @BindView(R.id.tv_name1_value)
+        TextView tv_name1_value;
+        @BindView(R.id.tv_name2)
+        TextView tv_name2;
+        @BindView(R.id.tv_name2_value)
+        TextView tv_name2_value;
+
+
         @BindView(R.id.tv_grosspay)
         TextView tv_grosspay;
         @BindView(R.id.tv_payfor)
@@ -112,11 +114,8 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
     public void setdata(MyViewHolder holder, int i){
         List<PieEntry> entries = new ArrayList<>();
 
-        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Net Salary"))
-            entries.add(new PieEntry((float)salarySlipDemos.get(i).getAmount(), "Take Home"));
-
-        if(salarySlipDemos.get(i).getName().equalsIgnoreCase("Total Deduction"))
-            entries.add(new PieEntry((float)salarySlipDemos.get(i).getAmount(), "Deductions"));
+            entries.add(new PieEntry((float) salarySlips.get(i).getAmount(), salarySlips.get(i).getName()));
+            entries.add(new PieEntry((float) salarySlips.get(i).getAmount(), salarySlips.get(i).getName()));
 
         PieDataSet set = new PieDataSet(entries, "");
         PieData data = new PieData(set);
