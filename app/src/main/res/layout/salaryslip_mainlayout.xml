@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     app:cardCornerRadius="10dp"
     android:layout_margin="20dp"
     app:cardElevation="5dp">
@@ -19,87 +20,90 @@
             android:orientation="vertical"
             android:background="@drawable/gradient_2">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp">
-
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/piechart"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:padding="10dp"/>
-
-
-                <ImageView
-                    android:id="@+id/iv_piechart"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:background="@drawable/piechart_example"
-                    android:padding="10dp"
-                    android:visibility="gone"/>
-
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
-                    <TextView
-                        android:id="@+id/tv_name1"
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/piechart"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:padding="10dp"/>
+
+
+                    <ImageView
+                        android:id="@+id/iv_piechart"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:background="@drawable/piechart_example"
+                        android:padding="10dp"
+                        android:visibility="gone"/>
+
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:text="@string/takehome"
-                        android:textColor="@color/bluepie"
-                        android:textStyle="bold"/>
+                        android:layout_margin="5dp"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/tv_name1_value"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        <TextView
+                            android:id="@+id/tv_name1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:textColor="@color/purplepie"
+                            android:textStyle="bold"
+                            android:text="@string/netpay"/>
 
-                    <TextView
-                        android:id="@+id/tv_name2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:text="@string/deductions"
-                        android:textColor="@color/purplepie"
-                        android:textStyle="bold"/>
+                        <TextView
+                            android:id="@+id/tv_name1_value"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
-                    <TextView
-                        android:id="@+id/tv_name2_value"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        <TextView
+                            android:id="@+id/tv_name2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:textColor="@color/bluepie"
+                            android:textStyle="bold"
+                            android:text="@string/deductions"/>
+
+                        <TextView
+                            android:id="@+id/tv_name2_value"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
-            </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_grosspay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="@string/totalgrosspay"
+                    android:textColor="@color/white" />
 
-            <TextView
-                android:id="@+id/tv_grosspay"
+
+            <!--<androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_salaryslip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="@string/totalgrosspay"
-                android:textColor="@color/white" />
-
+                tools:listitem="@layout/salary_innerdetails_layout"/>-->
 
         </LinearLayout>
-
-
-
 
         <LinearLayout
             android:layout_width="match_parent"

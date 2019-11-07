@@ -34,9 +34,10 @@ public class CalendarGridAdapter extends ArrayAdapter {
         this.currentDate = currentDate;
         this.context = context;
         this.calendarDetails = calendarDetails;
-        Log.d("calendar size status ", calendarDetails.size() + "");
+        //Log.d("calendar size status ", calendarDetails.size() + "");
         mInflater = LayoutInflater.from(context);
     }
+
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -50,51 +51,46 @@ public class CalendarGridAdapter extends ArrayAdapter {
         int currentYear = currentDate.get(Calendar.YEAR);
         View view = convertView;
 
-        if(view == null){
+        if (view == null) {
             view = mInflater.inflate(R.layout.single_cell_layout, parent, false);
 
         }
 
+        Log.d("calendar grid adapter  ", calendarDetails.size() + " day cell value " + dayValue);
         TextView cellNumber = view.findViewById(R.id.calendar_date_id);
-        if(displayMonth == currentMonth && displayYear == currentYear){
-            //view.setBackgroundColor(context.getResources().getColor(R.color.colorWhite))
-
+        if (displayMonth == currentMonth && displayYear == currentYear) {
             if(i<calendarDetails.size()) {
-                cellNumber.setTextColor(context.getResources().getColor(R.color.white));
-                setstatus_color(cellNumber, calendarDetails.get(i).getStatus());
-                Log.d("status check ", calendarDetails.get(i).getStatus());
-                i++;
+                if (String.valueOf(dayValue).equalsIgnoreCase(calendarDetails.get(i).getCDate())) {
+                    cellNumber.setText(String.valueOf(calendarDetails.get(i).getCDate()));
+                    cellNumber.setTextColor(context.getResources().getColor(R.color.white));
+                    setstatus_color(cellNumber, calendarDetails.get(i).getStatus());
+                    i++;
+                }
             }
 
-        }else{
+        } else {
             //view.setBackgroundResource(R.drawable.textview_rounded_holiday);
             cellNumber.setTextColor(context.getResources().getColor(R.color.black));
         }
-        //Add day to calendar
-
-        cellNumber.setText(String.valueOf(dayValue));
-        /*Add events to the calendar
-        TextView eventIndicator = (TextView)view.findViewById(R.id.event_id);
-        Calendar eventCalendar = Calendar.getInstance();*/
 
         return view;
     }
 
     private void setstatus_color(TextView cellNumber, String s) {
 
-        if(s.equalsIgnoreCase("0")){
+        if (s.equalsIgnoreCase("0")) {
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_absent);
-        }else if(s.equalsIgnoreCase("1")){
+        } else if (s.equalsIgnoreCase("1")) {
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_present);
-        }else if(s.equalsIgnoreCase("2")){
+        } else if (s.equalsIgnoreCase("2")) {
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_lateby);
-        }else if(s.equalsIgnoreCase("3")){
+        } else if (s.equalsIgnoreCase("3")) {
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_weekoff_holiday);
-        }else if(s.equalsIgnoreCase("4")){
+        } else if (s.equalsIgnoreCase("4")) {
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_workdone_onholiday);
-        }else if(s.equalsIgnoreCase("5")){
+        } else if (s.equalsIgnoreCase("5")) {
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_takenleave);
-        }else if(s.equalsIgnoreCase("6")){
+        } else if (s.equalsIgnoreCase("6")) {
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_overtime);
         }/*else{
             cellNumber.setBackgroundResource(R.drawable.textview_rounded_holiday);
@@ -106,6 +102,7 @@ public class CalendarGridAdapter extends ArrayAdapter {
     public int getCount() {
         return monthlyDates.size();
     }
+
     @Nullable
     @Override
     public Object getItem(int position) {

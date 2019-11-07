@@ -105,16 +105,18 @@
                         android:layout_weight="1"
                         android:gravity="end"
                         android:text="@string/employeename"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_gravity="center"/>
 
                     <TextView
+                        android:id="@+id/tv_employee_name"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_weight="1"
-                        android:text="Mr. Abc Def"
                         android:textAlignment="center"
-                        android:padding="5dp"/>
+                        android:layout_margin="5dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 </LinearLayout>
 
@@ -132,7 +134,8 @@
                         android:gravity="end"
                         android:text="@string/iwishtoapplyfor"
                         android:layout_margin="5dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_gravity="center"/>
 
                     <TextView
                         android:id="@+id/tv_leavetype"
@@ -144,7 +147,39 @@
                         android:textStyle="bold"
                         android:padding="5dp"
                         android:layout_margin="5dp"
-                        android:textColor="@color/lightblue"
+                        android:textColor="@color/colorPrimary"
+                        android:background="@drawable/textview_unselected"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:text="@string/balanceleave"
+                        android:layout_margin="5dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_gravity="center"/>
+
+                    <TextView
+                        android:id="@+id/tv_balance_leave"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:textAlignment="center"
+                        android:textStyle="bold"
+                        android:padding="5dp"
+                        android:layout_margin="5dp"
+                        android:textColor="@color/colorPrimary"
                         android:background="@drawable/textview_unselected"/>
 
                 </LinearLayout>
@@ -202,7 +237,8 @@
                         android:gravity="end"
                         android:text="@string/dateofleavefrom"
                         android:layout_margin="5dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_gravity="center"/>
 
                     <EditText
                         android:id="@+id/et_dateofleave_from"
@@ -232,7 +268,8 @@
                         android:gravity="end"
                         android:text="@string/dateofleaveto"
                         android:layout_margin="5dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_gravity="center"/>
 
                     <EditText
                         android:id="@+id/et_dateofleave_to"
@@ -262,7 +299,8 @@
                         android:gravity="end"
                         android:text="@string/days"
                         android:layout_margin="5dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_gravity="center"/>
 
                     <TextView
                         android:id="@+id/tv_days"
@@ -295,18 +333,50 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
-                        android:text="@string/templates"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        android:text="@string/reportto"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_gravity="center"
+                        android:layout_margin="5dp"/>
 
                     <Spinner
-                        android:id="@+id/spinner_duties"
+                        android:id="@+id/spinner_reportto"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_weight="1"
-                        android:background="@drawable/textview_unselected" />
+                        android:background="@drawable/textview_unselected"
+                        android:layout_margin="5dp"/>
 
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:text="@string/dutiescoveredby"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_gravity="center"
+                        android:layout_margin="5dp"/>
+
+                    <Spinner
+                        android:id="@+id/spinner_duties_coveredby"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:background="@drawable/textview_unselected"
+                        android:layout_margin="5dp"/>
+
+                </LinearLayout>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -348,6 +418,7 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
                     <EditText
+                        android:id="@+id/et_description"
                         android:layout_width="match_parent"
                         android:layout_height="100dp"
                         android:gravity="top|start"

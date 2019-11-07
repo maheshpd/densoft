@@ -1,6 +1,7 @@
 package com.densoftinfotech.densoftpaysmart;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,12 +11,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.adapter.QuickActionsAdapter;
-import com.densoftinfotech.densoftpaysmart.adapter.SalaryDistinctAdapter;
 import com.densoftinfotech.densoftpaysmart.adapter.SalarySlipAdapter;
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.app_utilities.SnapHelperOneByOne;
 import com.densoftinfotech.densoftpaysmart.classes.QuickActions;
-import com.densoftinfotech.densoftpaysmart.classes.SalarySlipDistinct;
 import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
-import com.densoftinfotech.densoftpaysmart.demo_class.QuickActionsArray;
+import com.densoftinfotech.densoftpaysmart.classes.QuickActionsArray;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
@@ -31,7 +32,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -39,8 +43,10 @@ import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,20 +73,17 @@ public class MainActivity extends CommonActivity {
     @BindView(R.id.tv_title)
     TextView tv_title;
 
-
     RecyclerView.LayoutManager layoutManager_salaryslip, layoutManager_quickaction;
 
-    SalaryDistinctAdapter salaryDistinctAdapter;
     QuickActionsAdapter quickActionsAdapter;
 
-    ArrayList<SalarySlipDistinct> salarySlipDistincts = new ArrayList<>();
+    ArrayList<SalarySlip> salarySlips = new ArrayList<>();
     ArrayList<QuickActions> quickActions = new ArrayList<>();
     StaffDetailsRoom staffDetailsRoom;
-
-    ArrayList<SalarySlip> salarySlips = new ArrayList<>();
     SalarySlipAdapter salarySlipAdapter;
 
     private GetServiceInterface getServiceInterface;
+    SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,23 +92,20 @@ public class MainActivity extends CommonActivity {
         fullscreen();
         setContentView(R.layout.activity_main);
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+
         ButterKnife.bind(this);
 
         GetRoomData getRoomData = new GetRoomData();
         getRoomData.execute();
 
-
+        LinearSnapHelper linearSnapHelper = new SnapHelperOneByOne();
         layoutManager_salaryslip = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recycler_view_salaryslip.setLayoutManager(layoutManager_salaryslip);
+        linearSnapHelper.attachToRecyclerView(recycler_view_salaryslip);
 
-        layoutManager_quickaction = new GridLayoutManager(this, 2);
+        layoutManager_quickaction = new GridLayoutManager(this, 3);
         recycler_view_quickactions.setLayoutManager(layoutManager_quickaction);
-
-
-        /*for (int i = 0; i < SalarySlipDemo.month.length; i++) {
-            salarySlipDistincts.add(new SalarySlipDistinct(SalarySlipDemo.apply_for_month[i], SalarySlipDemo.days_of_month[i], SalarySlipDemo.month_short[i], SalarySlipDemo.deductions[i]));
-        }*/
-
 
         for (int i = 0; i < QuickActionsArray.names.length; i++) {
             quickActions.add(new QuickActions(QuickActionsArray.names[i], QuickActionsArray.image[i]));
@@ -144,75 +144,43 @@ public class MainActivity extends CommonActivity {
 
     private void get_salary_data(String staffid) {
 
-
         Retrofit retrofit = RetrofitClient.getRetrofit();
-
         getServiceInterface = retrofit.create(GetServiceInterface.class);
 
         Map<String, Object> params = new HashMap<>();
+
+        params.put("customerid", preferences.getString("customerid", ""));
         params.put("ActionId", "0");
         params.put("StaffId", staffid);
         params.put("Month", 0);
-        params.put("Year", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+        params.put("Year", String.valueOf(Calendar.getInstance().get(Calendar.YEAR))); //current year
         JSONObject obj = new JSONObject(params);
         Log.d("params ", obj + "");
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
-        Call<ArrayList<SalarySlipDistinct>> call = getServiceInterface.request_salary(requestBody);
+        Call<ArrayList<SalarySlip>> call = getServiceInterface.request_salary(requestBody);
 
-        call.enqueue(new Callback<ArrayList<SalarySlipDistinct>>() {
+
+        call.enqueue(new Callback<ArrayList<SalarySlip>>() {
             @Override
-            public void onResponse(Call<ArrayList<SalarySlipDistinct>> call, Response<ArrayList<SalarySlipDistinct>> response) {
+            public void onResponse(Call<ArrayList<SalarySlip>> call, Response<ArrayList<SalarySlip>> response) {
                 if (!response.isSuccessful()) {
                     Log.d("response code ", response.code() + " ");
                 } else {
                     if (!response.body().isEmpty()) {
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            ArrayList<SalarySlipDistinct> distinctElements = (ArrayList<SalarySlipDistinct>) response.body().stream()
-                                    .filter(distinctByKey(SalarySlipDistinct::getApplyForMonth))
-                                    .collect(Collectors.toList());
-                            Log.d("SalarySlipscount ", distinctElements.size() + "");
 
-                            salarySlipDistincts = distinctElements;
+                        TreeSet<Integer> newset = new TreeSet<>();
+                        salarySlips = response.body();
 
-
+                        for (SalarySlip record : salarySlips) {
+                            newset.add(record.getApplyForMonth());
                         }
 
+                        //Log.d("newset is ", newset.size() + " " + newset);
 
-                        Log.d("size distinct ", salarySlipDistincts.size() + " \nsize arraylist " + response.body().size());
-                        for (int i = 0; i < salarySlipDistincts.size(); i++) {
+                        salarySlipAdapter = new SalarySlipAdapter(MainActivity.this, newset, response.body());
+                        recycler_view_salaryslip.setAdapter(salarySlipAdapter);
 
-                            /*salarySlips.clear();
-                            for (int j = 0; j < response.body().size(); j++) {
-                                if (response.body().get(j).getApplyForMonth() == salarySlipDistincts.get(i).getApplyForMonth()) {
-                                    Log.d("distinct elements are ", response.body().get(j).getApplyForMonth() + "");
-                                    salarySlips.add(new SalarySlip(response.body().get(j).getName(),
-                                            response.body().get(j).getAmount(), response.body().get(j).getApplyForMonth(),
-                                            response.body().get(j).getApplyForYear()));
-
-                                }
-
-                                Log.d("salary slip added ", salarySlips.size() + "");
-
-                            }*/
-
-                            salaryDistinctAdapter = new SalaryDistinctAdapter(MainActivity.this, response.body(), salarySlipDistincts);
-                            recycler_view_salaryslip.setAdapter(salaryDistinctAdapter);
-
-                            /*salarySlipAdapter = new SalarySlipAdapter(MainActivity.this, salarySlips);
-                            recycler_view_salaryslip.setAdapter(salarySlipAdapter);*/
-
-
-                        }
-
-                        /*salarySlipAdapter = new SalarySlipAdapter(MainActivity.this, salarySlipDistincts);
-                        recycler_view_salaryslip.setAdapter(salarySlipAdapter);*/
-
-                        //Set<SalarySlipDistinct> salarySlipscount = new HashSet<SalarySlipDistinct>(response.body());
-
-
-                            /*salarySlipAdapter = new SalarySlipAdapter(MainActivity.this, salarySlipDistincts);
-                            recycler_view_salaryslip.setAdapter(salarySlipAdapter);*/
 
                     } else {
 
@@ -221,38 +189,39 @@ public class MainActivity extends CommonActivity {
             }
 
             @Override
-            public void onFailure(Call<ArrayList<SalarySlipDistinct>> call, Throwable t) {
+            public void onFailure(Call<ArrayList<SalarySlip>> call, Throwable t) {
 
             }
         });
 
     }
 
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
-        Map<Object, Boolean> map = new ConcurrentHashMap<>();
-        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
-
     public void gotoactivity(int image) {
 
         switch (image) {
-            case R.mipmap.salarydetails:
-                Intent isalary = new Intent(MainActivity.this, SalaryDetailsActivity.class);
+            case R.mipmap.salary_details:
+                Intent isalary = new Intent(MainActivity.this, SalarySlipDetailsActivity.class);
                 startActivity(isalary);
                 break;
             case R.mipmap.planner:
-                Intent iplan = new Intent(MainActivity.this, PlannerActivity.class);
+                Intent iplan = new Intent(MainActivity.this, PlannerActivityv1.class);
                 startActivity(iplan);
                 break;
-            case R.mipmap.attendancehistory:
+            case R.mipmap.attendance_history:
                 Intent iattendance = new Intent(MainActivity.this, MarkAttendanceActivity.class);
                 startActivity(iattendance);
                 break;
-            case R.mipmap.travelclaims:
-                Intent itravel = new Intent(MainActivity.this, MarkAttendanceActivity.class);
-                startActivity(itravel);
+            case R.mipmap.travel_claims:
+                /*Intent itravel = new Intent(MainActivity.this, TravelClaimActivity.class);
+                startActivity(itravel);*/
+                break;
+            case R.mipmap.leaves:
+                Intent ileave = new Intent(MainActivity.this, LeaveListActivity.class);
+                startActivity(ileave);
+                break;
+            case R.mipmap.team:
+                /*Intent iteam = new Intent(MainActivity.this, TeamActivity.class);
+                startActivity(iteam);*/
                 break;
         }
     }
@@ -261,6 +230,8 @@ public class MainActivity extends CommonActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             staffDetailsRoom = Paysmart_roomdatabase.get_PaysmartDatabase(MainActivity.this).staffDetails_dao().getAll();
+            Constants.staffid = staffDetailsRoom.getStaffId();
+            Constants.staffDetailsRoom = staffDetailsRoom;
             return null;
         }
 
@@ -271,7 +242,7 @@ public class MainActivity extends CommonActivity {
                 tv_title.setText(staffDetailsRoom.getCompanyName());
                 get_salary_data(staffDetailsRoom.getStaffId());
 
-                Picasso.with(MainActivity.this).load(staffDetailsRoom.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
+                //Picasso.with(MainActivity.this).load(staffDetailsRoom.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
             }
 
         }

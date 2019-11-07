@@ -5,6 +5,7 @@
     <string name="enterstaffid">Staff Id</string>
     <string name="enterpassword">Password</string>
     <string name="login">Login</string>
+    <string name="pleaseentercustomerid">Please enter the customer id!!</string>
     <string name="pleaseenterstaffid">Please enter the staff id!!</string>
     <string name="pleaseenterpassword">Please enter the password!!</string>
     <string name="myleaves">My Leaves</string>
@@ -60,7 +61,7 @@
     <string name="gpsnotenabled">GPS is not enabled. Kindly enable it from the settings to proceed.</string>
     <string name="ok">Ok</string>
     <string name="pleasecontactbranch">Login failed. Please contact your branch</string>
-    <string name="iwishtoapplyfor">I wish to appy for</string>
+    <string name="iwishtoapplyfor">I wish to apply for</string>
     <string name="selectgreaterdate">Please select a date greater than the date you have selected</string>
     <string name="welcome">Welcome</string>
     <string name="rs">₹</string>
@@ -78,5 +79,14 @@
     <string name="weekoff_holiday">WeekOff Holiday</string>
     <string name="takenleave">Taken Leave</string>
     <string name="workdone_onholiday">Workdone on Weekoff/Holiday</string>
+    <string name="get_salaryslip">Get Salary Slip</string>
+    <string name="leaveassigned">Leave Assigned</string>
+    <string name="balanceleave">Balance Leave</string>
+    <string name="reportto">Report To</string>
+    <string name="cannotapplyforleaveinprobation">You Can\'t apply for leaves in your probation period</string>
+    <string name="leavesnotremaining">You do not have sufficient leaves</string>
+    <string name="pleasecontactadmin">Please contact the concerned person</string>
+    <string name="receivedleaveapplication">We have received your leave application</string>
+    <string name="nodataavailable">No data available for the selected year</string>
 
 </resources>

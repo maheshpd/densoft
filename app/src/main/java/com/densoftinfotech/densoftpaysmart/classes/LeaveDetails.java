@@ -3,27 +3,77 @@ package com.densoftinfotech.densoftpaysmart.classes;
 import java.io.Serializable;
 
 public class LeaveDetails implements Serializable {
-    int days = 0;
-    String name_of_leave = "";
 
-    public LeaveDetails(int days, String name_of_leave){
-        this.days = days;
-        this.name_of_leave = name_of_leave;
+    String StaffId = "";
+    String PName = "";
+    String Name = "";
+    String Description = "";
+    String LeaveId = "";
+    String LeaveAssign = "";
+    String LeaveTaken = "";
+    String BalanceLeave = "";
+
+    public String getStaffId() {
+        return StaffId;
     }
 
-    public int getDays() {
-        return days;
+    public void setStaffId(String staffId) {
+        StaffId = staffId;
     }
 
-    public void setDays(int days) {
-        this.days = days;
+    public String getPName() {
+        return PName;
     }
 
-    public String getName_of_leave() {
-        return name_of_leave;
+    public void setPName(String PName) {
+        this.PName = PName;
     }
 
-    public void setName_of_leave(String name_of_leave) {
-        this.name_of_leave = name_of_leave;
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public String getDescription() {
+        return Description;
+    }
+
+    public void setDescription(String description) {
+        Description = description;
+    }
+
+    public String getLeaveId() {
+        return LeaveId;
+    }
+
+    public void setLeaveId(String leaveId) {
+        LeaveId = leaveId;
+    }
+
+    public String getLeaveAssign() {
+        return LeaveAssign;
+    }
+
+    public void setLeaveAssign(String leaveAssign) {
+        LeaveAssign = leaveAssign;
+    }
+
+    public String getLeaveTaken() {
+        return LeaveTaken;
+    }
+
+    public void setLeaveTaken(String leaveTaken) {
+        LeaveTaken = leaveTaken;
+    }
+
+    public String getBalanceLeave() {
+        return BalanceLeave;
+    }
+
+    public void setBalanceLeave(String balanceLeave) {
+        BalanceLeave = balanceLeave;
     }
 }

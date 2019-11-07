@@ -38,15 +38,20 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, final int i) {
-        holder.tv_days.setText("" + leaveDetails.get(i).getDays());
-        holder.tv_name_of_leave.setText(leaveDetails.get(i).getName_of_leave());
+
+        holder.tv_name_of_leave.setText(leaveDetails.get(i).getName() + " - " + leaveDetails.get(i).getDescription());
+
+        holder.tv_balance_leave.setText("" + leaveDetails.get(i).getBalanceLeave());
+        holder.tv_takenleave.setText("" + leaveDetails.get(i).getLeaveTaken());
+        holder.tv_totalassigned.setText("" + leaveDetails.get(i).getLeaveAssign());
+
 
 
         holder.tv_apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i1 = new Intent(context, LeaveApplicationActivity.class);
-                i1.putExtra("leave", leaveDetails.get(i));
+                i1.putExtra("leaves", leaveDetails.get(i));
                 context.startActivity(i1);
             }
         });
@@ -59,8 +64,12 @@ public class LeaveAdapter extends RecyclerView.Adapter<LeaveAdapter.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.tv_days)
-        TextView tv_days;
+        @BindView(R.id.tv_balance_leave)
+        TextView tv_balance_leave;
+        @BindView(R.id.tv_takenleave)
+        TextView tv_takenleave;
+        @BindView(R.id.tv_totalassigned)
+        TextView tv_totalassigned;
         @BindView(R.id.tv_name_of_leave)
         TextView tv_name_of_leave;
         @BindView(R.id.tv_apply)

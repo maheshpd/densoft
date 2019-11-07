@@ -1,5 +1,7 @@
 package com.densoftinfotech.densoftpaysmart.classes;
 
+import androidx.annotation.NonNull;
+
 public class CalendarDetails {
 
     String description = "";
@@ -152,5 +154,11 @@ public class CalendarDetails {
 
     public void setStatus(String status) {
         Status = status;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

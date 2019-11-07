@@ -65,9 +65,9 @@ public class MyLeaveFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        for(int i = 0; i< LeaveDetailsDemo.name_of_leave.length; i++){
+        /*for(int i = 0; i< LeaveDetailsDemo.name_of_leave.length; i++){
             leaveDetails.add(new LeaveDetails(LeaveDetailsDemo.days[i], LeaveDetailsDemo.name_of_leave[i]));
-        }
+        }*/
 
         leaveAdapter = new LeaveAdapter(getActivity(), leaveDetails);
         recyclerView.setAdapter(leaveAdapter);

@@ -10,12 +10,12 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "table_staff_details")
-public class StaffDetailsRoom{
+public class StaffDetailsRoom {
 
     public StaffDetailsRoom() {
     }
 
-    @PrimaryKey(autoGenerate =  true)
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     @ColumnInfo(name = "staff_id")
@@ -51,8 +51,11 @@ public class StaffDetailsRoom{
     @ColumnInfo(name = "staff_profileimage")
     private String StaffPhoto = "";
 
+    @ColumnInfo(name = "staff_domainurl")
+    private String DomainUrl = "";
 
-    public StaffDetailsRoom(String staffId, String PName, String mobile1, String email1, String gender, String joiningDate, String companyName, String branchName, String department, String designation, String StaffPhoto) {
+    public StaffDetailsRoom(String staffId, String PName, String mobile1, String email1, String gender, String joiningDate, String companyName, String branchName,
+                            String department, String designation, String StaffPhoto, String DomainUrl) {
 
         this.StaffId = staffId;
         this.PName = PName;
@@ -65,6 +68,7 @@ public class StaffDetailsRoom{
         this.Department = department;
         this.Designation = designation;
         this.StaffPhoto = StaffPhoto;
+        this.DomainUrl = DomainUrl;
     }
 
     public int getId() {
@@ -162,4 +166,14 @@ public class StaffDetailsRoom{
     public void setStaffPhoto(String staffPhoto) {
         StaffPhoto = staffPhoto;
     }
+
+
+    public String getDomainUrl() {
+        return DomainUrl;
+    }
+
+    public void setDomainUrl(String domainUrl) {
+        DomainUrl = domainUrl;
+    }
+
 }

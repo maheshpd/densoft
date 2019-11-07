@@ -29,8 +29,6 @@ public class StaffDetails{
     private String UANNO = "";
     private String ESIC = "";
 
-
-
     public String getStaffId() {
         return StaffId;
     }

@@ -1,7 +1,10 @@
 package com.densoftinfotech.densoftpaysmart;
 
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -9,10 +12,14 @@ import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.adapter.PlannerAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 import com.squareup.picasso.Picasso;
+
+import java.util.Calendar;
+import java.util.Locale;
 
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
@@ -36,20 +43,24 @@ public class PlannerActivity extends CommonActivity {
     @BindView(R.id.iv_profile)
     ImageView iv_profile;
 
-
     PlannerAdapter plannerAdapter;
-
-    private StaffDetailsRoom staffDetailsRoom;
-
+    private Calendar cal = Calendar.getInstance(Locale.ENGLISH);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planner);
-        toolbar_common();
-        back();
 
         ButterKnife.bind(this);
+
+
+        if(Constants.staffDetailsRoom!=null){
+            setTitle(Constants.staffDetailsRoom.getPName());
+            back();
+        }else{
+            toolbar_common();
+            back();
+        }
 
         plannerAdapter = new PlannerAdapter(getSupportFragmentManager(), 1);
         viewpager.setAdapter(plannerAdapter);
@@ -74,6 +85,7 @@ public class PlannerActivity extends CommonActivity {
                 viewpager.setCurrentItem(2);
             }
         });
+
 
 
         viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -123,6 +135,15 @@ public class PlannerActivity extends CommonActivity {
         tv_myplanner.setTextColor(getResources().getColor(R.color.white));
         tv_myteam.setBackgroundResource(R.drawable.textview_rounded_unselected_right);
         tv_myteam.setTextColor(getResources().getColor(R.color.black));
+
+        Calendar mCal = (Calendar) cal.clone();
+        mCal.add(Calendar.MONTH, 1);
+        Log.d("month ", mCal.get(Calendar.MONTH) + " ");
+
+        Intent intent = new Intent("notifyrecycler");
+        intent.putExtra("status", mCal.get(Calendar.MONTH));
+        sendBroadcast(intent);
+
     }
 
     private void select_tv_myteam() {

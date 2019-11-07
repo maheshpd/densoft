@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class MonthDisplay {
     String name_of_month = "";
+    boolean isSelected = false;
 
     public MonthDisplay(String name_of_month){
         this.name_of_month = name_of_month;
@@ -17,4 +18,11 @@ public class MonthDisplay {
         this.name_of_month = name_of_month;
     }
 
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
 }

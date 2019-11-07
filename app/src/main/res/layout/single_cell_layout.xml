@@ -12,9 +12,7 @@
         android:textStyle="bold"
         android:gravity="center"
         android:layout_gravity="center"
-        android:text="@string/last_date"
         android:textAlignment="center"
-        android:background="@drawable/textview_rounded_holiday"
         android:ems="2"/>
 
     <!--<LinearLayout

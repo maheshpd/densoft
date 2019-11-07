@@ -1,18 +1,15 @@
 package com.densoftinfotech.densoftpaysmart.classes;
 
+import java.util.ArrayList;
+
 public class SalarySlip {
 
     int ApplyForMonth = 0;
     int ApplyForYear = 0;
     String Name = "";
     double Amount = 0;
+    boolean isSelected = false;
 
-    public SalarySlip(String Name, double Amount, int ApplyForMonth, int ApplyForYear) {
-        this.Name = Name;
-        this.Amount = Amount;
-        this.ApplyForMonth = ApplyForMonth;
-        this.ApplyForYear = ApplyForYear;
-    }
 
     public int getApplyForMonth() {
         return ApplyForMonth;
@@ -44,5 +41,13 @@ public class SalarySlip {
 
     public void setAmount(double amount) {
         Amount = amount;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

@@ -19,25 +19,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-import com.densoftinfotech.densoftpaysmart.MainActivity;
 import com.densoftinfotech.densoftpaysmart.MarkAttendanceActivity;
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.adapter.CalendarDetailsAdapter;
-import com.densoftinfotech.densoftpaysmart.adapter.MarkAttendanceAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
-import com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView;
 import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
-import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
-import com.densoftinfotech.densoftpaysmart.demo_class.CalendarDetailsDemo;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
@@ -49,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Attributes;
 
 public class MyPlannerFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
@@ -62,8 +54,8 @@ public class MyPlannerFragment extends Fragment {
     RecyclerView recyclerview;
     @BindView(R.id.scrollview)
     ScrollView scrollview;
-    @BindView(R.id.custom_calendar)
-    CalendarCustomView mView;
+    /*@BindView(R.id.custom_calendar)
+    CalendarCustomView mView;*/
     @BindView(R.id.iv_history)
     ImageView iv_history;
 
@@ -104,9 +96,9 @@ public class MyPlannerFragment extends Fragment {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_my_planner, container, false);
 
-        if(getContext()!=null) {
+        /*if(getContext()!=null) {
             getContext().registerReceiver(broadcastReceiver, new IntentFilter("notifyrecycler"));
-        }
+        }*/
 
         ButterKnife.bind(this, v);
         scrollview.fullScroll(ScrollView.FOCUS_UP);
@@ -127,7 +119,7 @@ public class MyPlannerFragment extends Fragment {
         return v;
     }
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    /*private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.hasExtra("status")){
@@ -159,13 +151,13 @@ public class MyPlannerFragment extends Fragment {
                 recyclerview.getLayoutManager().startSmoothScroll(smoothScroller);
             }
         }
-    };
+    };*/
 
     @Override
     public void onDestroy() {
-        if(getContext()!=null){
+        /*if(getContext()!=null){
             getContext().unregisterReceiver(broadcastReceiver);
-        }
+        }*/
 
         super.onDestroy();
     }
@@ -183,7 +175,7 @@ public class MyPlannerFragment extends Fragment {
         params.put("Year", String.valueOf(2019));
 
         JSONObject obj = new JSONObject(params);
-        Log.d("params ", obj + "");
+        //Log.d("params ", obj + "");
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
 
@@ -194,7 +186,7 @@ public class MyPlannerFragment extends Fragment {
                 if(!response.isSuccessful()){
                     Log.d("response code ", response.code() + " ");
                 }else {
-                    Log.d("response ", response.body() + "");
+                    Log.d("recvd in planner ", response.body() + "");
 
                     if(response.body()!=null && !response.body().isEmpty()) {
                         calendarDetails = response.body();

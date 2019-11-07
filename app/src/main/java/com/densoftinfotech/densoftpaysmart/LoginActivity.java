@@ -17,6 +17,7 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
 import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 
+import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 import com.google.gson.Gson;
@@ -24,7 +25,9 @@ import com.google.gson.GsonBuilder;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,19 +95,16 @@ public class LoginActivity extends CommonActivity {
 
     private void get_login_data() {
 
-        Gson gson = new GsonBuilder().serializeNulls().create();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(URLS.common_url_webroute())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
+        Retrofit retrofit = RetrofitClient.getRetrofit();
         apiInterface = retrofit.create(GetServiceInterface.class);
 
         Map<String, Object> params = new HashMap<>();
 
+        params.put("customerid", et_customerid.getText().toString());
         params.put("user", et_staffid.getText().toString());
         params.put("password", et_password.getText().toString());
+
+        edit.putString("customerid", et_customerid.getText().toString());
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(params)).toString());
 
@@ -130,21 +130,25 @@ public class LoginActivity extends CommonActivity {
     }
 
     private boolean checkfor_noblankparam() {
-        if (!et_staffid.getText().toString().trim().equals("")) {
-            if (!et_password.getText().toString().trim().equals("")) {
-                return true;
+        if(!et_customerid.getText().toString().trim().equals("")) {
+            if (!et_staffid.getText().toString().trim().equals("")) {
+                if (!et_password.getText().toString().trim().equals("")) {
+                    return true;
+                } else {
+                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleaseenterpassword), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
             } else {
-                Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleaseenterpassword), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleaseenterstaffid), Toast.LENGTH_SHORT).show();
                 return false;
             }
-        } else {
-            Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleaseenterstaffid), Toast.LENGTH_SHORT).show();
+        }else{Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleaseentercustomerid), Toast.LENGTH_SHORT).show();
             return false;
         }
     }
 
 
-    private class SaveDetails_async extends AsyncTask<ArrayList<StaffDetails>, String, Void> {
+    private class SaveDetails_async extends AsyncTask<ArrayList<StaffDetails>, Void, Void> {
 
         StaffDetailsRoom staffDetailsRoom;
 
@@ -157,7 +161,7 @@ public class LoginActivity extends CommonActivity {
 
             staffDetailsRoom = new StaffDetailsRoom(staffDetailsArrayList.get(0).getStaffId(), staffDetailsArrayList.get(0).getPName(), staffDetailsArrayList.get(0).getMobile1(), staffDetailsArrayList.get(0).getEmail1(),
                     staffDetailsArrayList.get(0).getGender(), staffDetailsArrayList.get(0).getJoiningDate(), staffDetailsArrayList.get(0).getCompanyName(), staffDetailsArrayList.get(0).getBranchName(),
-                    staffDetailsArrayList.get(0).getDepartment(), staffDetailsArrayList.get(0).getDesignation(), staffDetailsArrayList.get(0).getStaffPhoto());
+                    staffDetailsArrayList.get(0).getDepartment(), staffDetailsArrayList.get(0).getDesignation(), staffDetailsArrayList.get(0).getStaffPhoto(), staffDetailsArrayList.get(0).getDomainUrl());
 
             Paysmart_roomdatabase.get_PaysmartDatabase(LoginActivity.this).staffDetails_dao().insertAll(staffDetailsRoom);
 

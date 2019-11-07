@@ -6,6 +6,10 @@ public class URLS {
         return "http://" + Constants.ip + "//WebRoute/";
     }
 
+    public final static String dynamic_url_webroute(String domain){
+        return "http://" + domain +"/";
+    }
+
     public static final String login_api(){
         return common_url_webroute() + "stafflogin_Api";
     }

@@ -33,7 +33,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView
+            <!--<com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView
                 android:id="@+id/custom_calendar"
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
@@ -46,7 +46,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
-            </com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView>
+            </com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView>-->
 
             <View
                 android:id="@+id/view"

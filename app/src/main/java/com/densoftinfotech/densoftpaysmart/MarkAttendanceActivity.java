@@ -1,6 +1,7 @@
 package com.densoftinfotech.densoftpaysmart;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -12,6 +13,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -34,6 +36,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.adapter.MarkAttendanceAdapter;
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
 import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
 import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
@@ -88,6 +91,9 @@ public class MarkAttendanceActivity extends CommonActivity {
     ArrayList<MarkAttendanceDetails> markAttendanceDetails = new ArrayList<>();
     private ArrayList<Integer> years = new ArrayList<>();
     private static String[] month_short = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    private SharedPreferences preferences;
+
+    Bundle b;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,13 +105,22 @@ public class MarkAttendanceActivity extends CommonActivity {
 
         ButterKnife.bind(this);
 
-        layoutManager = new LinearLayoutManager(MarkAttendanceActivity.this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(MarkAttendanceActivity.this);
+
+        b = getIntent().getExtras();
+        if (b != null) {
+            if (b.containsKey("planner_month") && b.containsKey("planner_year")) {
+                getset_spinner_data(Integer.parseInt(b.getString("planner_year", "")), Integer.parseInt(b.getString("planner_month", "")), Constants.staffid, 0);
+                get_monthandyear(Constants.staffid, b.getString("planner_month", ""), b.getString("planner_year", ""));
+
+            }
+        }else{
+            Get_Attendance get_attendance = new Get_Attendance();
+            get_attendance.execute();
+        }
+
+        layoutManager = new LinearLayoutManager(MarkAttendanceActivity.this, LinearLayoutManager.VERTICAL, true);
         recycler_view_markattendance.setLayoutManager(layoutManager);
-
-        Get_Attendance get_attendance = new Get_Attendance();
-        get_attendance.execute();
-
-
 
         tv_checkin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,39 +136,16 @@ public class MarkAttendanceActivity extends CommonActivity {
             }
         });
 
-        /*et_month.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                if(!charSequence.toString().trim().equals("")) {
-                    Get_Attendance get_attendance = new Get_Attendance();
-                    get_attendance.execute(charSequence.toString());
-                }else {
-                    linearLayout11.setVisibility(View.GONE);
-                    recycler_view_markattendance.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });*/
 
     }
 
     private void get_attendance_details(String staffid, String month_send, String year_send) {
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
-
         getServiceInterface = retrofit.create(GetServiceInterface.class);
-
         Map<String, Object> params = new HashMap<>();
+
+        params.put("customerid", preferences.getString("customerid", ""));
         params.put("ActionId", "0");
         params.put("StaffId", staffid);
         params.put("Month", month_send);
@@ -168,18 +160,18 @@ public class MarkAttendanceActivity extends CommonActivity {
         call.enqueue(new Callback<ArrayList<MarkAttendanceDetails>>() {
             @Override
             public void onResponse(Call<ArrayList<MarkAttendanceDetails>> call, Response<ArrayList<MarkAttendanceDetails>> response) {
-                if(!response.isSuccessful()){
+                if (!response.isSuccessful()) {
                     Log.d("response code ", response.code() + " ");
-                }else {
+                } else {
                     Log.d("response ", response.body() + "");
 
-                    if(response.body()!=null && !response.body().isEmpty()) {
+                    if (response.body() != null && !response.body().isEmpty()) {
                         linearLayout11.setVisibility(View.VISIBLE);
                         recycler_view_markattendance.setVisibility(View.VISIBLE);
                         markAttendanceDetails = response.body();
                         markAttendanceAdapter = new MarkAttendanceAdapter(MarkAttendanceActivity.this, markAttendanceDetails);
                         recycler_view_markattendance.setAdapter(markAttendanceAdapter);
-                    }else {
+                    } else {
                         linearLayout11.setVisibility(View.GONE);
                         recycler_view_markattendance.setVisibility(View.GONE);
                     }
@@ -199,16 +191,23 @@ public class MarkAttendanceActivity extends CommonActivity {
         if (userLocation.isGpsEnabled()) {
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy ', ' HH:mm:ss z");
             String currentDateandTime = sdf.format(new Date());
-            if(flag == 0){
+            if (flag == 0) {
                 tv_checkintime.setText(getResources().getString(R.string.checkintime) + " " + currentDateandTime + " at " + userLocation.getAddress());
                 tv_checkintime.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 tv_checkouttime.setText(getResources().getString(R.string.checkouttime) + " " + currentDateandTime + " at " + userLocation.getAddress());
                 tv_checkouttime.setVisibility(View.VISIBLE);
             }
             longitude = Double.toString(userLocation.getLongitude());
             latitude = Double.toString(userLocation.getLatitude());
-            Log.d("lat and long checkin ", longitude + "    " + latitude +  " address " +userLocation.getAddress());
+            Log.d("lat and long checkin ", longitude + "    " + latitude + " address " + userLocation.getAddress());
+
+            /*jsonObject.accumulate("myConStr", "a");
+            jsonObject.accumulate("type", type); // in / out
+            jsonObject.accumulate("id", id);
+            jsonObject.accumulate("lat", latitude);
+            jsonObject.accumulate("logi", longitude);
+            jsonObject.accumulate("number", "");*/
         } else {
             userLocation.gpsNotEnabled_Alert();
         }
@@ -225,7 +224,7 @@ public class MarkAttendanceActivity extends CommonActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_checkin:
                 set_check_time(0);
                 break;
@@ -239,39 +238,43 @@ public class MarkAttendanceActivity extends CommonActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class Get_Attendance extends AsyncTask<Void, Void, Void > {
+    private class Get_Attendance extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
 
             StaffDetailsRoom staffDetails = Paysmart_roomdatabase.get_PaysmartDatabase(MarkAttendanceActivity.this).staffDetails_dao().getAll();
 
-            if(staffDetails!=null){
+            if (staffDetails != null) {
                 //get_attendance_details(staffDetails.getStaffId(), voids[0]);
                 year_of_joining = Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]);
 
-                getset_spinner_data(year_of_joining, staffDetails.getStaffId());
+                getset_spinner_data(year_of_joining, Calendar.getInstance().get(Calendar.MONTH), staffDetails.getStaffId(), 1);
             }
 
             return null;
         }
     }
 
-    private void getset_spinner_data(int year_of_joining, String staffid) {
+    private void getset_spinner_data(int year_of_joining, int month1, String staffid, int flag) {
 
-        for(int i = year_of_joining; i<=Calendar.getInstance().get(Calendar.YEAR); i++) {
+        for (int i = Integer.parseInt(Constants.staffDetailsRoom.getJoiningDate().split("-")[2]); i <= Calendar.getInstance().get(Calendar.YEAR); i++) {
             years.add(i);
         }
 
         ArrayAdapter<Integer> yearAdapter = new ArrayAdapter<Integer>(MarkAttendanceActivity.this, R.layout.custom_spinnerlayout, R.id.text1, years);
         spinner_year.setAdapter(yearAdapter);
 
-        spinner_year.setSelection((years.size()-1));
-
         ArrayAdapter<String> monthAdapter = new ArrayAdapter<String>(MarkAttendanceActivity.this, R.layout.custom_spinnerlayout, R.id.text1, month_short);
         spinner_month.setAdapter(monthAdapter);
 
-        spinner_month.setSelection(Calendar.getInstance().get(Calendar.MONTH));
+        if(flag == 1) {
+            spinner_month.setSelection(Calendar.getInstance().get(Calendar.MONTH));
+            spinner_year.setSelection((years.size() - 1));
+        }else{
+            spinner_month.setSelection(month1-1);
+            spinner_year.setSelection(yearAdapter.getPosition(year_of_joining));
+        }
 
         spinner_month.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -302,55 +305,71 @@ public class MarkAttendanceActivity extends CommonActivity {
         });
     }
 
-    private void get_monthandyear(String  staffid, String month, String year) {
+    private void get_monthandyear(String staffid, String month, String year1) {
 
-        if(year.equals("")){
+        if (year.equals("")) {
             year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+        }else {
+            year = year1;
         }
-        if(month.equals("")){
+
+
+        if (month.equals("")) {
             month = String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
         }
 
-        switch (month){
+        Log.d("month by broadcast ", month + " MarkAttendanceActivity " + year1);
+
+        switch (month) {
             case "Jan":
+            case "1":
                 get_attendance_details(staffid, "1", year);
                 break;
             case "Feb":
+            case "2":
                 get_attendance_details(staffid, "2", year);
                 break;
             case "Mar":
+            case "3":
                 get_attendance_details(staffid, "3", year);
                 break;
             case "Apr":
+            case "4":
                 get_attendance_details(staffid, "4", year);
                 break;
             case "May":
+            case "5":
                 get_attendance_details(staffid, "5", year);
                 break;
             case "Jun":
+            case "6":
                 get_attendance_details(staffid, "6", year);
                 break;
             case "Jul":
+            case "7":
                 get_attendance_details(staffid, "7", year);
                 break;
             case "Aug":
+            case "8":
                 get_attendance_details(staffid, "8", year);
                 break;
             case "Sep":
+            case "9":
                 get_attendance_details(staffid, "9", year);
                 break;
             case "Oct":
+            case "10":
                 get_attendance_details(staffid, "10", year);
                 break;
             case "Nov":
+            case "11":
                 get_attendance_details(staffid, "11", year);
                 break;
             case "Dec":
+            case "12":
                 get_attendance_details(staffid, "12", year);
                 break;
         }
-
-
 
     }
 }

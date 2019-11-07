@@ -153,8 +153,8 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
         holder.tv_status.setText("" + (position + 1));
         holder.tv_intime.setText(": " + calendarDetails.get(position).getInTime());
         holder.tv_outtime.setText(": " + calendarDetails.get(position).getOutTime());
-        holder.tv_working_hours.setText(": " + calendarDetails.get(position).getWorkingHour());
         holder.tv_lateby.setText(": " + calendarDetails.get(position).getLateBy());
+        holder.tv_working_hours.setText(": " + calendarDetails.get(position).getWorkingHour());
         holder.tv_holiday_name.setText(": " + calendarDetails.get(position).getHoliDayName());
         holder.tv_overtime.setText(": " + calendarDetails.get(position).getOutTime());
 

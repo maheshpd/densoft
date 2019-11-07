@@ -9,9 +9,11 @@ import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.SalarySlipDetailsActivity;
+import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.classes.MonthDisplay;
 
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,14 +23,12 @@ import butterknife.ButterKnife;
 public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder> {
 
     Context context;
-    ArrayList<MonthDisplay> monthDisplays = new ArrayList<>();
+    ArrayList<Integer> monthDisplays = new ArrayList<>();
     int selected = 0;
-    int pos = 0;
 
-    public MonthAdapter(Context context, ArrayList<MonthDisplay> monthDisplays, int pos) {
+    public MonthAdapter(Context context, TreeSet<Integer> monthDisplays) {
         this.context = context;
-        this.monthDisplays = monthDisplays;
-        this.pos = pos;
+        this.monthDisplays = new ArrayList<Integer>(monthDisplays);
     }
 
     @NonNull
@@ -41,15 +41,26 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
 
-        holder.tv_month.setSelected(i == selected);
+
+        holder.tv_month.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                holder.tv_month.setTextColor(context.getResources().getColor(R.color.white));
+                holder.tv_month.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                ((SalarySlipDetailsActivity) context).gotoselection(String.valueOf(monthDisplays.get(i)));
+
+            }
+        });
+
+        /*holder.tv_month.setSelected(i == selected);
 
         if (holder.tv_month.isSelected()) {
             holder.tv_month.setTextColor(context.getResources().getColor(R.color.white));
             holder.tv_month.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-            //((SalarySlipDetailsActivity) context).gotoselection(i);
+            ((SalarySlipDetailsActivity) context).gotoselection(String.valueOf(monthDisplays.get(i)));
         } else {
             holder.tv_month.setTextColor(context.getResources().getColor(R.color.gray));
-        }
+        }*/
 
         /*holder.tv_month.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,8 +69,9 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
             }
         });*/
 
-        holder.tv_month.setText(monthDisplays.get(i).getName_of_month());
+        holder.tv_month.setText(((CommonActivity) context).get_monthName(monthDisplays.get(i)));
     }
+
 
     @Override
     public int getItemCount() {
@@ -76,13 +88,6 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
 
             ButterKnife.bind(this, itemView);
 
-            tv_month.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    selected = getAdapterPosition();
-                    notifyDataSetChanged();
-                }
-            });
         }
     }
 }
