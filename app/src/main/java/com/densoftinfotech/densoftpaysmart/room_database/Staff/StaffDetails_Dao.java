@@ -1,9 +1,5 @@
 package com.densoftinfotech.densoftpaysmart.room_database.Staff;
 
-
-
-import java.util.ArrayList;
-
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -24,7 +20,7 @@ public interface StaffDetails_Dao {
         @Insert
         void insertAll(StaffDetailsRoom users);
 
-        @Delete
-        void delete(StaffDetailsRoom user);
+        @Query("DELETE FROM table_staff_details where staff_id = :staffid")
+        void delete(String staffid);
 
 }

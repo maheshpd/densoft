@@ -23,18 +23,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
+            <TextView
                 android:id="@+id/iv_history"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
-                android:background="@drawable/history"
+                android:drawableRight="@drawable/history"
+                android:drawablePadding="5dp"
+                android:text="Check History"
                 app:layout_constraintBottom_toTopOf="@+id/custom_calendar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.958"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent"
+                android:gravity="center"
+                android:textColor="@color/darkblue"/>
 
             <com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView
                 android:id="@+id/custom_calendar"

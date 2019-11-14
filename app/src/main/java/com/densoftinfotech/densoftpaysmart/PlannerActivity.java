@@ -1,8 +1,6 @@
 package com.densoftinfotech.densoftpaysmart;
 
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,10 +11,6 @@ import android.widget.TextView;
 import com.densoftinfotech.densoftpaysmart.adapter.PlannerAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
-import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
-import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
-import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.Locale;

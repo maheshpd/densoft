@@ -1,5 +1,30 @@
 package com.densoftinfotech.densoftpaysmart;
 
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.densoftinfotech.densoftpaysmart.adapter.SalarySlipAdapter;
+import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
+import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
+import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
+import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
+import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,35 +35,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.text.format.DateFormat;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.TextView;
-
-import com.densoftinfotech.densoftpaysmart.adapter.SalarySlipAdapter;
-import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
-import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
-import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
-import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
-import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
-import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
-import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
-import com.itextpdf.text.pdf.parser.Line;
-
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SalaryDetailsActivity extends CommonActivity {
 
@@ -101,7 +97,7 @@ public class SalaryDetailsActivity extends CommonActivity {
         params.put("Year", year_send);
 
         JSONObject obj = new JSONObject(params);
-        Log.d("params ", obj + "");
+        //Log.d("params ", obj + "");
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
         Call<ArrayList<SalarySlip>> call = getServiceInterface.request_salary(requestBody);
@@ -110,9 +106,9 @@ public class SalaryDetailsActivity extends CommonActivity {
             @Override
             public void onResponse(Call<ArrayList<SalarySlip>> call, Response<ArrayList<SalarySlip>> response) {
                 if(!response.isSuccessful()){
-                    Log.d("response code ", response.code() + " ");
+                    //Log.d("response code ", response.code() + " ");
                 }else {
-                    Log.d("response ", response.body() + "");
+                    //Log.d("response ", response.body() + "");
                     if(response.body()!=null){
                             salarySlips = response.body();
                             //salarySlipAdapter = new SalarySlipAdapter(SalaryDetailsActivity.this, salarySlips, response.body(), 1);
@@ -123,7 +119,7 @@ public class SalaryDetailsActivity extends CommonActivity {
 
             @Override
             public void onFailure(Call<ArrayList<SalarySlip>> call, Throwable t) {
-                Log.d("failed ", t.getMessage() + "");
+                //Log.d("failed ", t.getMessage() + "");
             }
         });
 

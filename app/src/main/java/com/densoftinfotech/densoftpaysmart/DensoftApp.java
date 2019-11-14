@@ -2,6 +2,8 @@ package com.densoftinfotech.densoftpaysmart;
 
 import android.content.Context;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
@@ -16,6 +18,6 @@ public class DensoftApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        //FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
     }
 }

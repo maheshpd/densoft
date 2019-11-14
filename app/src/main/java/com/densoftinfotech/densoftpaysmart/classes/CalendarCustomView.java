@@ -4,9 +4,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +16,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.adapter.CalendarGridAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
-import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 
 import org.json.JSONObject;
 
@@ -71,7 +68,7 @@ public class CalendarCustomView extends LinearLayout {
     public CalendarCustomView(Context context, AttributeSet attrs/*, ArrayList<CalendarDetails> calendarDetails*/) {
         super(context, attrs);
         this.context = context;
-        Log.d("context recvd ", context + "");
+        //Log.d("context recvd ", context + "");
         //Log.d("calendar size is ", calendarDetails.size() + "");
         initializeUILayout();
         setUpCalendarAdapter();
@@ -249,7 +246,7 @@ public class CalendarCustomView extends LinearLayout {
             @Override
             public void onResponse(Call<ArrayList<CalendarDetails>> call, Response<ArrayList<CalendarDetails>> response) {
                 if (!response.isSuccessful()) {
-                    Log.d("response code ", response.code() + " ");
+                    //Log.d("response code ", response.code() + " ");
                 } else {
                     //Log.d("response ", response.body() + "");
 

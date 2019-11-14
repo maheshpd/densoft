@@ -10,26 +10,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-//import com.android.volley.toolbox.StringRequest;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
-import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
-
 import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
-
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import androidx.preference.PreferenceManager;
@@ -40,7 +31,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+
+//import com.android.volley.toolbox.StringRequest;
 
 public class LoginActivity extends CommonActivity {
 
@@ -55,9 +47,6 @@ public class LoginActivity extends CommonActivity {
 
     SharedPreferences preferences;
     SharedPreferences.Editor edit;
-
-    //RequestQueue requestQueue;
-    //StringRequest request_login;
 
     private GetServiceInterface apiInterface;
 
@@ -114,9 +103,18 @@ public class LoginActivity extends CommonActivity {
             @Override
             public void onResponse(Call<ArrayList<StaffDetails>> call, Response<ArrayList<StaffDetails>> response) {
 
-                staffDetailsArrayList = response.body();
-                SaveDetails_async saveDetails_async = new SaveDetails_async();
-                saveDetails_async.execute();
+                if(response.isSuccessful() && response.body()!=null) {
+                    staffDetailsArrayList = response.body();
+
+                    if(staffDetailsArrayList.get(0).getColumn1().trim().equalsIgnoreCase("ERROR")){
+                        Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleasecontactadmin), Toast.LENGTH_LONG).show();
+                    }else {
+                        SaveDetails_async saveDetails_async = new SaveDetails_async();
+                        saveDetails_async.execute();
+                    }
+                }else{
+                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleasecontactadmin), Toast.LENGTH_LONG).show();
+                }
 
             }
 
@@ -128,6 +126,7 @@ public class LoginActivity extends CommonActivity {
 
 
     }
+
 
     private boolean checkfor_noblankparam() {
         if(!et_customerid.getText().toString().trim().equals("")) {
@@ -154,10 +153,6 @@ public class LoginActivity extends CommonActivity {
 
         @Override
         protected Void doInBackground(ArrayList<StaffDetails>... voids) {
-
-            /*staffDetailsRoom = new StaffDetailsRoom(voids[0].get(0).getStaffId(), voids[0].get(0).getPName(), voids[0].get(0).getMobile1(), voids[0].get(0).getEmail1(),
-                    voids[0].get(0).getGender(), voids[0].get(0).getJoiningDate(), voids[0].get(0).getCompanyName(), voids[0].get(0).getBranchName(),
-                    voids[0].get(0).getDepartment(), voids[0].get(0).getDesignation(), voids[0].get(0).getJobCategory());*/
 
             staffDetailsRoom = new StaffDetailsRoom(staffDetailsArrayList.get(0).getStaffId(), staffDetailsArrayList.get(0).getPName(), staffDetailsArrayList.get(0).getMobile1(), staffDetailsArrayList.get(0).getEmail1(),
                     staffDetailsArrayList.get(0).getGender(), staffDetailsArrayList.get(0).getJoiningDate(), staffDetailsArrayList.get(0).getCompanyName(), staffDetailsArrayList.get(0).getBranchName(),

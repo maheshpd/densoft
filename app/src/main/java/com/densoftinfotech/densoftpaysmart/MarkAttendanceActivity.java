@@ -1,5 +1,41 @@
 package com.densoftinfotech.densoftpaysmart;
 
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.densoftinfotech.densoftpaysmart.adapter.MarkAttendanceAdapter;
+import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
+import com.densoftinfotech.densoftpaysmart.classes.CheckLeaveStatus;
+import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
+import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
+import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
+import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
+import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
+import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
+import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
+
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,52 +47,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.SpannableString;
-import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
-
-import com.densoftinfotech.densoftpaysmart.adapter.MarkAttendanceAdapter;
-import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
-import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
-import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
-import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
-import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
-import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
-import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
-import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
-import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.itextpdf.text.pdf.parser.Line;
-
-import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MarkAttendanceActivity extends CommonActivity {
 
@@ -95,12 +85,20 @@ public class MarkAttendanceActivity extends CommonActivity {
 
     Bundle b;
 
+    private GetServiceInterface apiInterface;
+
+    Calendar c = Calendar.getInstance();
+    SimpleDateFormat df_date = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat df_time = new SimpleDateFormat("HH:mm");
+    String formattedDate = "";
+    String formattedTime = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mark_attendance);
 
-        toolbar_common();
+        setTitle(getResources().getString(R.string.myattendancehistory));
         back();
 
         ButterKnife.bind(this);
@@ -114,7 +112,7 @@ public class MarkAttendanceActivity extends CommonActivity {
                 get_monthandyear(Constants.staffid, b.getString("planner_month", ""), b.getString("planner_year", ""));
 
             }
-        }else{
+        } else {
             Get_Attendance get_attendance = new Get_Attendance();
             get_attendance.execute();
         }
@@ -122,21 +120,24 @@ public class MarkAttendanceActivity extends CommonActivity {
         layoutManager = new LinearLayoutManager(MarkAttendanceActivity.this, LinearLayoutManager.VERTICAL, true);
         recycler_view_markattendance.setLayoutManager(layoutManager);
 
-        tv_checkin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                set_check_time(0);
+    }
+
+
+    private boolean check_param_ok() {
+        userLocation = new UserLocation(MarkAttendanceActivity.this);
+        if (userLocation.isGpsEnabled()) {
+
+            if (userLocation.getLatitude() > 0 && userLocation.getLongitude() > 0 && !userLocation.getAddress().trim().equals("")) {
+                return true;
+            } else {
+                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.unabletofindlocation), Toast.LENGTH_SHORT).show();
+                return false;
             }
-        });
+        } else {
+            userLocation.gpsNotEnabled_Alert();
+            return false;
 
-        tv_checkout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                set_check_time(1);
-            }
-        });
-
-
+        }
     }
 
     private void get_attendance_details(String staffid, String month_send, String year_send) {
@@ -161,9 +162,9 @@ public class MarkAttendanceActivity extends CommonActivity {
             @Override
             public void onResponse(Call<ArrayList<MarkAttendanceDetails>> call, Response<ArrayList<MarkAttendanceDetails>> response) {
                 if (!response.isSuccessful()) {
-                    Log.d("response code ", response.code() + " ");
+                    //Log.d("response code ", response.code() + " ");
                 } else {
-                    Log.d("response ", response.body() + "");
+                    //Log.d("response ", response.body() + "");
 
                     if (response.body() != null && !response.body().isEmpty()) {
                         linearLayout11.setVisibility(View.VISIBLE);
@@ -186,31 +187,79 @@ public class MarkAttendanceActivity extends CommonActivity {
 
     }
 
-    private void set_check_time(int flag) {
-        userLocation = new UserLocation(MarkAttendanceActivity.this);
-        if (userLocation.isGpsEnabled()) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy ', ' HH:mm:ss z");
-            String currentDateandTime = sdf.format(new Date());
-            if (flag == 0) {
-                tv_checkintime.setText(getResources().getString(R.string.checkintime) + " " + currentDateandTime + " at " + userLocation.getAddress());
-                tv_checkintime.setVisibility(View.VISIBLE);
-            } else {
-                tv_checkouttime.setText(getResources().getString(R.string.checkouttime) + " " + currentDateandTime + " at " + userLocation.getAddress());
-                tv_checkouttime.setVisibility(View.VISIBLE);
-            }
-            longitude = Double.toString(userLocation.getLongitude());
-            latitude = Double.toString(userLocation.getLatitude());
-            Log.d("lat and long checkin ", longitude + "    " + latitude + " address " + userLocation.getAddress());
+    private void send_checkIn_checkOut(int flag) {
 
-            /*jsonObject.accumulate("myConStr", "a");
-            jsonObject.accumulate("type", type); // in / out
-            jsonObject.accumulate("id", id);
-            jsonObject.accumulate("lat", latitude);
-            jsonObject.accumulate("logi", longitude);
-            jsonObject.accumulate("number", "");*/
+        //{"UserID":"50", "lag":"19", "logi":"72", "Mobile":"", "address":"", "CustomerId":0}
+
+        userLocation = new UserLocation(MarkAttendanceActivity.this);
+
+        Retrofit retrofit = RetrofitClient.getRetrofit();
+        apiInterface = retrofit.create(GetServiceInterface.class);
+
+        Map<String, Object> params = new HashMap<>();
+
+        params.put("UserID", Constants.staffid);
+        params.put("lag", userLocation.getLatitude());
+        params.put("logi", userLocation.getLongitude());
+        params.put("Mobile", Constants.staffDetailsRoom.getMobile1());
+        params.put("address", userLocation.getAddress());
+        params.put("CustomerId", preferences.getString("customerid", ""));
+
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(params)).toString());
+        Call<ArrayList<CheckLeaveStatus>> call;
+        if (flag == 0) {
+            call = apiInterface.request_checkIn(body);
         } else {
-            userLocation.gpsNotEnabled_Alert();
+            call = apiInterface.request_checkOut(body);
         }
+
+
+        call.enqueue(new Callback<ArrayList<CheckLeaveStatus>>() {
+            @Override
+            public void onResponse(Call<ArrayList<CheckLeaveStatus>> call, Response<ArrayList<CheckLeaveStatus>> response) {
+
+                if (response.isSuccessful()) {
+                    formattedDate = df_date.format(c.getTime());
+                    formattedTime = df_time.format(c.getTime());
+
+                    if (flag == 0) {
+                        if (response.body() != null && !response.body().isEmpty()) {
+                            linearLayout11.setVisibility(View.VISIBLE);
+                            recycler_view_markattendance.setVisibility(View.VISIBLE);
+                            markAttendanceDetails.add(new MarkAttendanceDetails(formattedDate, formattedTime));
+                            markAttendanceAdapter = new MarkAttendanceAdapter(MarkAttendanceActivity.this, markAttendanceDetails);
+                            recycler_view_markattendance.setAdapter(markAttendanceAdapter);
+                        } else {
+                            linearLayout11.setVisibility(View.GONE);
+                            recycler_view_markattendance.setVisibility(View.GONE);
+                        }
+                        DatabaseHelper.getInstance(MarkAttendanceActivity.this).save_time(Constants.staffid, formattedTime, "0", formattedDate);
+                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkinsuccess), Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (response.body() != null && !response.body().isEmpty()) {
+                            linearLayout11.setVisibility(View.VISIBLE);
+                            recycler_view_markattendance.setVisibility(View.VISIBLE);
+                            markAttendanceDetails.add(new MarkAttendanceDetails(formattedDate, formattedTime));
+                            markAttendanceAdapter = new MarkAttendanceAdapter(MarkAttendanceActivity.this, markAttendanceDetails);
+                            recycler_view_markattendance.setAdapter(markAttendanceAdapter);
+                        } else {
+                            linearLayout11.setVisibility(View.GONE);
+                            recycler_view_markattendance.setVisibility(View.GONE);
+                        }
+                        DatabaseHelper.getInstance(MarkAttendanceActivity.this).save_time(Constants.staffid, "0", formattedTime, formattedDate);
+                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkoutsuccess), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<CheckLeaveStatus>> call, Throwable t) {
+                //Log.d("failed is ", t.getMessage());
+            }
+        });
+
+
     }
 
     @Override
@@ -226,14 +275,35 @@ public class MarkAttendanceActivity extends CommonActivity {
 
         switch (item.getItemId()) {
             case R.id.menu_checkin:
-                set_check_time(0);
+
+                if (check_param_ok()) {
+                    if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(0)) {
+                        if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
+                            send_checkIn_checkOut(0);
+                        } else {
+                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkin_once), Toast.LENGTH_LONG).show();
+                    }
+                }
                 break;
             case R.id.menu_checkout:
-                set_check_time(1);
+                if (check_param_ok()) {
+                    if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(1)) {
+                        if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
+                            send_checkIn_checkOut(1);
+                        } else {
+                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkout_once), Toast.LENGTH_LONG).show();
+                    }
+                }
+
                 break;
 
         }
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -268,11 +338,11 @@ public class MarkAttendanceActivity extends CommonActivity {
         ArrayAdapter<String> monthAdapter = new ArrayAdapter<String>(MarkAttendanceActivity.this, R.layout.custom_spinnerlayout, R.id.text1, month_short);
         spinner_month.setAdapter(monthAdapter);
 
-        if(flag == 1) {
+        if (flag == 1) {
             spinner_month.setSelection(Calendar.getInstance().get(Calendar.MONTH));
             spinner_year.setSelection((years.size() - 1));
-        }else{
-            spinner_month.setSelection(month1-1);
+        } else {
+            spinner_month.setSelection(month1 - 1);
             spinner_year.setSelection(yearAdapter.getPosition(year_of_joining));
         }
 
@@ -309,7 +379,7 @@ public class MarkAttendanceActivity extends CommonActivity {
 
         if (year.equals("")) {
             year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-        }else {
+        } else {
             year = year1;
         }
 
@@ -318,7 +388,7 @@ public class MarkAttendanceActivity extends CommonActivity {
             month = String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
         }
 
-        Log.d("month by broadcast ", month + " MarkAttendanceActivity " + year1);
+        //Log.d("month by broadcast ", month + " MarkAttendanceActivity " + year1);
 
         switch (month) {
             case "Jan":
@@ -372,32 +442,12 @@ public class MarkAttendanceActivity extends CommonActivity {
         }
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(DateUtils.calculate_validity(DatabaseHelper.getInstance(MarkAttendanceActivity.this).check_sqliteDate(), Constants.today_date)){
+            DatabaseHelper.getInstance(MarkAttendanceActivity.this).deleteEntry(Constants.staffid);
+        }
+    }
 }
-
-
-
-/*final Animation animLeftToRight = AnimationUtils.loadAnimation(MarkAttendanceActivity.this, R.anim.swiperight);
-        animLeftToRight.setRepeatMode(Animation.INFINITE);
-        tv_checkin.startAnimation(animLeftToRight);
-
-        final Animation animRightToLeft = AnimationUtils.loadAnimation(MarkAttendanceActivity.this, R.anim.swipeleft);
-        animRightToLeft.setRepeatMode(Animation.INFINITE);
-        tv_checkout.startAnimation(animRightToLeft);*/
-
-        /*final ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 1.0f);
-        animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.setDuration(3000L);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                final float progress = (float) animation.getAnimatedValue();
-                final float width = tv_checkin.getWidth();
-                final float translationX = width * progress;
-                tv_checkin.setTranslationX(translationX);
-
-                final float translationX1 = - (width * progress);
-                tv_checkout.setTranslationX(translationX1);
-            }
-        });
-        animator.start();*/

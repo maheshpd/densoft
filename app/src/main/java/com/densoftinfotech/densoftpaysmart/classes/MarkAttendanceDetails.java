@@ -5,6 +5,11 @@ public class MarkAttendanceDetails {
     String ThumbDate = "";
     String ThumbTime = "";
 
+    public MarkAttendanceDetails(String ThumbDate, String ThumbTime){
+        this.ThumbDate = ThumbDate;
+        this.ThumbTime = ThumbTime;
+    }
+
     public String getStaffid() {
         return staffid;
     }

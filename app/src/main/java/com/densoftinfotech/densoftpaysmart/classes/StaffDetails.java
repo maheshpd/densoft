@@ -28,6 +28,7 @@ public class StaffDetails{
     private String PFAccNo = "";
     private String UANNO = "";
     private String ESIC = "";
+    private String Column1 = "";
 
     public String getStaffId() {
         return StaffId;
@@ -211,5 +212,13 @@ public class StaffDetails{
 
     public void setESIC(String ESIC) {
         this.ESIC = ESIC;
+    }
+
+    public String getColumn1() {
+        return Column1;
+    }
+
+    public void setColumn1(String column1) {
+        Column1 = column1;
     }
 }

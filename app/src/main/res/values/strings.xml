@@ -8,13 +8,14 @@
     <string name="pleaseentercustomerid">Please enter the customer id!!</string>
     <string name="pleaseenterstaffid">Please enter the staff id!!</string>
     <string name="pleaseenterpassword">Please enter the password!!</string>
-    <string name="myleaves">My Leaves</string>
-    <string name="myplanner">My Planner</string>
+    <string name="myleaves">Leaves</string>
+    <string name="myplanner">Planner</string>
+    <string name="myattendancehistory">Attendance History</string>
     <string name="myteam">My Team</string>
     <string name="present">Present</string>
     <string name="absent">Absent</string>
     <string name="bunk">Bunk</string>
-    <string name="leave">Leave</string>
+    <string name="leave">Leaves</string>
     <string name="late">Late</string>
     <string name="ontask">On Task</string>
     <string name="quickactions">Quick Actions</string>
@@ -85,8 +86,16 @@
     <string name="reportto">Report To</string>
     <string name="cannotapplyforleaveinprobation">You Can\'t apply for leaves in your probation period</string>
     <string name="leavesnotremaining">You do not have sufficient leaves</string>
-    <string name="pleasecontactadmin">Please contact the concerned person</string>
+    <string name="pleasecontactadmin">Please contact Admin</string>
     <string name="receivedleaveapplication">We have received your leave application</string>
     <string name="nodataavailable">No data available for the selected year</string>
+    <string name="notifications">Notifications</string>
+    <string name="checkinsuccess">Checked in Successfully!!</string>
+    <string name="checkoutsuccess">Checked out Successfully!!</string>
+    <string name="selectcurrentmonth">Please Select current month</string>
+    <string name="checkin_once">You can only Check In once in a day</string>
+    <string name="checkout_once">You can only Check Out once in a day</string>
+    <string name="unabletofindlocation">We are not able to get your location. Please try again later!</string>
+
 
 </resources>

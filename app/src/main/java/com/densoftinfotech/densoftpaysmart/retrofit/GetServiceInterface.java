@@ -51,6 +51,14 @@ public interface GetServiceInterface {
     Call<ArrayList<CheckLeaveStatus>>
     request_leave_applied_success(@Body RequestBody requestBody);
 
+    @POST("IUD_AttendanceIn_Api")
+    Call<ArrayList<CheckLeaveStatus>>
+    request_checkIn(@Body RequestBody requestBody);
+
+    @POST("IUD_AttendanceOut_Api")
+    Call<ArrayList<CheckLeaveStatus>>
+    request_checkOut(@Body RequestBody requestBody);
+
 
 
 

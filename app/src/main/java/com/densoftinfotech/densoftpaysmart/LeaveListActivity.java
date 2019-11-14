@@ -1,6 +1,21 @@
 package com.densoftinfotech.densoftpaysmart;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+
+import com.densoftinfotech.densoftpaysmart.adapter.LeaveAdapter;
+import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
+import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
+import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
+import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -10,26 +25,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.util.Log;
-
-import com.densoftinfotech.densoftpaysmart.adapter.LeaveAdapter;
-import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
-import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
-import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
-import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
-import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
-import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
-import com.google.gson.Gson;
-
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.densoftinfotech.densoftpaysmart.app_utilities.Constants.staffid;
 
@@ -55,6 +50,8 @@ public class LeaveListActivity extends CommonActivity {
 
         ButterKnife.bind(this);
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(LeaveListActivity.this);
+
         layoutManager = new LinearLayoutManager(LeaveListActivity.this);
         recyclerView.setLayoutManager(layoutManager);
 
@@ -68,7 +65,7 @@ public class LeaveListActivity extends CommonActivity {
         params.put("StaffId", staffid);
 
         JSONObject obj = new JSONObject(params);
-        Log.d("params ", obj + "");
+        //Log.d("params ", obj + "");
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
         Call<ArrayList<LeaveDetails>> call = getServiceInterface.request_leavedetails(requestBody);
@@ -77,7 +74,7 @@ public class LeaveListActivity extends CommonActivity {
             @Override
             public void onResponse(Call<ArrayList<LeaveDetails>> call, Response<ArrayList<LeaveDetails>> response) {
                 if (!response.isSuccessful()) {
-                    Log.d("response code ", response.code() + " ");
+                    //Log.d("response code ", response.code() + " ");
                 } else {
                     if (!response.body().isEmpty()) {
 

@@ -1,5 +1,7 @@
 package com.densoftinfotech.densoftpaysmart.app_utilities;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
@@ -15,6 +17,7 @@ import com.densoftinfotech.densoftpaysmart.SalaryDetailsActivity;
 import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
+import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +30,7 @@ public class CommonActivity extends AppCompatActivity {
     Toolbar toolbar;
     Context context;
     SharedPreferences preferences;
+    public ProgressDialog progressDialog;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
@@ -46,6 +50,8 @@ public class CommonActivity extends AppCompatActivity {
         toolbar.setLogo(R.mipmap.ic_launcher);
         setSupportActionBar(toolbar);
         context = this;
+
+        //DatabaseHelper.getInstance(context).deletebyid();
 
     }
 
@@ -81,6 +87,21 @@ public class CommonActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    public void add_loader() {
+
+        if (!((Activity) context).isFinishing()) {
+            progressDialog = ProgressDialog.show(context, "Loading", "Please wait...");
+            progressDialog.setCancelable(false);
+
+        }
+    }
+
+    public void dismiss_loader(){
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 
     public String get_monthName(int i) {
@@ -121,6 +142,7 @@ public class CommonActivity extends AppCompatActivity {
                 month = "Nov";
                 break;
             case 12:
+            case 0:
                 month = "Dec";
                 break;
             default:

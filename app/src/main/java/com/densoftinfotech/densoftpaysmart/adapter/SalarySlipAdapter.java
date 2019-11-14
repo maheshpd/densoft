@@ -3,7 +3,6 @@ package com.densoftinfotech.densoftpaysmart.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +12,8 @@ import android.widget.TextView;
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.SalarySlipDetailsActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
-import com.densoftinfotech.densoftpaysmart.classes.SalaryInternalDetails;
 import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
-import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -29,13 +25,7 @@ import java.util.TreeSet;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSnapHelper;
-import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SnapHelper;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.MyViewHolder> {
 
@@ -81,7 +71,7 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
 
         setdata(holder, response_salarySlips, salarySlips, i);
 
-        holder.tv_payfor.setText(context.getResources().getString(R.string.payfor) + " " + ((CommonActivity)context).get_monthName(salarySlips.get(i)) + " " +Calendar.getInstance().get(Calendar.YEAR));
+        holder.tv_payfor.setText(context.getResources().getString(R.string.payfor) + " " + ((CommonActivity)context).get_monthName(salarySlips.get(i)) + " " + Calendar.getInstance().get(Calendar.YEAR));
         for(int j = 0; j<response_salarySlips.size(); j++){
 
             if(response_salarySlips.get(j).getApplyForMonth() == salarySlips.get(i)) {
@@ -111,7 +101,7 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, SalarySlipDetailsActivity.class);
-                intent.putExtra("month", salarySlips.get(i));
+                //intent.putExtra("month", salarySlips.get(i));
                 context.startActivity(intent);
             }
         });

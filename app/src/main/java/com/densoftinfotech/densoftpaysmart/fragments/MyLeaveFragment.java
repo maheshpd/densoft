@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.adapter.LeaveAdapter;
 import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
-import com.densoftinfotech.densoftpaysmart.demo_class.LeaveDetailsDemo;
 
 import java.util.ArrayList;
 

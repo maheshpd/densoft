@@ -3,12 +3,11 @@ package com.densoftinfotech.densoftpaysmart;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.adapter.QuickActionsAdapter;
 import com.densoftinfotech.densoftpaysmart.adapter.SalarySlipAdapter;
@@ -24,7 +23,8 @@ import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
@@ -32,17 +32,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -67,6 +60,10 @@ public class MainActivity extends CommonActivity {
     ImageView iv_settings;
     @BindView(R.id.iv_profile)
     ImageView iv_profile;
+    @BindView(R.id.iv_notification)
+    ImageView iv_notification;
+    @BindView(R.id.iv_logout)
+    ImageView iv_logout;
 
     @BindView(R.id.tv_name)
     TextView tv_name;
@@ -84,6 +81,7 @@ public class MainActivity extends CommonActivity {
 
     private GetServiceInterface getServiceInterface;
     SharedPreferences preferences;
+    SharedPreferences.Editor edit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +91,7 @@ public class MainActivity extends CommonActivity {
         setContentView(R.layout.activity_main);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        edit = preferences.edit();
 
         ButterKnife.bind(this);
 
@@ -103,6 +102,23 @@ public class MainActivity extends CommonActivity {
         layoutManager_salaryslip = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recycler_view_salaryslip.setLayoutManager(layoutManager_salaryslip);
         linearSnapHelper.attachToRecyclerView(recycler_view_salaryslip);
+
+        iv_notification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent inot = new Intent(MainActivity.this, NotificationActivity.class);
+                startActivity(inot);
+            }
+        });
+
+        iv_logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Logout_DeleteUser logout_deleteUser = new Logout_DeleteUser();
+                logout_deleteUser.execute();
+
+            }
+        });
 
         layoutManager_quickaction = new GridLayoutManager(this, 3);
         recycler_view_quickactions.setLayoutManager(layoutManager_quickaction);
@@ -115,30 +131,21 @@ public class MainActivity extends CommonActivity {
         recycler_view_quickactions.setAdapter(quickActionsAdapter);
 
 
-        /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationManager mNotificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel mChannel = new NotificationChannel(Constants.channel_id, Constants.channel_name, importance);
-            mChannel.setDescription(Constants.channel_description);
-            mChannel.enableLights(true);
-            mChannel.setLightColor(Color.RED);
-            mChannel.enableVibration(true);
-            mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-            mNotificationManager.createNotificationChannel(mChannel);
-        }
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            //Log.d("task failed", "" + task.getException());
+                            return;
+                        }
 
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
 
-        FirebaseMessaging.getInstance().subscribeToTopic("DensoftUser");*/
-
-        FirebaseMessaging.getInstance().subscribeToTopic("DensoftUser").addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (!task.isSuccessful()) {
-                    Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                        //Log.d("task success", " " + token);
+                    }
+                });
 
     }
 
@@ -155,7 +162,7 @@ public class MainActivity extends CommonActivity {
         params.put("Month", 0);
         params.put("Year", String.valueOf(Calendar.getInstance().get(Calendar.YEAR))); //current year
         JSONObject obj = new JSONObject(params);
-        Log.d("params ", obj + "");
+        //Log.d("params ", obj + "");
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
         Call<ArrayList<SalarySlip>> call = getServiceInterface.request_salary(requestBody);
@@ -165,7 +172,7 @@ public class MainActivity extends CommonActivity {
             @Override
             public void onResponse(Call<ArrayList<SalarySlip>> call, Response<ArrayList<SalarySlip>> response) {
                 if (!response.isSuccessful()) {
-                    Log.d("response code ", response.code() + " ");
+                    //Log.d("response code ", response.code() + " ");
                 } else {
                     if (!response.body().isEmpty()) {
 
@@ -238,12 +245,34 @@ public class MainActivity extends CommonActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             if (staffDetailsRoom != null) {
-                tv_name.setText(getResources().getString(R.string.welcome) + " " + staffDetailsRoom.getPName());
+                tv_name.setText(" " + staffDetailsRoom.getPName());
                 tv_title.setText(staffDetailsRoom.getCompanyName());
                 get_salary_data(staffDetailsRoom.getStaffId());
 
-                //Picasso.with(MainActivity.this).load(staffDetailsRoom.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
+                if (staffDetailsRoom.getStaffPhoto() != null && !staffDetailsRoom.getStaffPhoto().trim().equals("")) {
+                    Picasso.with(MainActivity.this).load(staffDetailsRoom.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
+                }
             }
+
+        }
+    }
+
+
+    private class Logout_DeleteUser extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Paysmart_roomdatabase.get_PaysmartDatabase(MainActivity.this).staffDetails_dao().delete(Constants.staffid);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            edit.clear();
+            edit.apply();
+            Intent i = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(i);
+            finish();
 
         }
     }

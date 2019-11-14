@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.SalarySlipDetailsActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
-import com.densoftinfotech.densoftpaysmart.classes.MonthDisplay;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -41,8 +40,7 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
 
-
-        holder.tv_month.setOnClickListener(new View.OnClickListener() {
+        /*holder.tv_month.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 holder.tv_month.setTextColor(context.getResources().getColor(R.color.white));
@@ -50,9 +48,9 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
                 ((SalarySlipDetailsActivity) context).gotoselection(String.valueOf(monthDisplays.get(i)));
 
             }
-        });
+        });*/
 
-        /*holder.tv_month.setSelected(i == selected);
+        holder.tv_month.setSelected(i == selected);
 
         if (holder.tv_month.isSelected()) {
             holder.tv_month.setTextColor(context.getResources().getColor(R.color.white));
@@ -60,14 +58,8 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
             ((SalarySlipDetailsActivity) context).gotoselection(String.valueOf(monthDisplays.get(i)));
         } else {
             holder.tv_month.setTextColor(context.getResources().getColor(R.color.gray));
-        }*/
+        }
 
-        /*holder.tv_month.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((SalarySlipDetailsActivity)context).gotoselection(i);
-            }
-        });*/
 
         holder.tv_month.setText(((CommonActivity) context).get_monthName(monthDisplays.get(i)));
     }
@@ -88,6 +80,13 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
 
             ButterKnife.bind(this, itemView);
 
+            tv_month.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selected = getAdapterPosition();
+                    notifyDataSetChanged();
+                }
+            });
         }
     }
 }

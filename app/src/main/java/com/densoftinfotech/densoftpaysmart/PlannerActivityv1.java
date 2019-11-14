@@ -1,19 +1,5 @@
 package com.densoftinfotech.densoftpaysmart;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSmoothScroller;
-import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,15 +9,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.adapter.CalendarDetailsAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView;
 import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
-import com.densoftinfotech.densoftpaysmart.fragments.MyPlannerFragment;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
@@ -45,6 +30,18 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+
 public class PlannerActivityv1 extends CommonActivity {
 
     @BindView(R.id.recyclerview_planner)
@@ -54,7 +51,7 @@ public class PlannerActivityv1 extends CommonActivity {
     @BindView(R.id.custom_calendar)
     CalendarCustomView mView;
     @BindView(R.id.iv_history)
-    ImageView iv_history;
+    TextView iv_history;
 
     ArrayList<CalendarDetails> calendarDetails = new ArrayList<>();
     RecyclerView.LayoutManager layoutManager;
@@ -75,7 +72,7 @@ public class PlannerActivityv1 extends CommonActivity {
 
         ButterKnife.bind(this);
 
-        toolbar_common();
+        setTitle(getResources().getString(R.string.myplanner));
         back();
 
         preferences = PreferenceManager.getDefaultSharedPreferences(PlannerActivityv1.this);
@@ -123,7 +120,9 @@ public class PlannerActivityv1 extends CommonActivity {
 
             } else if (intent.hasExtra("scrolltoposition")) {
                 //recyclerview.getLayoutManager().smoothScrollToPosition(recyclerview, new RecyclerView.State(), intent.getIntExtra("scrolltoposition", 0));
-                Log.d("month by broadcast ", intent.getIntExtra("scrolltoposition", 0) + "");
+                int scrollpos = intent.getIntExtra("scrolltoposition", 0) - Constants.count_before_firstpos;
+
+                Log.d("scroll to ",  + scrollpos + "");
 
                 LinearSmoothScroller smoothScroller = new LinearSmoothScroller(PlannerActivityv1.this) {
                     @Override
@@ -132,7 +131,7 @@ public class PlannerActivityv1 extends CommonActivity {
                     }
                 };
 
-                smoothScroller.setTargetPosition(intent.getIntExtra("scrolltoposition", 0));  // pos on which item you want to scroll recycler view
+                smoothScroller.setTargetPosition(scrollpos);  // pos on which item you want to scroll recycler view
                 recyclerview_planner.getLayoutManager().startSmoothScroll(smoothScroller);
             }
             if(intent.hasExtra("status_year")){

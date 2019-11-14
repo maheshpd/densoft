@@ -4,7 +4,6 @@
     <color name="colorPrimaryDark">#0998BB</color>
     <color name="colorAccent">#D81B60</color>
 
-
     <!--densoft colors-->
 
     <color name="green">#00923F</color>
@@ -69,6 +68,8 @@
     <color name="green1">#003E05</color>
     <color name="green2">#00790A</color>
 
+    <color name="blue2">#81ABC1</color>
+
 
     <!--<color name="bluelighttoolbar">#11B2DA</color>
     <color name="bluedarktoolbar">#0998BB</color>-->
@@ -77,6 +78,14 @@
 
     <color name="bluepie">#B1DFE5</color>
     <color name="purplepie">#E0BBE9</color>
+
+
+    <color name="transparentgreen">#00923F</color>
+    <color name="transparentblue">#7F333DBB</color>
+    <color name="transparentwhite">#FFFFFF</color>
+
+    <color name="mycolor1">#000000aa</color>
+    <color name="mycolor2">#ff00aa00</color>
 
 
 </resources>

@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.R;
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
 
 import java.util.ArrayList;
@@ -56,7 +57,6 @@ public class CalendarGridAdapter extends ArrayAdapter {
 
         }
 
-        Log.d("calendar grid adapter  ", calendarDetails.size() + " day cell value " + dayValue);
         TextView cellNumber = view.findViewById(R.id.calendar_date_id);
         if (displayMonth == currentMonth && displayYear == currentYear) {
             if(i<calendarDetails.size()) {
@@ -64,8 +64,14 @@ public class CalendarGridAdapter extends ArrayAdapter {
                     cellNumber.setText(String.valueOf(calendarDetails.get(i).getCDate()));
                     cellNumber.setTextColor(context.getResources().getColor(R.color.white));
                     setstatus_color(cellNumber, calendarDetails.get(i).getStatus());
+                    if(calendarDetails.get(i).getCDate().equalsIgnoreCase("1")){
+
+                        Constants.count_before_firstpos = position;
+                        Log.d("count_firstpos is ", Constants.count_before_firstpos + " ");
+                    }
                     i++;
                 }
+
             }
 
         } else {

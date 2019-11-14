@@ -1,10 +1,5 @@
 package com.densoftinfotech.densoftpaysmart.room_database.Staff;
 
-import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
-import com.google.gson.annotations.SerializedName;
-
-import java.io.Serializable;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

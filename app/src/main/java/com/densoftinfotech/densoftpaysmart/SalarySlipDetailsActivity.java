@@ -1,22 +1,7 @@
 package com.densoftinfotech.densoftpaysmart;
 
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,32 +12,32 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.adapter.MonthAdapter;
-import com.densoftinfotech.densoftpaysmart.adapter.SalarySlipAdapter;
+import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
-import com.densoftinfotech.densoftpaysmart.classes.MonthDisplay;
 import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
-import com.densoftinfotech.densoftpaysmart.demo_class.SalarySlipDemo;
-import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class SalarySlipDetailsActivity extends CommonActivity {
 
@@ -103,15 +88,15 @@ public class SalarySlipDetailsActivity extends CommonActivity {
         b = getIntent().getExtras();
         if (b != null) {
             if (b.containsKey("month")) {
-                gotoselection(String.valueOf(b.getInt("month")));
+                gotoselection_showslip(String.valueOf(b.getInt("month")), String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
             }
         }
 
     }
 
-    public void gotoselection(String monthname) {
-        webview.loadUrl(URLS.dynamic_url_webroute(Constants.staffDetailsRoom.getDomainUrl()) + "AdminRpt/EmployeeSalarySlip.htm?CategoryId=233&" + "month=" + monthname +
-                "&year=" + "2019" + "&StaffId=" + Constants.staffid + "&mText=" + get_monthName(Integer.parseInt(monthname)));
+    public void gotoselection_showslip(String month_number, String year) {
+        webview.loadUrl(URLS.dynamic_url_webroute(Constants.staffDetailsRoom.getDomainUrl()) + "AdminRpt/EmployeeSalarySlip.htm?CategoryId=233&" + "month=" + month_number +
+                "&year=" + year + "&StaffId=" + Constants.staffid + "&mText=" + get_monthName(Integer.parseInt(month_number)));
     }
 
     private void getset_spinner_data(int year_of_joining, String staffid) {
@@ -202,4 +187,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
 
     }
 
+    public void gotoselection(String valueOf) {
+        gotoselection_showslip(valueOf, String.valueOf(salarySlips.get(spinner.getSelectedItemPosition()).getApplyForYear()));
+    }
 }

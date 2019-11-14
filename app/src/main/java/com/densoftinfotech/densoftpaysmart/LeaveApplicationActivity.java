@@ -14,7 +14,7 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -200,7 +200,7 @@ public class LeaveApplicationActivity extends CommonActivity {
 
 
         JSONObject obj = new JSONObject(params);
-        Log.d("params ", obj + "");
+        //Log.d("params ", obj + "");
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
         Call<ArrayList<CheckLeaveStatus>> call = getServiceInterface.request_leave_applied_success(requestBody);
@@ -209,7 +209,7 @@ public class LeaveApplicationActivity extends CommonActivity {
             @Override
             public void onResponse(Call<ArrayList<CheckLeaveStatus>> call, Response<ArrayList<CheckLeaveStatus>> response) {
                 if (!response.isSuccessful()) {
-                    Log.d("response code ", response.code() + " ");
+                    //Log.d("response code ", response.code() + " ");
                 } else {
 
                         if (response.body() != null) {
@@ -276,7 +276,7 @@ public class LeaveApplicationActivity extends CommonActivity {
             @Override
             public void onResponse(Call<ArrayList<ParentEmployee>> call, Response<ArrayList<ParentEmployee>> response) {
                 if (!response.isSuccessful()) {
-                    Log.d("response code ", response.code() + " ");
+                    //Log.d("response code ", response.code() + " ");
                 } else {
                     if (!response.body().isEmpty()) {
 
@@ -315,7 +315,7 @@ public class LeaveApplicationActivity extends CommonActivity {
             @Override
             public void onResponse(Call<ArrayList<CareOfStaff_Employee>> call, Response<ArrayList<CareOfStaff_Employee>> response) {
                 if (!response.isSuccessful()) {
-                    Log.d("response code ", response.code() + " ");
+                    //Log.d("response code ", response.code() + " ");
                 } else {
                     if (!response.body().isEmpty()) {
 

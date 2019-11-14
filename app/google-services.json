@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "880443224045",
-    "firebase_url": "https://paysmart-9c748.firebaseio.com",
-    "project_id": "paysmart-9c748",
-    "storage_bucket": "paysmart-9c748.appspot.com"
+    "project_number": "835349786121",
+    "firebase_url": "https://paysmart-e9c91.firebaseio.com",
+    "project_id": "paysmart-e9c91",
+    "storage_bucket": "paysmart-e9c91.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:880443224045:android:3654c051e633a873f9c1e4",
+        "mobilesdk_app_id": "1:835349786121:android:12b478abc92883ad0a12d8",
         "android_client_info": {
           "package_name": "com.densoftinfotech.densoftpaysmart"
         }
       },
       "oauth_client": [
         {
-          "client_id": "880443224045-fun6apra2hqguhsfpfhiuo9keusna4s7.apps.googleusercontent.com",
+          "client_id": "835349786121-arlt8ci8k9nup5gntcugke0forjgisc3.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.densoftinfotech.densoftpaysmart",
@@ -23,20 +23,20 @@
           }
         },
         {
-          "client_id": "880443224045-1hfhcracedg0itf9iakohqud9p86hlho.apps.googleusercontent.com",
+          "client_id": "835349786121-vit9236o75fv08amb2q4blcakqhuvodp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyD5GgT8uCiUfAjZPsCjpHjfaSkwwvFIh0o"
+          "current_key": "AIzaSyBtz8Lj3b6_PHVW3C86iaHEIrwkODU2f4Y"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "880443224045-1hfhcracedg0itf9iakohqud9p86hlho.apps.googleusercontent.com",
+              "client_id": "835349786121-vit9236o75fv08amb2q4blcakqhuvodp.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

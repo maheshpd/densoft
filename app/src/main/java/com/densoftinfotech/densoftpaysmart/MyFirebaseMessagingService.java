@@ -1,83 +1,120 @@
 package com.densoftinfotech.densoftpaysmart;
 
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.media.RingtoneManager;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
 import android.util.Log;
 
-import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 
-class MyFirebaseMessagingService extends FirebaseMessagingService {
-    public MyFirebaseMessagingService() {
-        super();
+public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    private static final String TAG = "MyFirebaseMessaging";
+    Bitmap bitmap = null;
+
+    @Override
+    public void onNewToken(String s) {
+        super.onNewToken(s);
+
+        updateTokenToFirebase(s);
+
     }
-
-    String title = "";
-    String body = "";
-
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        /*if(remoteMessage.getData().size()>0){
-            //for custom data
-        }*/
+        if (remoteMessage.getNotification() != null) {
+            sendNotification(remoteMessage);
+        }
 
-        if(remoteMessage.getNotification()!=null) {
-            title = remoteMessage.getNotification().getTitle();
-            body = remoteMessage.getNotification().getBody();
-            //image  = remoteMessage.getNotification().getIcon();
+    }
 
-            Log.d("remote msg ", remoteMessage.getNotification().toString());
+    private void sendNotification(RemoteMessage remoteMessage) {
 
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, Constants.channel_id)
-                    .setContentTitle(remoteMessage.getNotification().getTitle())
-                    .setContentText(remoteMessage.getNotification().getBody())
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setStyle(new NotificationCompat.BigTextStyle())
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setAutoCancel(true);
+        Log.d("recvd data ", remoteMessage.getNotification().getTitle() + " " + remoteMessage.getNotification().getBody() + " " + remoteMessage.getNotification().getImageUrl() + " ");
+        String title = remoteMessage.getNotification().getTitle();
+        String content = remoteMessage.getNotification().getBody();
+        String bigpicture = String.valueOf(remoteMessage.getNotification().getImageUrl());
 
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-            notificationManager.notify(0, notificationBuilder.build());
+        if (remoteMessage.getNotification().getImageUrl() != null) {
+            bitmap = getBitmapfromUrl(bigpicture);
+        }
+
+        DatabaseHelper.getInstance(this).savenotificationData(title, content, bigpicture);
+
+        Intent activityIntent = new Intent(this, NotificationActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        String NOTIFICATION_CHANNEL_ID = "Paysmart";
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Paysmart", NotificationManager.IMPORTANCE_DEFAULT);
+
+            //Configure the notification channel
+            notificationChannel.setName(title);
+            notificationChannel.setDescription(content);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+            notificationChannel.enableVibration(true);
+
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        notificationBuilder
+                .setContentTitle(title)
+                .setLargeIcon(bitmap)/*Notification icon image*/
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentText(content)
+                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap))
+                .setAutoCancel(true)
+                .setTicker("Hearty365")
+                .setContentIntent(contentIntent);
+
+        notificationManager.notify(1, notificationBuilder.build());
+    }
+
+    //update notification
+    private void updateTokenToFirebase(String s) {
+        //Log.d("string token ", s) ;
+    }
+
+    public Bitmap getBitmapfromUrl(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(input);
+            return bitmap;
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
 
         }
     }
 
-    @Override
-    public void onNewToken(@NonNull String s) {
-        super.onNewToken(s);
-        Log.d("token s ", s);
-    }
-
-    /*@Override
-    public void onDeletedMessages() {
-        super.onDeletedMessages();
-    }
-
-    @Override
-    public void onMessageSent(@NonNull String s) {
-        super.onMessageSent(s);
-    }
-
-    @Override
-    public void onSendError(@NonNull String s, @NonNull Exception e) {
-        super.onSendError(s, e);
-    }
-
-    @Override
-    public void onNewToken(@NonNull String s) {
-        super.onNewToken(s);
-    }*/
 }
