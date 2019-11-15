@@ -29,4 +29,6 @@ public class Constants {
 
     public static int count_before_firstpos = 0;
 
+    public static String firebase_database_name = "LiveTracking";
+
 }

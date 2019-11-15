@@ -21,7 +21,7 @@ public abstract class Paysmart_roomdatabase extends RoomDatabase {
     public static Paysmart_roomdatabase get_PaysmartDatabase(Context context){
         if(INSTANCE == null){
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), Paysmart_roomdatabase.class, Constants.db_name).build();
-            //INSTANCE =Room.databaseBuilder(context.getApplicationContext(), Paysmart_roomdatabase.class, Constants.db_name).addMigrations(MIGRATION_1_2).build();
+            //INSTANCE =Room.databaseBuilder(context.getApplicationContext(), Paysmart_roomdatabase.class, MapConstants.db_name).addMigrations(MIGRATION_1_2).build();
         }
         return INSTANCE;
     }

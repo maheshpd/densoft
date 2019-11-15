@@ -22,7 +22,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static Context mcontext;
 
     public static final String TABLE_NOTIFICATION = "table_notification";
-    public static final String TABLE_BUTTON = "table_button";
+    public static final String TABLE_ATTENDANCE = "table_attendance";
+    public static final String TABLE_FIREBASE_LIVE_LOCATION = "table_firebase_live_location";
 
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
@@ -35,6 +36,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CHECK_OUT_TIME = "check_out_time";
     public static final String TODAY_DATE = "today_date";
     public static final String SAVEDTIME = "SAVEDTIME";
+
+    public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
+    public static final String ADDRESS = "address";
+    public static final String STAFF_NAME = "staff_name";
+    public static final String WORKING_HOUR_FROM = "working_hour_from";
+    public static final String WORKING_HOUR_TO = "working_hour_to";
 
 
     public DatabaseHelper(Context context) {
@@ -56,9 +64,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + TITLE + " TEXT," + DESCRIPTION + " TEXT," + BIG_PICTURE + " TEXT," + DELETED + " INTEGER," + SAVEDTIME + " TEXT)";
         db.execSQL(query_notification);
 
-        String query_button = "CREATE TABLE IF NOT EXISTS " + TABLE_BUTTON + "("
+        String query_attendance = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTENDANCE + "("
                 + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + CHECK_IN_TIME + " TEXT," + CHECK_OUT_TIME + " TEXT," + TODAY_DATE + " TEXT," + SAVEDTIME + " TEXT)";
-        db.execSQL(query_button);
+        db.execSQL(query_attendance);
+
+        String query_liveupdates = "CREATE TABLE IF NOT EXISTS " + TABLE_FIREBASE_LIVE_LOCATION + "("
+                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + STAFF_NAME + " TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT,"
+                + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + SAVEDTIME + " TEXT)";
+        db.execSQL(query_liveupdates);
     }
 
 
@@ -73,14 +86,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void createTime_forButton() {
+    public void createTable_forAttendance() {
         try {
             SQLiteDatabase db = getWritableDatabase();
 
-            String query_button = "CREATE TABLE IF NOT EXISTS " + TABLE_BUTTON + "("
+            String query_button = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTENDANCE + "("
                     + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + CHECK_IN_TIME + " TEXT," + CHECK_OUT_TIME + " TEXT," + TODAY_DATE + " TEXT," + SAVEDTIME + " TEXT)";
             db.execSQL(query_button);
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createtable_location() {
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            String query_liveupdates = "CREATE TABLE IF NOT EXISTS " + TABLE_FIREBASE_LIVE_LOCATION + "("
+                    + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + STAFF_NAME + " TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT,"
+                    + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + SAVEDTIME + " TEXT)";
+            db.execSQL(query_liveupdates);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,17 +129,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return index;
     }
 
+    public long save_location(ContentValues c) {
+        long index = 0;
+        try {
+            createtable_location();
+            SQLiteDatabase db = getWritableDatabase();
+            index = db.insertWithOnConflict(TABLE_FIREBASE_LIVE_LOCATION, null, c, SQLiteDatabase.CONFLICT_REPLACE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return index;
+    }
+
+
+
     public long save_time(String staffid, String checkin, String checkout, String today_date) {
         long index = 0;
-        createTime_forButton();
+        createTable_forAttendance();
         SQLiteDatabase db = getWritableDatabase();
-        Cursor c1 = db.rawQuery("SELECT * FROM " + TABLE_BUTTON, null);
+        Cursor c1 = db.rawQuery("SELECT * FROM " + TABLE_ATTENDANCE, null);
         c1.moveToFirst();
         //Log.d("Number of Records", " :: " + c1.getCount());
 
         if (c1.getCount() == 0) {
             try {
-                createTime_forButton();
+                createTable_forAttendance();
 
                 ContentValues c = new ContentValues();
                 c.put(STAFF_ID, staffid);
@@ -128,7 +167,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 c.put(TODAY_DATE, today_date);
                 c.put(SAVEDTIME, DateUtils.getSqliteTime());
 
-                index = db.insertWithOnConflict(TABLE_BUTTON, null, c, SQLiteDatabase.CONFLICT_REPLACE);
+                index = db.insertWithOnConflict(TABLE_ATTENDANCE, null, c, SQLiteDatabase.CONFLICT_REPLACE);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -155,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             c.put(TODAY_DATE, today_date);
             c.put(SAVEDTIME, DateUtils.getSqliteTime());
 
-            db.update(TABLE_BUTTON, c, "STAFF_ID=" + staffid, null);
+            db.update(TABLE_ATTENDANCE, c, "STAFF_ID=" + staffid, null);
 
             /*if (!checkin.equalsIgnoreCase("0")) {
                 String query ="UPDATE " + TABLE_BUTTON + " SET " + CHECK_IN_TIME + " = " + checkin + ", "
@@ -174,11 +213,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean allow_check(int status) {
-        createTime_forButton();
+        createTable_forAttendance();
         String today_date = "";
         try {
             SQLiteDatabase db = getReadableDatabase();
-            String query = "SELECT * FROM " + TABLE_BUTTON;
+            String query = "SELECT * FROM " + TABLE_ATTENDANCE;
             Cursor c = db.rawQuery(query, null);
             c.moveToFirst();
 
@@ -204,11 +243,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String check_sqliteDate(){
-        createTime_forButton();
+        createTable_forAttendance();
         String today_date = Constants.today_date;
         try {
             SQLiteDatabase db = getReadableDatabase();
-            String query = "SELECT * FROM " + TABLE_BUTTON;
+            String query = "SELECT * FROM " + TABLE_ATTENDANCE;
             Cursor c = db.rawQuery(query, null);
             c.moveToFirst();
 
@@ -263,11 +302,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteEntry(String staffid)
+    public void deleteEntry(String table, String staffid)
     {
         String where="id=?";
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_BUTTON, where, new String[]{staffid}) ;
+        db.delete(table, where, new String[]{staffid}) ;
     }
 
     public void update_notification() {

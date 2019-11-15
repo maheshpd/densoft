@@ -18,18 +18,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".NotificationActivity"></activity>
+        <activity android:name=".TravelClaimsActivity"></activity>
+        <activity android:name=".NotificationActivity" />
         <activity android:name=".LeaveListActivity" />
         <activity android:name=".PlannerActivityv1" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/notification_icon" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
-
+        <!--
+<meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/api_key_map" />
+        -->
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="true">

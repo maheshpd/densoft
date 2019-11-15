@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Paysmart</string>
+    <string name="api_key_map">aaa</string>
+
     <string name="title">Paysmart</string>
     <string name="densoft">Densoft</string>
     <string name="enterstaffid">Staff Id</string>
@@ -96,6 +98,7 @@
     <string name="checkin_once">You can only Check In once in a day</string>
     <string name="checkout_once">You can only Check Out once in a day</string>
     <string name="unabletofindlocation">We are not able to get your location. Please try again later!</string>
+    <string name="track_me">Track me live</string>
 
 
 </resources>

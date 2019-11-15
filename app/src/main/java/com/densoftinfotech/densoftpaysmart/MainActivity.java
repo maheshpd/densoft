@@ -219,8 +219,8 @@ public class MainActivity extends CommonActivity {
                 startActivity(iattendance);
                 break;
             case R.mipmap.travel_claims:
-                /*Intent itravel = new Intent(MainActivity.this, TravelClaimActivity.class);
-                startActivity(itravel);*/
+                Intent itravel = new Intent(MainActivity.this, TravelClaimsActivity.class);
+                startActivity(itravel);
                 break;
             case R.mipmap.leaves:
                 Intent ileave = new Intent(MainActivity.this, LeaveListActivity.class);

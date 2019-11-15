@@ -447,7 +447,7 @@ public class MarkAttendanceActivity extends CommonActivity {
     protected void onResume() {
         super.onResume();
         if(DateUtils.calculate_validity(DatabaseHelper.getInstance(MarkAttendanceActivity.this).check_sqliteDate(), Constants.today_date)){
-            DatabaseHelper.getInstance(MarkAttendanceActivity.this).deleteEntry(Constants.staffid);
+            DatabaseHelper.getInstance(MarkAttendanceActivity.this).deleteEntry("table_attendance",Constants.staffid);
         }
     }
 }
