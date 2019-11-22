@@ -48,12 +48,12 @@
         <activity android:name=".MarkAttendanceActivity" />
         <activity
             android:name=".LeaveApplicationActivity"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"/>
         <activity android:name=".SalarySlipDetailsActivity" />
-        <activity android:name=".SalaryDetailsActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".PlannerActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

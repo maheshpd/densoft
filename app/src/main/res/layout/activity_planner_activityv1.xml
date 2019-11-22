@@ -38,7 +38,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:gravity="center"
-                android:textColor="@color/darkblue"/>
+                android:textColor="@color/blue2"/>
 
             <com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView
                 android:id="@+id/custom_calendar"

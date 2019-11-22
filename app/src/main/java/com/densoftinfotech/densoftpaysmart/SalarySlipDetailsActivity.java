@@ -78,17 +78,22 @@ public class SalarySlipDetailsActivity extends CommonActivity {
         webview.getSettings().setBuiltInZoomControls(true);
 
         staffDetails = Constants.staffDetailsRoom;
-        if (staffDetails != null) {
-            getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId());
-        }
+
 
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recycler_view_salaryslipdetails.setLayoutManager(layoutManager);
 
+
+
         b = getIntent().getExtras();
         if (b != null) {
-            if (b.containsKey("month")) {
-                gotoselection_showslip(String.valueOf(b.getInt("month")), String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+            if (b.containsKey("monthpos")) {
+                //gotoselection_showslip(String.valueOf(b.getInt("monthpos")), String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+                getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), b.getInt("monthpos"));
+            }
+        }else{
+            if (staffDetails != null) {
+                getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), -1);
             }
         }
 
@@ -99,7 +104,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
                 "&year=" + year + "&StaffId=" + Constants.staffid + "&mText=" + get_monthName(Integer.parseInt(month_number)));
     }
 
-    private void getset_spinner_data(int year_of_joining, String staffid) {
+    private void getset_spinner_data(int year_of_joining, String staffid, int monthpos) {
 
         for (int i = year_of_joining; i <= Calendar.getInstance().get(Calendar.YEAR); i++) {
             years.add(i);
@@ -113,7 +118,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                get_salary_data(Constants.staffid, adapterView.getItemAtPosition(i).toString());
+                get_salary_data(Constants.staffid, adapterView.getItemAtPosition(i).toString(), monthpos);
             }
 
             @Override
@@ -124,7 +129,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
 
     }
 
-    private void get_salary_data(String staffid, String year) {
+    private void get_salary_data(String staffid, String year, int monthpos) {
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
         getServiceInterface = retrofit.create(GetServiceInterface.class);
@@ -165,11 +170,11 @@ public class SalarySlipDetailsActivity extends CommonActivity {
                                 newset.add(record.getApplyForMonth());
                             }
 
-                            monthAdapter = new MonthAdapter(SalarySlipDetailsActivity.this, newset);
+                            monthAdapter = new MonthAdapter(SalarySlipDetailsActivity.this, newset, monthpos);
                             recycler_view_salaryslipdetails.setAdapter(monthAdapter);
                         } else {
                             tv_nodataavailable.setVisibility(View.VISIBLE);
-                            recycler_view_salaryslipdetails.setVisibility(View.GONE);
+                            recycler_view_salaryslipdetails.setVisibility(View.INVISIBLE);
                             webview.setVisibility(View.GONE);
                         }
 

@@ -6,18 +6,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.View;
 import android.view.WindowManager;
 
 import com.densoftinfotech.densoftpaysmart.R;
-import com.densoftinfotech.densoftpaysmart.SalaryDetailsActivity;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
-import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
-import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
-import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;

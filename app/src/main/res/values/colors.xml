@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#11B2DA</color>
-    <color name="colorPrimaryDark">#0998BB</color>
+    <color name="colorPrimary">#423184</color>
+    <color name="colorPrimaryDark">#29166F</color>
     <color name="colorAccent">#D81B60</color>
 
     <!--densoft colors-->
@@ -68,7 +68,9 @@
     <color name="green1">#003E05</color>
     <color name="green2">#00790A</color>
 
-    <color name="blue2">#81ABC1</color>
+    <color name="blue3">#81ABC1</color>
+
+    <color name="blue2">#423184</color>
 
 
     <!--<color name="bluelighttoolbar">#11B2DA</color>

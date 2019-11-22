@@ -34,17 +34,6 @@
             android:scrollbars="none"
             tools:listitem="@layout/month_layout" />
 
-        <TextView
-            android:id="@+id/tv_nodataavailable"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/nodataavailable"
-            android:textColor="@color/darkbrownred"
-            android:textAlignment="center"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:visibility="gone"/>
-
     </LinearLayout>
 
     <!--<View
@@ -165,12 +154,21 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/tv_nodataavailable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nodataavailable"
+            android:textColor="@color/darkbrownred"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
 
         <WebView
             android:id="@+id/webview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
 
     </LinearLayout>

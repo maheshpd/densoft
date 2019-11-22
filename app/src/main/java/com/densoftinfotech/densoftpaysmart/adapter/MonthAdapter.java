@@ -2,6 +2,7 @@ package com.densoftinfotech.densoftpaysmart.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +24,13 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
 
     Context context;
     ArrayList<Integer> monthDisplays = new ArrayList<>();
-    int selected = 0;
+    int selected = -1;
+    int monthpos;
 
-    public MonthAdapter(Context context, TreeSet<Integer> monthDisplays) {
+    public MonthAdapter(Context context, TreeSet<Integer> monthDisplays, int monthpos) {
         this.context = context;
         this.monthDisplays = new ArrayList<Integer>(monthDisplays);
+        this.monthpos = monthpos;
     }
 
     @NonNull
@@ -50,7 +53,16 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
             }
         });*/
 
-        holder.tv_month.setSelected(i == selected);
+
+        if (monthDisplays.get(i) == monthpos) {
+            holder.tv_month.setSelected(true);
+            monthpos = 0;
+            Log.d("position of month ", monthpos + " if");
+        } else {
+            Log.d("position of month ", selected + " else");
+            holder.tv_month.setSelected(i == selected);
+        }
+
 
         if (holder.tv_month.isSelected()) {
             holder.tv_month.setTextColor(context.getResources().getColor(R.color.white));
@@ -58,6 +70,7 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
             ((SalarySlipDetailsActivity) context).gotoselection(String.valueOf(monthDisplays.get(i)));
         } else {
             holder.tv_month.setTextColor(context.getResources().getColor(R.color.gray));
+            holder.tv_month.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
         }
 
 

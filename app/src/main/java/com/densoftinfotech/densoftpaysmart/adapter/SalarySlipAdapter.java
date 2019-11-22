@@ -101,7 +101,7 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, SalarySlipDetailsActivity.class);
-                //intent.putExtra("month", salarySlips.get(i));
+                intent.putExtra("monthpos", salarySlips.get(i));
                 context.startActivity(intent);
             }
         });

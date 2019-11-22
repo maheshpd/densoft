@@ -99,6 +99,7 @@
     <string name="checkout_once">You can only Check Out once in a day</string>
     <string name="unabletofindlocation">We are not able to get your location. Please try again later!</string>
     <string name="track_me">Track me live</string>
+    <string name="pleasecheckinternet">Please check your Network</string>
 
 
 </resources>

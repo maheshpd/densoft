@@ -4,13 +4,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
+import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
 import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
@@ -31,8 +36,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-
-//import com.android.volley.toolbox.StringRequest;
 
 public class LoginActivity extends CommonActivity {
 
@@ -55,10 +58,8 @@ public class LoginActivity extends CommonActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //fullscreen();
+        getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.login));
         setContentView(R.layout.activity_login);
-
         ButterKnife.bind(this);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
@@ -70,12 +71,40 @@ public class LoginActivity extends CommonActivity {
             finish();
         }
 
+        et_customerid.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                et_customerid.setInputType(InputType.TYPE_CLASS_TEXT);
+                return false;
+            }
+        });
+
+        et_staffid.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                et_staffid.setInputType(InputType.TYPE_CLASS_TEXT);
+                return false;
+            }
+        });
+
+        et_password.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                et_password.setInputType(InputType.TYPE_CLASS_TEXT);
+                return false;
+            }
+        });
+
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (checkfor_noblankparam()) {
-                    get_login_data();
+
+                    if(InternetUtils.getInstance(LoginActivity.this).available())
+                        get_login_data();
+                    else
+                        Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleasecheckinternet), Toast.LENGTH_SHORT).show();
                 }
             }
         });
