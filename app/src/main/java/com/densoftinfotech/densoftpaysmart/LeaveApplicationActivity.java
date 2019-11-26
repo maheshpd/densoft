@@ -69,17 +69,17 @@ public class LeaveApplicationActivity extends CommonActivity {
     @BindView(R.id.spinner_duties_coveredby)
     Spinner spinner_duties_coveredby;
 
-    LeaveDetails leaveDetails;
-    String leave_id = "";
+    private LeaveDetails leaveDetails;
+    private String leave_id = "";
 
 
-    ArrayList<ParentEmployee> spinner_parentEmployees = new ArrayList<>();
-    ArrayAdapter<ParentEmployee> parentEmployee_ArrayAdapter;
+    private ArrayList<ParentEmployee> spinner_parentEmployees = new ArrayList<>();
+    private ArrayAdapter<ParentEmployee> parentEmployee_ArrayAdapter;
 
-    ArrayList<CareOfStaff_Employee> spinner_careOfStaff_employees = new ArrayList<>();
-    ArrayAdapter<CareOfStaff_Employee> careOfStaffEmployee_ArrayAdapter;
+    private ArrayList<CareOfStaff_Employee> spinner_careOfStaff_employees = new ArrayList<>();
+    private ArrayAdapter<CareOfStaff_Employee> careOfStaffEmployee_ArrayAdapter;
 
-    Bundle b;
+    private Bundle b;
     private GetServiceInterface getServiceInterface;
     private SharedPreferences preferences;
 
@@ -158,10 +158,7 @@ public class LeaveApplicationActivity extends CommonActivity {
         tv_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 submit_leave_application();
-
-
             }
         });
 

@@ -4,19 +4,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.adapter.QuickActionsAdapter;
 import com.densoftinfotech.densoftpaysmart.adapter.SalarySlipAdapter;
+import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.SnapHelperOneByOne;
 import com.densoftinfotech.densoftpaysmart.classes.QuickActions;
-import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
 import com.densoftinfotech.densoftpaysmart.classes.QuickActionsArray;
-import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
+import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
@@ -70,18 +69,18 @@ public class MainActivity extends CommonActivity {
     @BindView(R.id.tv_title)
     TextView tv_title;
 
-    RecyclerView.LayoutManager layoutManager_salaryslip, layoutManager_quickaction;
+    private RecyclerView.LayoutManager layoutManager_salaryslip, layoutManager_quickaction;
 
-    QuickActionsAdapter quickActionsAdapter;
+    private QuickActionsAdapter quickActionsAdapter;
 
-    ArrayList<SalarySlip> salarySlips = new ArrayList<>();
-    ArrayList<QuickActions> quickActions = new ArrayList<>();
-    StaffDetailsRoom staffDetailsRoom;
-    SalarySlipAdapter salarySlipAdapter;
+    private ArrayList<SalarySlip> salarySlips = new ArrayList<>();
+    private ArrayList<QuickActions> quickActions = new ArrayList<>();
+    private StaffDetailsRoom staffDetailsRoom;
+    private SalarySlipAdapter salarySlipAdapter;
 
     private GetServiceInterface getServiceInterface;
-    SharedPreferences preferences;
-    SharedPreferences.Editor edit;
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor edit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +101,7 @@ public class MainActivity extends CommonActivity {
         layoutManager_salaryslip = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recycler_view_salaryslip.setLayoutManager(layoutManager_salaryslip);
         linearSnapHelper.attachToRecyclerView(recycler_view_salaryslip);
+
 
         iv_notification.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,7 +141,7 @@ public class MainActivity extends CommonActivity {
                         }
 
                         // Get new Instance ID token
-                        String token = task.getResult().getToken();
+                        //String token = task.getResult().getToken();
 
                         //Log.d("task success", " " + token);
                     }

@@ -100,6 +100,7 @@
     <string name="unabletofindlocation">We are not able to get your location. Please try again later!</string>
     <string name="track_me">Track me live</string>
     <string name="pleasecheckinternet">Please check your Network</string>
+    <string name="permission_rationale">Set Permissions</string>
 
 
 </resources>

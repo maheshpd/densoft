@@ -67,31 +67,29 @@ public class MarkAttendanceActivity extends CommonActivity {
     @BindView(R.id.spinner_year)
     Spinner spinner_year;
 
-    UserLocation userLocation;
-    String longitude = "";
-    String latitude = "";
-    int year_of_joining = 2000;
+    private UserLocation userLocation;
+    private int year_of_joining = 2000;
 
-    String month, year = "";
+    private String month, year = "";
 
-    RecyclerView.LayoutManager layoutManager;
-    MarkAttendanceAdapter markAttendanceAdapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private MarkAttendanceAdapter markAttendanceAdapter;
 
-    GetServiceInterface getServiceInterface;
-    ArrayList<MarkAttendanceDetails> markAttendanceDetails = new ArrayList<>();
+    private GetServiceInterface getServiceInterface;
+    private ArrayList<MarkAttendanceDetails> markAttendanceDetails = new ArrayList<>();
     private ArrayList<Integer> years = new ArrayList<>();
     private static String[] month_short = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     private SharedPreferences preferences;
 
-    Bundle b;
+    private Bundle b;
 
     private GetServiceInterface apiInterface;
 
-    Calendar c = Calendar.getInstance();
-    SimpleDateFormat df_date = new SimpleDateFormat("yyyy-MM-dd");
-    SimpleDateFormat df_time = new SimpleDateFormat("HH:mm");
-    String formattedDate = "";
-    String formattedTime = "";
+    private Calendar c = Calendar.getInstance();
+    private SimpleDateFormat df_date = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat df_time = new SimpleDateFormat("HH:mm");
+    private String formattedDate = "";
+    private String formattedTime = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -283,7 +281,7 @@ public class MarkAttendanceActivity extends CommonActivity {
                         } else {
                             Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
                         }
-                    }else {
+                    } else {
                         Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkin_once), Toast.LENGTH_LONG).show();
                     }
                 }
@@ -383,71 +381,21 @@ public class MarkAttendanceActivity extends CommonActivity {
             year = year1;
         }
 
-
         if (month.equals("")) {
             month = String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
         }
-
-        //Log.d("month by broadcast ", month + " MarkAttendanceActivity " + year1);
-
-        switch (month) {
-            case "Jan":
-            case "1":
-                get_attendance_details(staffid, "1", year);
-                break;
-            case "Feb":
-            case "2":
-                get_attendance_details(staffid, "2", year);
-                break;
-            case "Mar":
-            case "3":
-                get_attendance_details(staffid, "3", year);
-                break;
-            case "Apr":
-            case "4":
-                get_attendance_details(staffid, "4", year);
-                break;
-            case "May":
-            case "5":
-                get_attendance_details(staffid, "5", year);
-                break;
-            case "Jun":
-            case "6":
-                get_attendance_details(staffid, "6", year);
-                break;
-            case "Jul":
-            case "7":
-                get_attendance_details(staffid, "7", year);
-                break;
-            case "Aug":
-            case "8":
-                get_attendance_details(staffid, "8", year);
-                break;
-            case "Sep":
-            case "9":
-                get_attendance_details(staffid, "9", year);
-                break;
-            case "Oct":
-            case "10":
-                get_attendance_details(staffid, "10", year);
-                break;
-            case "Nov":
-            case "11":
-                get_attendance_details(staffid, "11", year);
-                break;
-            case "Dec":
-            case "12":
-                get_attendance_details(staffid, "12", year);
-                break;
-        }
+        get_attendance_details(staffid, get_monthNumber(month), year);
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(DateUtils.calculate_validity(DatabaseHelper.getInstance(MarkAttendanceActivity.this).check_sqliteDate(), Constants.today_date)){
-            DatabaseHelper.getInstance(MarkAttendanceActivity.this).deleteEntry("table_attendance",Constants.staffid);
+        if (DateUtils.calculate_validity(DatabaseHelper.getInstance(MarkAttendanceActivity.this).check_sqliteDate(), Constants.today_date)) {
+            Log.d("validity ", DatabaseHelper.getInstance(MarkAttendanceActivity.this).check_sqliteDate() + "" + Constants.today_date);
+            DatabaseHelper.getInstance(MarkAttendanceActivity.this).deleteEntry("table_attendance", Constants.staffid);
+        } else {
+            Log.d("validity ", DatabaseHelper.getInstance(MarkAttendanceActivity.this).check_sqliteDate() + " " + Constants.today_date);
         }
     }
 }

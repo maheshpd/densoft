@@ -50,14 +50,14 @@ public class SalarySlipDetailsActivity extends CommonActivity {
     @BindView(R.id.tv_nodataavailable)
     TextView tv_nodataavailable;
 
-    ArrayList<Integer> years = new ArrayList<>();
-    RecyclerView.LayoutManager layoutManager;
-    MonthAdapter monthAdapter;
-    Bundle b;
+    private ArrayList<Integer> years = new ArrayList<>();
+    private RecyclerView.LayoutManager layoutManager;
+    private MonthAdapter monthAdapter;
+    private Bundle b;
 
-    StaffDetailsRoom staffDetails;
+    private StaffDetailsRoom staffDetails;
     private GetServiceInterface getServiceInterface;
-    ArrayList<SalarySlip> salarySlips = new ArrayList<>();
+    private ArrayList<SalarySlip> salarySlips = new ArrayList<>();
     private SharedPreferences preferences;
 
 
@@ -90,16 +90,18 @@ public class SalarySlipDetailsActivity extends CommonActivity {
             if (b.containsKey("monthpos")) {
                 //gotoselection_showslip(String.valueOf(b.getInt("monthpos")), String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
                 getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), b.getInt("monthpos"));
+                // if option is selected from the card view of Main Activity
             }
         }else{
             if (staffDetails != null) {
                 getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), -1);
+                // if option is selected from Quick Actions
             }
         }
 
     }
 
-    public void gotoselection_showslip(String month_number, String year) {
+    private void gotoselection_showslip(String month_number, String year) {
         webview.loadUrl(URLS.dynamic_url_webroute(Constants.staffDetailsRoom.getDomainUrl()) + "AdminRpt/EmployeeSalarySlip.htm?CategoryId=233&" + "month=" + month_number +
                 "&year=" + year + "&StaffId=" + Constants.staffid + "&mText=" + get_monthName(Integer.parseInt(month_number)));
     }

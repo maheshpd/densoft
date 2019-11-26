@@ -49,11 +49,12 @@ public class CommonActivity extends AppCompatActivity {
 
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title/*, int color*/){
         ButterKnife.bind(this);
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(title);
         toolbar.setTitleMargin(20, 10, 10, 10);
+        //toolbar.setBackgroundColor(color);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         toolbar.setLogo(R.mipmap.ic_launcher);
         setSupportActionBar(toolbar);

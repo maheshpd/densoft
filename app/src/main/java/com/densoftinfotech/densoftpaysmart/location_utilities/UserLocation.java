@@ -36,7 +36,7 @@ public class UserLocation extends Service implements LocationListener {
     private Context context;
 
     private static final long MIN_DISTANCE_FOR_UPDATE = 10; // The minimum distance to change Updates in meters
-    private static final long MIN_TIME_FOR_UPDATE = 1000; // The minimum time between updates in milliseconds
+    private static final long MIN_TIME_FOR_UPDATE = 10000; // The minimum time between updates in milliseconds
 
     double latitude; // latitude
     double longitude; // longitude

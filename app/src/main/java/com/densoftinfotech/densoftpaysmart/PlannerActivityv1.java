@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -53,17 +54,17 @@ public class PlannerActivityv1 extends CommonActivity {
     @BindView(R.id.iv_history)
     TextView iv_history;
 
-    ArrayList<CalendarDetails> calendarDetails = new ArrayList<>();
-    RecyclerView.LayoutManager layoutManager;
-    CalendarDetailsAdapter calendarDetailsAdapter;
+    private ArrayList<CalendarDetails> calendarDetails = new ArrayList<>();
+    private RecyclerView.LayoutManager layoutManager;
+    private CalendarDetailsAdapter calendarDetailsAdapter;
     private GetServiceInterface getServiceInterface;
 
     private StaffDetailsRoom staffDetailsRoom;
     private Calendar cal = Calendar.getInstance(Locale.ENGLISH);
     private SharedPreferences preferences;
 
-    int month = Calendar.getInstance().get(Calendar.MONTH)+1;
-    int year = Calendar.getInstance().get(Calendar.YEAR);
+    private int month = Calendar.getInstance().get(Calendar.MONTH)+1;
+    private int year = Calendar.getInstance().get(Calendar.YEAR);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,6 +188,8 @@ public class PlannerActivityv1 extends CommonActivity {
 
                     if (response.body() != null && !response.body().isEmpty()) {
                         calendarDetails = response.body();
+
+                        Collections.reverse(calendarDetails);
 
                         calendarDetailsAdapter = new CalendarDetailsAdapter(PlannerActivityv1.this, calendarDetails);
                         recyclerview_planner.setAdapter(calendarDetailsAdapter);

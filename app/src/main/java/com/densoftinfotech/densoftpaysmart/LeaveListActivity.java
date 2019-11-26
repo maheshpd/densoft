@@ -32,8 +32,8 @@ public class LeaveListActivity extends CommonActivity {
 
     @BindView(R.id. recyclerview_leave)
     RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-    LeaveAdapter leaveAdapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private LeaveAdapter leaveAdapter;
 
     private ArrayList<LeaveDetails> leaveDetails = new ArrayList<>();
     private GetServiceInterface getServiceInterface;
@@ -65,7 +65,6 @@ public class LeaveListActivity extends CommonActivity {
         params.put("StaffId", staffid);
 
         JSONObject obj = new JSONObject(params);
-        //Log.d("params ", obj + "");
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
         Call<ArrayList<LeaveDetails>> call = getServiceInterface.request_leavedetails(requestBody);

@@ -90,4 +90,12 @@
     <color name="mycolor2">#ff00aa00</color>
 
 
+    <color name="icon_color_salarydetails">#9A0710</color>
+    <color name="icon_color_planner">#00209D</color>
+    <color name="icon_color_attendance_history">#51595A</color>
+    <color name="icon_color_travel_claims">#026941</color>
+    <color name="icon_color_leaves">#7D00C5</color>
+    <color name="icon_color_team">#D95200</color>
+
+
 </resources>

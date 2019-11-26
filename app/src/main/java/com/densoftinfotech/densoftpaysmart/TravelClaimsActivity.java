@@ -27,11 +27,11 @@ import java.util.Map;
 
 public class TravelClaimsActivity extends CommonActivity {
 
-    TextView tv_trackme;
+    private TextView tv_trackme;
 
     private UserLocation userLocation;
-    final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    DatabaseReference databaseReference;
+    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

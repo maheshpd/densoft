@@ -33,11 +33,11 @@ public class SalarySlipAdapter extends RecyclerView.Adapter<SalarySlipAdapter.My
     ArrayList<Integer> salarySlips = new ArrayList<>();
     ArrayList<SalarySlip> response_salarySlips = new ArrayList<>();
 
-    public static int[] background_gradient = {R.drawable.gradient_2, R.drawable.gradient_12, R.drawable.gradient_4,
-            R.drawable.gradient_11, R.drawable.gradient_5, R.drawable.gradient_6 , R.drawable.gradient_3, R.drawable.gradient_7,
+    public static int[] background_gradient = {R.drawable.gradient_11, R.drawable.gradient_2, R.drawable.gradient_12, R.drawable.gradient_4,
+            R.drawable.gradient_5, R.drawable.gradient_6 , R.drawable.gradient_3, R.drawable.gradient_7,
             R.drawable.gradient_8, R.drawable.gradient_9, R.drawable.gradient_10, R.drawable.gradient_13,
-            R.drawable.gradient_2, R.drawable.gradient_12, R.drawable.gradient_4,
-            R.drawable.gradient_11, R.drawable.gradient_5, R.drawable.gradient_6 , R.drawable.gradient_3, R.drawable.gradient_7,
+            R.drawable.gradient_11, R.drawable.gradient_2, R.drawable.gradient_12, R.drawable.gradient_4,
+            R.drawable.gradient_5, R.drawable.gradient_6 , R.drawable.gradient_3, R.drawable.gradient_7,
             R.drawable.gradient_8, R.drawable.gradient_9, R.drawable.gradient_10, (R.drawable.gradient_13)};
 
     public SalarySlipAdapter(Context context, TreeSet<Integer> salarySlips, ArrayList<SalarySlip> response_salarySlips) {

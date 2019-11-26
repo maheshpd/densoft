@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
@@ -214,7 +215,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean allow_check(int status) {
         createTable_forAttendance();
-        String today_date = "";
         try {
             SQLiteDatabase db = getReadableDatabase();
             String query = "SELECT * FROM " + TABLE_ATTENDANCE;
@@ -304,9 +304,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void deleteEntry(String table, String staffid)
     {
-        String where="id=?";
+
+        createtablenotification();
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(table, where, new String[]{staffid}) ;
+        db.execSQL("DELETE FROM " + table + " WHERE STAFF_ID = " + staffid);
+        /*String where="id=?";
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(table, where, new String[]{staffid}) ;*/
     }
 
     public void update_notification() {

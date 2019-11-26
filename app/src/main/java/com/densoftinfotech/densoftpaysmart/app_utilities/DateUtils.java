@@ -76,4 +76,25 @@ public class DateUtils {
 		}
 	}
 
+	public static boolean calculate_time_validity(String time_from, String time_to) {
+		SimpleDateFormat myFormat = new SimpleDateFormat("HH:mm");
+
+
+		try {
+			Date timeBefore = myFormat.parse(time_from);
+			Date timeAfter = myFormat.parse(time_to);
+
+			if (timeAfter.after(timeBefore))
+				return true;
+
+			if (timeAfter.equals(timeBefore))
+				return false;
+			else
+				return false;
+
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 }

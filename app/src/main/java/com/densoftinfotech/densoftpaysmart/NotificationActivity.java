@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class NotificationActivity extends CommonActivity {
 
-    RecyclerView recycler_view_notification;
-    RecyclerView.LayoutManager layoutManager;
-    NotificationAdapter notificationAdapter;
-    ArrayList<NotificationReceived> notificationList = new ArrayList<>();
+    private RecyclerView recycler_view_notification;
+    private RecyclerView.LayoutManager layoutManager;
+    private NotificationAdapter notificationAdapter;
+    private ArrayList<NotificationReceived> notificationList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

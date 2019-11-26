@@ -24,7 +24,7 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
 
     Context context;
     ArrayList<Integer> monthDisplays = new ArrayList<>();
-    int selected = -1;
+    int selected = 0;
     int monthpos;
 
     public MonthAdapter(Context context, TreeSet<Integer> monthDisplays, int monthpos) {
@@ -43,25 +43,14 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
 
-        /*holder.tv_month.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.tv_month.setTextColor(context.getResources().getColor(R.color.white));
-                holder.tv_month.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                ((SalarySlipDetailsActivity) context).gotoselection(String.valueOf(monthDisplays.get(i)));
-
-            }
-        });*/
-
-
-        if (monthDisplays.get(i) == monthpos) {
-            holder.tv_month.setSelected(true);
-            monthpos = 0;
-            Log.d("position of month ", monthpos + " if");
-        } else {
-            Log.d("position of month ", selected + " else");
-            holder.tv_month.setSelected(i == selected);
-        }
+       if(monthpos == -1){
+           holder.tv_month.setSelected(i == selected);
+       }else {
+           if (monthDisplays.get(i) == monthpos) {
+               holder.tv_month.setSelected(true);
+                monthpos = -1;
+           }
+       }
 
 
         if (holder.tv_month.isSelected()) {

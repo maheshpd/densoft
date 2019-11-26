@@ -37,7 +37,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
-        setdata(holder, position);
+        setdata(holder, position, Integer.parseInt(calendarDetails.get(position).getCDate()));
 
         if (calendarDetails.get(position).getStatus().equalsIgnoreCase("0")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.absent));
@@ -146,9 +146,9 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
         }
     }
 
-    private void setdata(MyViewHolder holder, int position) {
+    private void setdata(MyViewHolder holder, int position, int i) {
 
-        holder.tv_status.setText("" + (position + 1));
+        holder.tv_status.setText("" + i);
         holder.tv_intime.setText(": " + calendarDetails.get(position).getInTime());
         holder.tv_outtime.setText(": " + calendarDetails.get(position).getOutTime());
         holder.tv_lateby.setText(": " + calendarDetails.get(position).getLateBy());

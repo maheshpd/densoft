@@ -1,4 +1,4 @@
-package com.densoftinfotech.densoftpaysmart;
+package com.densoftinfotech.densoftpaysmart.background_service;
 
 
 import android.app.NotificationChannel;
@@ -12,6 +12,8 @@ import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
 
+import com.densoftinfotech.densoftpaysmart.NotificationActivity;
+import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;

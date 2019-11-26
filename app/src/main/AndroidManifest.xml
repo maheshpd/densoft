@@ -38,12 +38,18 @@
             android:value="@string/api_key_map" />
         -->
         <service
-            android:name=".MyFirebaseMessagingService"
+            android:name=".background_service.MyFirebaseMessagingService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <receiver android:name=".background_service.BackgroundService">
+            <intent-filter>
+                <action android:name="location_update"/>
+            </intent-filter>
+        </receiver>
 
         <activity android:name=".MarkAttendanceActivity" />
         <activity

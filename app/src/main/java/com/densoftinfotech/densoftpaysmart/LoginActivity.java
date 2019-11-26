@@ -1,7 +1,9 @@
 package com.densoftinfotech.densoftpaysmart;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
@@ -21,6 +23,7 @@ import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONObject;
 
@@ -28,6 +31,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,12 +54,12 @@ public class LoginActivity extends CommonActivity {
     @BindView(R.id.et_customerid)
     EditText et_customerid;
 
-    SharedPreferences preferences;
-    SharedPreferences.Editor edit;
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor edit;
 
     private GetServiceInterface apiInterface;
 
-    ArrayList<StaffDetails> staffDetailsArrayList = new ArrayList<>();
+    private ArrayList<StaffDetails> staffDetailsArrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +77,10 @@ public class LoginActivity extends CommonActivity {
             finish();
         }
 
-        et_customerid.setOnTouchListener(new View.OnTouchListener() {
+
+        check_permission();
+
+        /*et_customerid.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 et_customerid.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -93,7 +102,7 @@ public class LoginActivity extends CommonActivity {
                 et_password.setInputType(InputType.TYPE_CLASS_TEXT);
                 return false;
             }
-        });
+        });*/
 
 
         btn_login.setOnClickListener(new View.OnClickListener() {
@@ -202,6 +211,54 @@ public class LoginActivity extends CommonActivity {
             finish();
 
         }
-
     }
+
+    private void check_permission(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                        21);
+
+        } else {
+            // Permission has already been granted
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == 21) {
+
+        }else{
+            //show_snackbar();
+        }
+    }
+
+    /*private void show_snackbar() {
+        showSnackbar(R.string.permission_rationale,
+                android.R.string.ok, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Request permission
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                                21);
+                    }
+                });
+    }
+
+    private void showSnackbar(final int mainTextStringId, final int actionStringId,
+                              View.OnClickListener listener) {
+        Snackbar.make(
+                findViewById(android.R.id.content),
+                getString(mainTextStringId),
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(getString(actionStringId), listener).show();
+    }*/
 }
