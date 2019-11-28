@@ -1,27 +1,15 @@
 package com.densoftinfotech.densoftpaysmart;
 
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.FragmentActivity;
-
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.location.Geocoder;
 import android.os.Bundle;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -35,23 +23,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import static android.graphics.Typeface.BOLD;
-import static android.graphics.Typeface.ITALIC;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 
 public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -67,7 +50,6 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         setContentView(R.layout.activity_google_map);
         SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         btn_search = findViewById(R.id.btn_search);
-
 
         if (supportMapFragment != null) {
             supportMapFragment.getMapAsync(this);
@@ -173,9 +155,9 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         if (firebaseLiveLocations != null) {
 
             for(int i = 0; i<firebaseLiveLocations.size(); i++){
-                if(firebaseLiveLocations.get(i).getStaff_name().trim().contains(location.trim())){
+                if(firebaseLiveLocations.get(i).getStaff_name().toLowerCase().trim().contains(location.toLowerCase().trim()) ||
+                        firebaseLiveLocations.get(i).getStaff_id().toLowerCase().trim().contains(location.toLowerCase().trim())){
                     LatLng latLng = new LatLng(Double.parseDouble(firebaseLiveLocations.get(i).getLatitude()), Double.parseDouble(firebaseLiveLocations.get(i).getLongitude()));
-                    googleMap.addMarker(new MarkerOptions().position(latLng).title(location));
                     googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                 }
