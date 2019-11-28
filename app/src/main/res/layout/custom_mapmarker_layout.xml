@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical">
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="5dp"
+        app:cardCornerRadius="5dp"
+        android:layout_gravity="center">
+
+        <LinearLayout
+            android:id="@+id/linearlayout_marker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:maxHeight="80dp"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:layout_margin="2dp">
+
+            <TextView
+                android:id="@+id/tv_nameofstaff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/darkbrownred"
+                />
+
+            <TextView
+                android:id="@+id/tv_staffid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:textColor="@color/gray3"
+                />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/iv_marker"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:scaleType="fitXY"
+        android:src="@drawable/location" />
+
+
+</LinearLayout>

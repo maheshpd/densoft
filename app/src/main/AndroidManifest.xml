@@ -18,7 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".TravelClaimsActivity"></activity>
+        <activity android:name=".GoogleMapActivity"></activity>
+        <activity android:name=".TravelClaimsActivity" />
         <activity android:name=".NotificationActivity" />
         <activity android:name=".LeaveListActivity" />
         <activity android:name=".PlannerActivityv1" />
@@ -29,6 +30,12 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/map_api_key" />
         <!--
 <meta-data
             android:name="com.google.android.gms.version"
@@ -47,18 +54,19 @@
 
         <receiver android:name=".background_service.BackgroundService">
             <intent-filter>
-                <action android:name="location_update"/>
+                <action android:name="location_update" />
             </intent-filter>
         </receiver>
 
         <activity android:name=".MarkAttendanceActivity" />
         <activity
             android:name=".LeaveApplicationActivity"
-            android:windowSoftInputMode="stateHidden"/>
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".SalarySlipDetailsActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".PlannerActivity" />
-        <activity android:name=".LoginActivity"
+        <activity
+            android:name=".LoginActivity"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

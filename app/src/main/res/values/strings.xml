@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Paysmart</string>
-    <string name="api_key_map">aaa</string>
 
     <string name="title">Paysmart</string>
     <string name="densoft">Densoft</string>

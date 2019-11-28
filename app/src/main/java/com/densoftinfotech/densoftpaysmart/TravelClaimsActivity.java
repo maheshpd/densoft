@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,13 +24,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.net.Inet4Address;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TravelClaimsActivity extends CommonActivity {
 
-    private TextView tv_trackme;
-
+    TextView tv_trackme;
+    ImageView iv_seemap;
     private UserLocation userLocation;
     private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference;
@@ -39,6 +43,7 @@ public class TravelClaimsActivity extends CommonActivity {
         setContentView(R.layout.activity_travel_claims);
 
         tv_trackme = findViewById(R.id.tv_trackme);
+        iv_seemap = findViewById(R.id.iv_seemap);
 
         databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + Constants.staffDetailsRoom.getCompanyName()) ;
         setTitle(getResources().getString(R.string.track_me));
@@ -50,6 +55,14 @@ public class TravelClaimsActivity extends CommonActivity {
                 if(check_param_ok()) {
                     add_live_updates_to_firebase();
                 }
+            }
+        });
+
+        iv_seemap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(TravelClaimsActivity.this, GoogleMapActivity.class);
+                startActivity(i);
             }
         });
 

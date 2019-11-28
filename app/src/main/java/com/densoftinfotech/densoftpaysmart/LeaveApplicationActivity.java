@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.classes.CareOfStaff_Employee;
 import com.densoftinfotech.densoftpaysmart.classes.CheckLeaveStatus;
 import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
@@ -158,7 +159,11 @@ public class LeaveApplicationActivity extends CommonActivity {
         tv_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                submit_leave_application();
+                if(DateUtils.calculate_validity(Constants.today_date, et_dateofleave_from.getText().toString())) {
+                    submit_leave_application();
+                }else{
+                    Toast.makeText(LeaveApplicationActivity.this, getResources().getString(R.string.selectgreaterdate), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -281,7 +286,7 @@ public class LeaveApplicationActivity extends CommonActivity {
                         parentEmployee_ArrayAdapter = new ArrayAdapter(LeaveApplicationActivity.this, R.layout.custom_spinnerlayout, R.id.text1, spinner_parentEmployees);
                         spinner_reportto.setAdapter(parentEmployee_ArrayAdapter);
 
-                        get_duties_covered_by_list();
+                        get_duties_covered_by_list(); //staff list
 
                     } else {
 
