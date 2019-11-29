@@ -3,7 +3,7 @@ package com.densoftinfotech.densoftpaysmart.classes;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
-public class FirebaseLiveLocation implements ClusterItem{
+public class FirebaseLiveLocation/* implements ClusterItem*/{
     private String staff_id = "";
     private String staff_name = "";
     private String latitude = "";
@@ -72,7 +72,7 @@ public class FirebaseLiveLocation implements ClusterItem{
         this.workinghours = workinghours;
     }
 
-    String title = "";
+    /*String title = "";
     LatLng latLng = null;
     String snippet = "";
     public FirebaseLiveLocation(String title, LatLng latLng, String snippet) {
@@ -92,7 +92,7 @@ public class FirebaseLiveLocation implements ClusterItem{
     @Override
     public String getSnippet() {
         return snippet;
-    }
+    }*/
 
 
     /*private LatLng mPosition;

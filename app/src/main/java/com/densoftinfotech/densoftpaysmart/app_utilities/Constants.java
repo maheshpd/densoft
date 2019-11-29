@@ -30,5 +30,10 @@ public class Constants {
     public static int count_before_firstpos = 0;
 
     public static String firebase_database_name = "LiveTracking";
+    public static long LOCATION_INTERVAL = 1000;
+    public static long FASTEST_LOCATION_INTERVAL = 0;
+
+    public static final double current_loc_latitude = 19.0175853;
+    public static final double current_loc_longitude = 72.830392;
 
 }

@@ -52,6 +52,8 @@
             </intent-filter>
         </service>
 
+        <service android:name=".location_utilities.LocationMonitoringService" />
+
         <receiver android:name=".background_service.BackgroundService">
             <intent-filter>
                 <action android:name="location_update" />

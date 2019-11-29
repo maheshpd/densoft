@@ -253,4 +253,37 @@ public class UserLocation extends Service implements LocationListener {
         return add;
     }
 
+    public String getAddress_fromLatLng(double latitude, double longitude) {
+        String add = "";
+        try {
+
+                Geocoder geoCoder = new Geocoder(context, Locale.getDefault());
+                StringBuilder builder = new StringBuilder();
+                try {
+                    List<Address> address = geoCoder.getFromLocation(latitude, longitude, 1);
+                    int maxLines = address.get(0).getMaxAddressLineIndex();
+                    for (int i = 0; i < maxLines; i++) {
+                        String addressStr = address.get(0).getAddressLine(i);
+                        Log.e("str ", "str " + addressStr);
+                        builder.append(addressStr);
+                        builder.append(" ");
+                    }
+
+                    Address obj = address.get(0);
+                    add = obj.getAddressLine(0);
+                    Log.e("Address", " " + add);
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // reporterror("ActivityCommon getAddress", e.toString());
+        }
+        return add;
+    }
+
 }

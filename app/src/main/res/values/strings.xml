@@ -100,6 +100,11 @@
     <string name="track_me">Track me live</string>
     <string name="pleasecheckinternet">Please check your Network</string>
     <string name="permission_rationale">Set Permissions</string>
-
+    <string name="no_google_playservice_available">no google playservice available</string>
+    <string name="title_alert_no_intenet">no intenet</string>
+    <string name="msg_alert_no_internet">please check your intenet connection</string>
+    <string name="btn_label_refresh">Refresh</string>
+    <string name="permission_denied_explanation">permission denied. please allow permissions</string>
+    <string name="settings">Go to Settings</string>
 
 </resources>
