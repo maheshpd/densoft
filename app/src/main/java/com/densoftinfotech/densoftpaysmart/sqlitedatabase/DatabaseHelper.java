@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
+import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
 import com.densoftinfotech.densoftpaysmart.classes.NotificationReceived;
 
 import org.json.JSONException;
@@ -130,19 +131,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return index;
     }
 
-    public long save_location(ContentValues c) {
+    public long save_location(ContentValues c, String staffid) {
         long index = 0;
         try {
             createtable_location();
             SQLiteDatabase db = getWritableDatabase();
-            index = db.insertWithOnConflict(TABLE_FIREBASE_LIVE_LOCATION, null, c, SQLiteDatabase.CONFLICT_REPLACE);
+            Cursor c1 = db.rawQuery("SELECT * FROM "+TABLE_FIREBASE_LIVE_LOCATION, null);
+            if (c1.getCount() == 0) {
+                try {
+
+                    index = db.insertWithOnConflict(TABLE_FIREBASE_LIVE_LOCATION, null, c, SQLiteDatabase.CONFLICT_REPLACE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                db.update(TABLE_FIREBASE_LIVE_LOCATION, c, "STAFF_ID=" + staffid, null);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return index;
     }
-
-
 
     public long save_time(String staffid, String checkin, String checkout, String today_date) {
         long index = 0;
@@ -176,6 +186,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             update_time(db, staffid, checkin, checkout, today_date);
         }
 
+        c1.close();
+
         return index;
     }
 
@@ -197,17 +209,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             db.update(TABLE_ATTENDANCE, c, "STAFF_ID=" + staffid, null);
 
-            /*if (!checkin.equalsIgnoreCase("0")) {
-                String query ="UPDATE " + TABLE_BUTTON + " SET " + CHECK_IN_TIME + " = " + checkin + ", "
-                        + TODAY_DATE + " = " + today_date + ", " + SAVEDTIME + " = " + DateUtils.getSqliteTime() + " WHERE " + STAFF_ID + " = " + staffid;
-                        db.execSQL(query);
-            }
-            if (!checkout.equalsIgnoreCase("0")) {
-                String query = "UPDATE " + TABLE_BUTTON + " SET " + CHECK_OUT_TIME + " = " + checkout + ", "
-                        + TODAY_DATE + " = " + today_date + ", " + SAVEDTIME + " = " + DateUtils.getSqliteTime() + " WHERE " + STAFF_ID + " = " + staffid;
-                db.execSQL(query);
-            }*/
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -220,7 +221,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String query = "SELECT * FROM " + TABLE_ATTENDANCE;
             Cursor c = db.rawQuery(query, null);
             c.moveToFirst();
-
+            //status 0 for checkin, 1 for checkout
             if(status == 0){
                 if (c.getCount() == 0) {
                     return true;
@@ -239,6 +240,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
             return false;
         }
+
 
     }
 
@@ -292,6 +294,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    public ArrayList<FirebaseLiveLocation> get_LiveLocationUpdate(String staffid) {
+        createtable_location();
+        ArrayList<FirebaseLiveLocation> list = new ArrayList<FirebaseLiveLocation>();
+        try {
+            SQLiteDatabase db = getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION + " WHERE STAFF_ID = " +staffid;
+            Cursor c = db.rawQuery(query, null);
+
+            if(c.getCount()>0){
+                if (c.moveToFirst()) {
+                    do {
+                        JSONObject obj = new JSONObject();
+                        try {
+                            obj.put("staff_id", c.getString(1));
+                            obj.put("staff_name", c.getString(2));
+                            obj.put("latitude", c.getString(3));
+                            obj.put("longitude", c.getString(4));
+                            obj.put("address", c.getString(5));
+                            obj.put("workinghours", c.getString(6)+"-"+c.getString(7));
+                            //Log.d("obj_notification", "obj " + obj.toString());
+                            list.add(new FirebaseLiveLocation(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5), (c.getString(6)+"-"+c.getString(7))));
+                        } catch (JSONException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                            //Log.e("error1", "error1" + e);
+                        }
+                    } while (c.moveToNext());
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public void deletebyid(long id) {
         try {
             createtablenotification();
@@ -305,7 +343,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteEntry(String table, String staffid)
     {
 
-        createtablenotification();
+        if (table.equals(TABLE_NOTIFICATION)) {
+            createtablenotification();
+        }else {
+            createtable_location();
+        }
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM " + table + " WHERE STAFF_ID = " + staffid);
         /*String where="id=?";
@@ -313,7 +355,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete(table, where, new String[]{staffid}) ;*/
     }
 
-    public void update_notification() {
+    /*public void update_notification() {
         try {
             createtablenotification();
             SQLiteDatabase db = getWritableDatabase();
@@ -322,7 +364,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

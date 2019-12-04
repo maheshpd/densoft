@@ -4,30 +4,6 @@ import androidx.annotation.NonNull;
 
 public class CalendarDetails {
 
-    String description = "";
-    int date = 0;
-
-    public CalendarDetails(String status, String description) {
-
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getDate() {
-        return date;
-    }
-
-    public void setDate(int date) {
-        this.date = date;
-    }
-
     String StaffId = "";
     String CDate = "";
     String InTime = "";

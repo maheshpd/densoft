@@ -2,24 +2,38 @@ package com.densoftinfotech.densoftpaysmart.location_utilities;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
+import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
+import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
 
 
 public class LocationMonitoringService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -29,9 +43,12 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
     LocationRequest mLocationRequest = new LocationRequest();
 
 
-    public static final String ACTION_LOCATION_BROADCAST = LocationMonitoringService.class.getName() + "LocationBroadcast";
+    public static final String ACTION_LOCATION_BROADCAST = "LocationBroadcast";
     public static final String EXTRA_LATITUDE = "latitude";
     public static final String EXTRA_LONGITUDE = "longitude";
+    SharedPreferences sharedPreferences;
+    private UserLocation userLocation;
+    private DatabaseReference databaseReference;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -51,6 +68,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
         mLocationRequest.setPriority(priority);
         mLocationClient.connect();
+        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name);
 
         //Make it stick to the notification panel so it is less prone to get cancelled by the Operating System.
         return START_STICKY;
@@ -105,6 +123,11 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
     private void sendMessageToUI(String lat, String lng) {
 
         Log.d(TAG, "Sending info...");
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if(sharedPreferences.contains("staffid")) {
+
+            add_data_toSqlite(sharedPreferences.getString("staffid", ""), sharedPreferences.getString("company_name", ""));
+        }
 
         Intent intent = new Intent(ACTION_LOCATION_BROADCAST);
         intent.putExtra(EXTRA_LATITUDE, lat);
@@ -112,9 +135,45 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    private void add_data_toSqlite(String staffid, String company_name) {
+        userLocation = new UserLocation(this);
+        ContentValues c = new ContentValues();
+        c.put(DatabaseHelper.STAFF_ID, staffid);
+        c.put(DatabaseHelper.LATITUDE, userLocation.getLatitude());
+        c.put(DatabaseHelper.LONGITUDE, userLocation.getLongitude());
+        c.put(DatabaseHelper.ADDRESS, userLocation.getAddress());
+        c.put(DatabaseHelper.SAVEDTIME, DateUtils.getSqliteTime());
+        DatabaseHelper.getInstance(this).save_location(c, staffid);
+        Log.d("update ", DatabaseHelper.getInstance(this).get_LiveLocationUpdate(staffid) + "");
+        add_live_updates_to_firebase(userLocation, staffid, company_name);
+    }
+
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d(TAG, "Failed to connect to Google API");
 
+    }
+
+
+    private void add_live_updates_to_firebase(UserLocation userLocation, String staffid, String company_name) {
+        Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
+        firebaseLiveLocationMap.put("staff_id", staffid );
+        firebaseLiveLocationMap.put("latitude", String.valueOf(userLocation.getLatitude()));
+        firebaseLiveLocationMap.put("longitude", String.valueOf(userLocation.getLongitude()));
+        firebaseLiveLocationMap.put("address", userLocation.getAddress());
+
+        databaseReference.child(company_name).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    databaseReference.child(staffid).updateChildren(firebaseLiveLocationMap);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

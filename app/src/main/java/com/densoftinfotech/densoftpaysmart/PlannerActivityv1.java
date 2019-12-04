@@ -1,5 +1,7 @@
 package com.densoftinfotech.densoftpaysmart;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -94,10 +96,18 @@ public class PlannerActivityv1 extends CommonActivity {
             }
         });
 
+        add_loader();
+
         Calendar mCal = (Calendar) cal.clone();
         mCal.add(Calendar.MONTH, 1);
-        GetRoomData getRoomData = new GetRoomData();
-        getRoomData.execute(String.valueOf(mCal.get(Calendar.MONTH)));
+        if (mCal.get(Calendar.MONTH) == 0) {
+            GetRoomData getRoomData = new GetRoomData();
+            getRoomData.execute(String.valueOf(12));
+        } else {
+            GetRoomData getRoomData = new GetRoomData();
+            getRoomData.execute(String.valueOf(mCal.get(Calendar.MONTH)));
+        }
+
 
 
     }
@@ -151,12 +161,6 @@ public class PlannerActivityv1 extends CommonActivity {
             }
             return null;
         }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-
-
-        }
     }
 
     private void get_attendance_details(String staffid, String month_send) {
@@ -173,7 +177,7 @@ public class PlannerActivityv1 extends CommonActivity {
         params.put("Year", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
 
         JSONObject obj = new JSONObject(params);
-        //Log.d("params ", obj + "");
+        Log.d("params ", obj + "");
 
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
 
@@ -181,11 +185,7 @@ public class PlannerActivityv1 extends CommonActivity {
         call.enqueue(new Callback<ArrayList<CalendarDetails>>() {
             @Override
             public void onResponse(Call<ArrayList<CalendarDetails>> call, Response<ArrayList<CalendarDetails>> response) {
-                if (!response.isSuccessful()) {
-                    Log.d("response code ", response.code() + " ");
-                } else {
-                    //Log.d("recvd in planner ", response.body() + "");
-
+                if (response.isSuccessful()) {
                     if (response.body() != null && !response.body().isEmpty()) {
                         calendarDetails = response.body();
 
@@ -193,10 +193,12 @@ public class PlannerActivityv1 extends CommonActivity {
 
                         calendarDetailsAdapter = new CalendarDetailsAdapter(PlannerActivityv1.this, calendarDetails);
                         recyclerview_planner.setAdapter(calendarDetailsAdapter);
-
-                    } else {
+                        dismiss_loader();
 
                     }
+
+                }else{
+                    Log.d("response code ", response.code() + " ");
                 }
             }
 
@@ -215,4 +217,6 @@ public class PlannerActivityv1 extends CommonActivity {
 
         super.onDestroy();
     }
+
+
 }

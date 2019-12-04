@@ -52,13 +52,8 @@
             </intent-filter>
         </service>
 
-        <service android:name=".location_utilities.LocationMonitoringService" />
-
-        <receiver android:name=".background_service.BackgroundService">
-            <intent-filter>
-                <action android:name="location_update" />
-            </intent-filter>
-        </receiver>
+        <service android:name=".location_utilities.LocationMonitoringService"
+            android:enabled="true"/>
 
         <activity android:name=".MarkAttendanceActivity" />
         <activity
@@ -66,7 +61,6 @@
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".SalarySlipDetailsActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".PlannerActivity" />
         <activity
             android:name=".LoginActivity"
             android:windowSoftInputMode="stateHidden">

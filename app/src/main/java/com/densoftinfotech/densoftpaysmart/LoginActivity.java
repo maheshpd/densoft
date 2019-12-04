@@ -80,31 +80,6 @@ public class LoginActivity extends CommonActivity {
 
         check_permission();
 
-        /*et_customerid.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                et_customerid.setInputType(InputType.TYPE_CLASS_TEXT);
-                return false;
-            }
-        });
-
-        et_staffid.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                et_staffid.setInputType(InputType.TYPE_CLASS_TEXT);
-                return false;
-            }
-        });
-
-        et_password.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                et_password.setInputType(InputType.TYPE_CLASS_TEXT);
-                return false;
-            }
-        });*/
-
-
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,6 +107,7 @@ public class LoginActivity extends CommonActivity {
         params.put("password", et_password.getText().toString());
 
         edit.putString("customerid", et_customerid.getText().toString());
+        edit.putString("staffid", et_staffid.getText().toString());
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(params)).toString());
 
@@ -195,6 +171,7 @@ public class LoginActivity extends CommonActivity {
             staffDetailsRoom = new StaffDetailsRoom(staffDetailsArrayList.get(0).getStaffId(), staffDetailsArrayList.get(0).getPName(), staffDetailsArrayList.get(0).getMobile1(), staffDetailsArrayList.get(0).getEmail1(),
                     staffDetailsArrayList.get(0).getGender(), staffDetailsArrayList.get(0).getJoiningDate(), staffDetailsArrayList.get(0).getCompanyName(), staffDetailsArrayList.get(0).getBranchName(),
                     staffDetailsArrayList.get(0).getDepartment(), staffDetailsArrayList.get(0).getDesignation(), staffDetailsArrayList.get(0).getStaffPhoto(), staffDetailsArrayList.get(0).getDomainUrl());
+            edit.putString("company_name", staffDetailsArrayList.get(0).getCompanyName());
 
             Paysmart_roomdatabase.get_PaysmartDatabase(LoginActivity.this).staffDetails_dao().insertAll(staffDetailsRoom);
 

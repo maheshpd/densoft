@@ -3,7 +3,11 @@ package com.densoftinfotech.densoftpaysmart.classes;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
-public class FirebaseLiveLocation/* implements ClusterItem*/{
+import java.io.Serializable;
+
+import androidx.annotation.NonNull;
+
+public class FirebaseLiveLocation implements Serializable/* implements ClusterItem*/{
     private String staff_id = "";
     private String staff_name = "";
     private String latitude = "";
@@ -128,5 +132,9 @@ public class FirebaseLiveLocation/* implements ClusterItem*/{
         return twitterHandle;
     }*/
 
-
+    @NonNull
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

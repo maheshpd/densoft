@@ -3,6 +3,7 @@ package com.densoftinfotech.densoftpaysmart.retrofit;
 import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
 import com.densoftinfotech.densoftpaysmart.classes.CareOfStaff_Employee;
 import com.densoftinfotech.densoftpaysmart.classes.CheckLeaveStatus;
+import com.densoftinfotech.densoftpaysmart.classes.LeaveAppliedDetails;
 import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
 import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
 import com.densoftinfotech.densoftpaysmart.classes.ParentEmployee;
@@ -38,6 +39,10 @@ public interface GetServiceInterface {
     @POST("LeaveDetails_Api")
     Call<ArrayList<LeaveDetails>>
     request_leavedetails(@Body RequestBody requestBody);
+
+    @POST("LeaveAppliedDetails_App")
+    Call<ArrayList<LeaveAppliedDetails>>
+    request_leaveapplieddetails(@Body RequestBody requestBody);
 
     @POST("getParentEmployee_api")
     Call<ArrayList<ParentEmployee>>

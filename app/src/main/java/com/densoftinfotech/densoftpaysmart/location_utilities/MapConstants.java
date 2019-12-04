@@ -1,4 +1,4 @@
-package com.densoftinfotech.densoftpaysmart.map;
+package com.densoftinfotech.densoftpaysmart.location_utilities;
 
 public class MapConstants {
     public static final String workinghour_from = "9:00";

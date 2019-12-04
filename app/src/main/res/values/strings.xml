@@ -106,5 +106,7 @@
     <string name="btn_label_refresh">Refresh</string>
     <string name="permission_denied_explanation">permission denied. please allow permissions</string>
     <string name="settings">Go to Settings</string>
+    <string name="leaves_available">Available Leaves</string>
+    <string name="leave_request_status">Leave Request Status</string>
 
 </resources>

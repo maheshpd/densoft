@@ -14,7 +14,7 @@ public interface MapServiceInterface {
     Call<String> getLocationfromAddress(@Url String url);
 
     @GET("maps/api/directions/json")
-    Call<String> getDirections(@Query("origin") String latlng, @Query("destination") String destination);
+    Call<DirectionJSONParser> getDirections(@Query("origin") String latlng, @Query("destination") String destination);
 
     //https://maps.googleapis.com/maps/api/geocode/json?latlng=19.0175681,72.8302762&key=AIzaSyBSUEeOWYgIGTE3REw9EritqxduqUsB5ZA
 }

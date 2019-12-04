@@ -1,80 +1,55 @@
 package com.densoftinfotech.densoftpaysmart;
 
-import android.Manifest;
-import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
+import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.BounceInterpolator;
-import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
-import com.densoftinfotech.densoftpaysmart.location_utilities.LocationMonitoringService;
-import com.densoftinfotech.densoftpaysmart.location_utilities.MapServiceInterface;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.location.LocationRequest;
+import com.densoftinfotech.densoftpaysmart.location_utilities.DirectionJSONParser;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Dot;
-import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PatternItem;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.maps.android.PolyUtil;
 import com.google.maps.android.ui.IconGenerator;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -84,8 +59,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
     ArrayList<FirebaseLiveLocation> firebaseLiveLocations = new ArrayList<>();
     Button btn_search;
 
-    MapServiceInterface mapServiceInterface;
-    Retrofit retrofit;
+    Marker marker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,49 +73,30 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         }
 
         databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + Constants.staffDetailsRoom.getCompanyName());
-
-
-        Gson gson = new GsonBuilder().serializeNulls().create();
-        retrofit = new Retrofit.Builder().baseUrl("https://maps.googleapis.com").addConverterFactory(GsonConverterFactory.create(gson)).build();
-        mapServiceInterface = retrofit.create(MapServiceInterface.class);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         googlemap = googleMap;
-        get_latlang_firebase(googlemap);
         googlemap.animateCamera(CameraUpdateFactory.zoomTo(16));
-        
+
         live_tracking(googlemap);
-
-        /*IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
-
-        LatLng latLng = new LatLng(19.0175853, 72.830392);
-        addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f));*/
-
     }
 
     private void live_tracking(GoogleMap googlemap) {
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                for (DataSnapshot children : dataSnapshot.getChildren()) {
-                    FirebaseLiveLocation firebaseLiveLocation = children.getValue(FirebaseLiveLocation.class);
-                    if(firebaseLiveLocation!=null) {
-                        if (firebaseLiveLocation.getAddress() != null && !firebaseLiveLocation.getAddress().isEmpty()){
-
-                        }
-                    }
-                }
-
-                /*IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
-
+                IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
+                googlemap.clear();
                 if (dataSnapshot.exists()) {
-                    LatLng latLng1 = new LatLng(19.0175853, 72.830392);
-                    addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng1);
-                    googlemap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng1, 16.0f));
+                    LatLng latLng_office = new LatLng(19.0175853, 72.830392);
+                    LatLng latLng1;
+                    //markerpoints.add(latLng_office);
+                    addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng_office);
+                    googlemap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng_office, 16.0f));
 
                     for (DataSnapshot children : dataSnapshot.getChildren()) {
                         FirebaseLiveLocation firebaseLiveLocation = children.getValue(FirebaseLiveLocation.class);
@@ -149,7 +104,28 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                         if (firebaseLiveLocation != null) {
                             //Log.d("datasnapshot child ", " " + firebaseLiveLocation.getLatitude() + "  " + firebaseLiveLocation.getLongitude());
 
-                            addIcon(googlemap, iconFactory, firebaseLiveLocation.getStaff_id(), firebaseLiveLocation.getStaff_name(), new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude())));
+                            latLng1 = new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude()));
+                            //markerpoints.add(latLng1);
+
+                            if (marker == null) {
+                                Location location1 = new Location("");
+                                location1.setLatitude(19.0175853);
+                                location1.setLongitude(72.830392);
+                                Location location2 = new Location("");
+                                location2.setLatitude(Double.parseDouble(firebaseLiveLocation.getLatitude()));
+                                location2.setLongitude(Double.parseDouble(firebaseLiveLocation.getLongitude()));
+                                float distanceInMeters = location1.distanceTo(location2);
+                                int speedIs10MetersPerMinute = 100;
+                                float estimatedDriveTimeInMinutes = distanceInMeters / speedIs10MetersPerMinute;
+                                addIcon(googlemap, iconFactory, firebaseLiveLocation.getStaff_id() + "\nEstimated distance ="+(distanceInMeters/1000) +"km"+ "\nEstimated time ="+estimatedDriveTimeInMinutes+"mins", firebaseLiveLocation.getStaff_name(), new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude())));
+
+                            } else {
+                                marker.setPosition(latLng1);
+                                marker.remove();
+                            }
+
+
+                            draw_routes(latLng_office, latLng1);
                         }
                     }
 
@@ -163,7 +139,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
                 } else {
                     Log.d("does not ", "exist");
-                }*/
+                }
             }
 
             @Override
@@ -173,97 +149,11 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         });
     }
 
-    private void get_latlang_firebase(GoogleMap googleMap) {
+    private void draw_routes(LatLng origin, LatLng dest) {
+        String url = getDirectionsUrl(origin, dest);
 
-
-        databaseReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                FirebaseLiveLocation firebaseLiveLocation = dataSnapshot.getValue(FirebaseLiveLocation.class);
-                LatLng latLng;
-                IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
-                if (firebaseLiveLocation != null) {
-                    latLng = new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude()));
-                    moveMarker(googleMap, iconFactory, firebaseLiveLocation, new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude())));
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                }
-
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        /*databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
-                googleMap.clear();
-                if (dataSnapshot.exists()) {
-                    LatLng latLng1 = new LatLng(19.0175853, 72.830392);
-                    addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng1);
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng1, 16.0f));
-
-                    for (DataSnapshot children : dataSnapshot.getChildren()) {
-                        FirebaseLiveLocation firebaseLiveLocation = children.getValue(FirebaseLiveLocation.class);
-                        firebaseLiveLocations.add(firebaseLiveLocation);
-                        if (firebaseLiveLocation != null) {
-                            //Log.d("datasnapshot child ", " " + firebaseLiveLocation.getLatitude() + "  " + firebaseLiveLocation.getLongitude());
-
-                            addIcon(googleMap, iconFactory, firebaseLiveLocation.getStaff_id(), firebaseLiveLocation.getStaff_name(), new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude())));
-                        }
-                    }
-
-                    btn_search.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            searchLocation(googleMap);
-                        }
-                    });
-
-
-                } else {
-                    Log.d("does not ", "exist");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });*/
-    }
-
-    private void moveMarker(GoogleMap googleMap, IconGenerator iconFactory, FirebaseLiveLocation firebaseLiveLocation, LatLng latLng) {
-
-        Marker marker = googleMap.addMarker(new MarkerOptions().
-                icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(firebaseLiveLocation.getStaff_id(), firebaseLiveLocation.getStaff_name()))).
-                position(latLng).
-                anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV()));
-
-        marker.setPosition(latLng);
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-
-
+        DownloadTask downloadTask = new DownloadTask();
+        downloadTask.execute(url);
     }
 
     private void addIcon(GoogleMap googleMap, IconGenerator iconFactory, String staff_id, String staff_name, LatLng latLng) {
@@ -273,7 +163,6 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                 anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
 
         googleMap.addMarker(markerOptions);
-        LatLng latLng1 = new LatLng(19.0175853, 72.830392);
 
     }
 
@@ -286,6 +175,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         markerImageView.setImageResource(R.mipmap.map_marker);
         tv_nameofstaff.setText(staff_name + "");
         tv_staffid.setText("Staff id: " + staff_id);
+
         customMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
         customMarkerView.buildDrawingCache();
@@ -316,8 +206,164 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                 }
             }
 
-
         }
     }
+
+    private String getDirectionsUrl(LatLng origin,LatLng dest){
+
+        // Origin of route
+        String str_origin = "origin="+origin.latitude+","+origin.longitude;
+
+        // Destination of route
+        String str_dest = "destination="+dest.latitude+","+dest.longitude;
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+
+        String key = "key="+getResources().getString(R.string.map_api_key);
+
+        // Building the parameters to the web service
+        String parameters = str_origin+"&"+str_dest+"&"+key+"&"+sensor;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/"+output+"?"+parameters;
+
+        return url;
+    }
+
+    /** A method to download json data from url */
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try{
+            URL url = new URL(strUrl);
+
+            // Creating an http connection to communicate with url
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            // Connecting to url
+            urlConnection.connect();
+
+            // Reading data from url
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb  = new StringBuffer();
+
+            String line = "";
+            while( ( line = br.readLine())  != null){
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        }catch(Exception e){
+            Log.d("Exception url", e.toString());
+        }finally{
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+    // Fetches data from url passed
+    private class DownloadTask extends AsyncTask<String, Void, String>{
+
+        // Downloading data in non-ui thread
+        @Override
+        protected String doInBackground(String... url) {
+
+            // For storing data from web service
+
+            String data = "";
+
+            try{
+                // Fetching the data from web service
+                data = downloadUrl(url[0]);
+            }catch(Exception e){
+                Log.d("Background Task",e.toString());
+            }
+            return data;
+        }
+
+        // Executes in UI thread, after the execution of
+        // doInBackground()
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+
+            // Invokes the thread for parsing the JSON data
+            parserTask.execute(result);
+        }
+    }
+
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,String>>> >{
+
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try{
+                jObject = new JSONObject(jsonData[0]);
+                DirectionJSONParser parser = new DirectionJSONParser();
+                routes = parser.parse(jObject);
+                Log.d("line options ", jsonData[0] + " routes " + routes + "");
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+
+            ArrayList<LatLng> points = null;
+            PolylineOptions lineOptions = null;
+
+            // Traversing through all the routes
+            for(int i=0;i<result.size();i++){
+                points = new ArrayList<LatLng>();
+                lineOptions = new PolylineOptions();
+
+                // Fetching i-th route
+                List<HashMap<String, String>> path = result.get(i);
+
+                // Fetching all the points in i-th route
+                for(int j=0;j<path.size();j++){
+                    HashMap<String,String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                // Adding all the points in the route to LineOptions
+                lineOptions.addAll(points);
+                lineOptions.width(5);
+                lineOptions.color(Color.RED);
+                Log.d("line options ", lineOptions + "");
+            }
+
+            // Drawing polyline in the Google Map for the i-th route
+
+            if(lineOptions!=null) {
+                googlemap.addPolyline(lineOptions);
+            }
+        }
+    }
+
 
 }

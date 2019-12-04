@@ -2,6 +2,8 @@ package com.densoftinfotech.densoftpaysmart.classes;
 
 import org.json.JSONObject;
 
+import androidx.annotation.NonNull;
+
 public class NotificationReceived {
 
     private long id = 0;
@@ -67,5 +69,11 @@ public class NotificationReceived {
 
     public void setDeleted(int deleted) {
         this.deleted = deleted;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

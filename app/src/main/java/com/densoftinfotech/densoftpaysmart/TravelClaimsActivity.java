@@ -1,9 +1,9 @@
 package com.densoftinfotech.densoftpaysmart;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -31,12 +32,11 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
 import com.densoftinfotech.densoftpaysmart.location_utilities.LocationMonitoringService;
 import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
-import com.densoftinfotech.densoftpaysmart.map.MapConstants;
+import com.densoftinfotech.densoftpaysmart.location_utilities.MapConstants;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,8 +44,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.net.Inet4Address;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,6 +59,7 @@ public class TravelClaimsActivity extends CommonActivity {
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private boolean mAlreadyStartedService = false;
     private LocationRequest mLocationRequest;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,14 +69,16 @@ public class TravelClaimsActivity extends CommonActivity {
         tv_trackme = findViewById(R.id.tv_trackme);
         iv_seemap = findViewById(R.id.iv_seemap);
 
-        databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + Constants.staffDetailsRoom.getCompanyName()) ;
+        databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + Constants.staffDetailsRoom.getCompanyName());
         setTitle(getResources().getString(R.string.track_me));
         back();
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(TravelClaimsActivity.this);
 
         tv_trackme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(check_param_ok()) {
+                if (check_param_ok()) {
                     live_track();
                 }
             }
@@ -95,18 +96,20 @@ public class TravelClaimsActivity extends CommonActivity {
 
     private void add_live_updates_to_firebase(String latitude, String longitude) {
         Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
+        firebaseLiveLocationMap.put(Constants.staffid, new FirebaseLiveLocation(Constants.staffid, Constants.staffDetailsRoom.getPName(), latitude,
+                longitude, userLocation.getAddress_fromLatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)), (MapConstants.workinghour_from + "-" + MapConstants.workinghour_to)));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                firebaseLiveLocationMap.put(Constants.staffid, new FirebaseLiveLocation(Constants.staffid, Constants.staffDetailsRoom.getPName(), String.valueOf(latitude),
-                        String.valueOf(longitude), userLocation.getAddress_fromLatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)), (MapConstants.workinghour_from + "-" + MapConstants.workinghour_to)));
-                if(!dataSnapshot.exists()){
-
+                //FirebaseLiveLocation firebaseLiveLocation = dataSnapshot.getValue(FirebaseLiveLocation.class);
+                if (!dataSnapshot.exists()) {
                     databaseReference.setValue(firebaseLiveLocationMap);
-                }else {
 
+                } else {
+                    //if (firebaseLiveLocation != null && (Double.parseDouble(latitude) >= 17.3)) {
                     databaseReference.updateChildren(firebaseLiveLocationMap);
+                    //}
+
                 }
             }
 
@@ -116,10 +119,11 @@ public class TravelClaimsActivity extends CommonActivity {
             }
         });
 
-        add_data_toSqlite();
+        //add_data_toSqlite();
     }
 
     private void add_data_toSqlite() {
+        userLocation = new UserLocation(TravelClaimsActivity.this);
         ContentValues c = new ContentValues();
         c.put(DatabaseHelper.STAFF_ID, Constants.staffid);
         c.put(DatabaseHelper.STAFF_NAME, Constants.staffDetailsRoom.getPName());
@@ -129,7 +133,9 @@ public class TravelClaimsActivity extends CommonActivity {
         c.put(DatabaseHelper.WORKING_HOUR_FROM, MapConstants.workinghour_from);
         c.put(DatabaseHelper.WORKING_HOUR_TO, MapConstants.workinghour_to);
         c.put(DatabaseHelper.SAVEDTIME, DateUtils.getSqliteTime());
-        DatabaseHelper.getInstance(TravelClaimsActivity.this).save_location(c);
+        DatabaseHelper.getInstance(TravelClaimsActivity.this).save_location(c, Constants.staffid);
+
+        add_live_updates_to_firebase(String.valueOf(userLocation.getLatitude()), String.valueOf(userLocation.getLongitude()));
     }
 
     private boolean check_param_ok() {
@@ -155,20 +161,23 @@ public class TravelClaimsActivity extends CommonActivity {
         mLocationRequest.setInterval(Constants.LOCATION_INTERVAL);
         mLocationRequest.setFastestInterval(Constants.FASTEST_LOCATION_INTERVAL);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
+        add_data_toSqlite();
+
+        /*LocalBroadcastManager.getInstance(this).registerReceiver(
                 new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
                         final String latitude = intent.getStringExtra(LocationMonitoringService.EXTRA_LATITUDE);
                         final String longitude = intent.getStringExtra(LocationMonitoringService.EXTRA_LONGITUDE);
                         if (latitude != null && longitude != null) {
-                            Log.d("Live Location ", "\n Latitude : " + latitude + "\n Longitude: " + longitude);
+                            //Log.d("Live Location ", "\n Latitude : " + latitude + "\n Longitude: " + longitude);
+
                             add_live_updates_to_firebase(latitude, longitude);
                         }
 
                     }
                 }, new IntentFilter(LocationMonitoringService.ACTION_LOCATION_BROADCAST)
-        );
+        );*/
 
 
     }
@@ -177,7 +186,8 @@ public class TravelClaimsActivity extends CommonActivity {
     public void onResume() {
         super.onResume();
 
-        startStep1();
+        if (sharedPreferences != null && sharedPreferences.contains("staffid"))
+            DatabaseHelper.getInstance(TravelClaimsActivity.this).get_LiveLocationUpdate(sharedPreferences.getString("staffid", ""));
     }
 
     private void startStep1() {
@@ -355,8 +365,8 @@ public class TravelClaimsActivity extends CommonActivity {
     @Override
     public void onDestroy() {
 
-        stopService(new Intent(this, LocationMonitoringService.class));
-        mAlreadyStartedService = false;
+        //stopService(new Intent(this, LocationMonitoringService.class));
+        //mAlreadyStartedService = false;
 
         super.onDestroy();
     }

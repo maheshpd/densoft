@@ -10,88 +10,188 @@
     <include
         layout="@layout/toolbar"/>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:orientation="horizontal"
-            android:padding="3dp">
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_name_of_leave"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="10dp"
-                android:text="Name"
+                android:text="@string/leaves_available"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorPrimaryDark"
+                android:padding="5dp"
                 android:textAlignment="center"
-                android:textColor="@color/black"
-                android:textStyle="bold"/>
+                android:background="@drawable/textview_unselected"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:orientation="horizontal"
+                android:padding="3dp">
+
+                <TextView
+                    android:id="@+id/tv_name_of_leave"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:text="Name"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tv_balance_leave"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="10dp"
+                    android:text="@string/balanceleave"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tv_takenleave"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="10dp"
+                    android:text="@string/takenleave"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_totalassigned"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="10dp"
+                    android:text="@string/leaveassigned"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_apply"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:background="@drawable/textview_rounded"
+                    android:padding="10dp"
+                    android:text="@string/apply"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:visibility="invisible"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/darkgray"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_leave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/leave_layout" />
 
             <TextView
-                android:id="@+id/tv_balance_leave"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:padding="10dp"
-                android:text="@string/balanceleave"
+                android:text="@string/leave_request_status"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorPrimaryDark"
+                android:padding="5dp"
                 android:textAlignment="center"
-                android:textColor="@color/black"
-                android:textStyle="bold"/>
+                android:background="@drawable/textview_unselected"
+                android:layout_marginTop="5dp"/>
 
-            <TextView
-                android:id="@+id/tv_takenleave"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:padding="10dp"
-                android:text="@string/takenleave"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                android:textStyle="bold" />
+                android:layout_margin="2dp"
+                android:orientation="horizontal"
+                android:padding="3dp">
 
-            <TextView
-                android:id="@+id/tv_totalassigned"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:padding="10dp"
-                android:text="@string/leaveassigned"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                android:textStyle="bold" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:text="Name"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
 
-            <TextView
-                android:id="@+id/tv_apply"
-                android:layout_width="0dp"
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="10dp"
+                    android:text="Date (From)"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="10dp"
+                    android:text="Date (To)"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="10dp"
+                    android:text="@string/days"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:text="Status"
+                    android:textAlignment="center"
+                    android:padding="10dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/darkgray"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_leave_request_status"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:background="@drawable/textview_rounded"
-                android:padding="10dp"
-                android:text="@string/apply"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                android:visibility="invisible"/>
+                tools:listitem="@layout/leaveapplied_details_layout"/>
 
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/darkgray"/>
+    </ScrollView>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview_leave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:listitem="@layout/leave_layout" />
 
-    </LinearLayout>
 
 
 </LinearLayout>
