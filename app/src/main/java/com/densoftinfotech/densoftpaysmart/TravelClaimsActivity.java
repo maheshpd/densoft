@@ -189,7 +189,6 @@ public class TravelClaimsActivity extends CommonActivity {
     @Override
     public void onResume() {
         super.onResume();
-
         if (sharedPreferences != null && sharedPreferences.contains("staffid"))
             DatabaseHelper.getInstance(TravelClaimsActivity.this).get_LiveLocationUpdate(sharedPreferences.getString("staffid", ""));
 
