@@ -164,7 +164,6 @@ public class LoginActivity extends CommonActivity {
     private class SaveDetails_async extends AsyncTask<ArrayList<StaffDetails>, Void, Void> {
 
         StaffDetailsRoom staffDetailsRoom;
-
         @Override
         protected Void doInBackground(ArrayList<StaffDetails>... voids) {
 

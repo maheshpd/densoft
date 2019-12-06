@@ -197,7 +197,6 @@ public class TravelClaimsActivity extends CommonActivity {
 
     private void startStep1() {
         if (isGooglePlayServicesAvailable()) {
-
             startStep2(null);
 
         } else {
