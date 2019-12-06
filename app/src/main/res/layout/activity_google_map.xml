@@ -18,24 +18,55 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/white">
+            android:background="@drawable/textview_rounded_header"
+            android:layout_margin="5dp"
+            android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/search1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_search_black_24dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"/>
+
+                <AutoCompleteTextView
+                    android:id="@+id/actv_search"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Search Location"
+                    android:enabled="true"
+                    android:layout_weight="1"
+                    android:background="@color/white"
+                    android:layout_margin="5dp"/>
+
+                <ImageView
+                    android:id="@+id/cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/reject"
+                    android:layout_margin="5dp"/>
+
+            </LinearLayout>
 
             <EditText
-                android:layout_width="248dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/editText"
                 android:layout_weight="0.5"
                 android:inputType="textPersonName"
-                android:hint="Search Location" />
+                android:hint="Search Location"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/btn_search"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:text="Search" />
+                android:layout_weight="1"
+                android:text="Search"
+                android:visibility="gone"/>
 
-        </LinearLayout>
 
     </fragment>
 

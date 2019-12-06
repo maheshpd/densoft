@@ -68,7 +68,6 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
         mLocationRequest.setPriority(priority);
         mLocationClient.connect();
-        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name);
 
         //Make it stick to the notification panel so it is less prone to get cancelled by the Operating System.
         return START_STICKY;
@@ -124,8 +123,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
         Log.d(TAG, "Sending info...");
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(sharedPreferences.contains("staffid")) {
-
+        if (sharedPreferences.contains("staffid") && !sharedPreferences.getString("staffid", "").trim().equals("")) {
             add_data_toSqlite(sharedPreferences.getString("staffid", ""), sharedPreferences.getString("company_name", ""));
         }
 
@@ -144,8 +142,10 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
         c.put(DatabaseHelper.ADDRESS, userLocation.getAddress());
         c.put(DatabaseHelper.SAVEDTIME, DateUtils.getSqliteTime());
         DatabaseHelper.getInstance(this).save_location(c, staffid);
-        Log.d("update ", DatabaseHelper.getInstance(this).get_LiveLocationUpdate(staffid) + "");
-        add_live_updates_to_firebase(userLocation, staffid, company_name);
+        //Log.d("update ", DatabaseHelper.getInstance(this).get_LiveLocationUpdate(staffid) + "");
+        if (!staffid.trim().equals("") && !company_name.trim().equals("")) {
+            add_live_updates_to_firebase(userLocation, staffid, company_name);
+        }
     }
 
     @Override
@@ -156,17 +156,20 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
 
     private void add_live_updates_to_firebase(UserLocation userLocation, String staffid, String company_name) {
+
+        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name);
         Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
-        firebaseLiveLocationMap.put("staff_id", staffid );
+        firebaseLiveLocationMap.put("staff_id", staffid);
         firebaseLiveLocationMap.put("latitude", String.valueOf(userLocation.getLatitude()));
         firebaseLiveLocationMap.put("longitude", String.valueOf(userLocation.getLongitude()));
         firebaseLiveLocationMap.put("address", userLocation.getAddress());
 
-        databaseReference.child(company_name).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child(company_name).child(staffid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    databaseReference.child(staffid).updateChildren(firebaseLiveLocationMap);
+                    databaseReference.updateChildren(firebaseLiveLocationMap);
+                    Log.d("location map ", firebaseLiveLocationMap.toString());
                 }
             }
 

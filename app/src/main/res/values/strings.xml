@@ -108,5 +108,6 @@
     <string name="settings">Go to Settings</string>
     <string name="leaves_available">Available Leaves</string>
     <string name="leave_request_status">Leave Request Status</string>
+    <string name="cannotcheckout">Please Check In first</string>
 
 </resources>

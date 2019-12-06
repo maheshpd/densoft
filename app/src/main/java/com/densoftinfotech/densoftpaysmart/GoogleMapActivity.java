@@ -9,17 +9,25 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
 import com.densoftinfotech.densoftpaysmart.location_utilities.DirectionJSONParser;
+import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -58,6 +66,11 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
     private DatabaseReference databaseReference;
     ArrayList<FirebaseLiveLocation> firebaseLiveLocations = new ArrayList<>();
     Button btn_search;
+    ImageView search, cancel;
+    AutoCompleteTextView actv_search;
+    ArrayList<String>firebaseList_search = new ArrayList<>();
+    ArrayAdapter<String>adapter_search;
+    ArrayList<FirebaseLiveLocation> datasetFilter = new ArrayList<>();
 
     Marker marker;
 
@@ -67,7 +80,8 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         setContentView(R.layout.activity_google_map);
         SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         btn_search = findViewById(R.id.btn_search);
-
+        search = findViewById(R.id.search1);
+        cancel = findViewById(R.id.cancel);
         if (supportMapFragment != null) {
             supportMapFragment.getMapAsync(this);
         }
@@ -91,6 +105,9 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
                 IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
                 googlemap.clear();
+                firebaseList_search.clear();
+                firebaseLiveLocations.clear();
+                datasetFilter.clear();
                 if (dataSnapshot.exists()) {
                     LatLng latLng_office = new LatLng(19.0175853, 72.830392);
                     LatLng latLng1;
@@ -101,6 +118,8 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                     for (DataSnapshot children : dataSnapshot.getChildren()) {
                         FirebaseLiveLocation firebaseLiveLocation = children.getValue(FirebaseLiveLocation.class);
                         firebaseLiveLocations.add(firebaseLiveLocation);
+                        datasetFilter.add(firebaseLiveLocation);
+                        firebaseList_search.add(firebaseLiveLocation.getStaff_name() + " (Staff id: " + firebaseLiveLocation.getStaff_id() +")");
                         if (firebaseLiveLocation != null) {
                             //Log.d("datasnapshot child ", " " + firebaseLiveLocation.getLatitude() + "  " + firebaseLiveLocation.getLongitude());
 
@@ -125,16 +144,20 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                             }
 
 
+
+
                             draw_routes(latLng_office, latLng1);
                         }
                     }
 
-                    btn_search.setOnClickListener(new View.OnClickListener() {
+                    autocomplete(googlemap);
+
+                    /*btn_search.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             searchLocation(googlemap);
                         }
-                    });
+                    });*/
 
 
                 } else {
@@ -190,10 +213,87 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         return returnedBitmap;
     }
 
-    public void searchLocation(GoogleMap googleMap) {
-        EditText locationSearch = findViewById(R.id.editText);
-        String location = locationSearch.getText().toString();
-        Log.d("data is ", firebaseLiveLocations.toString() + "");
+    private void autocomplete(final GoogleMap googleMap){
+        actv_search = findViewById(R.id.actv_search);
+        adapter_search = new ArrayAdapter<String>(GoogleMapActivity.this, R.layout.autocomplete_layout, R.id.actv_text, firebaseList_search);
+        actv_search.setThreshold(0);
+        actv_search.setAdapter(adapter_search);
+        actv_search.setTextColor(Color.BLACK);
+        actv_search.setTextAppearance(GoogleMapActivity.this, android.R.style.TextAppearance_Small);
+
+
+        actv_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                actv_search.showDropDown();
+            }
+        });
+
+        actv_search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //searchLocation(googleMap, s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        actv_search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String queryString = (String) parent.getItemAtPosition(position);
+                //getFilter().filter(queryString);
+                searchLocation(googleMap, queryString);
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                actv_search.setText("");
+                //searchLocation(googleMap, "");
+            }
+        });
+    }
+
+    public void searchLocation(GoogleMap googleMap, String querystring) {
+
+        databaseReference.child(querystring.split(":")[1].trim().split("\\)")[0]).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.exists()) {
+                    FirebaseLiveLocation fll = dataSnapshot.getValue(FirebaseLiveLocation.class);
+                    if(fll!=null) {
+                        LatLng latLng = new LatLng(Double.parseDouble(fll.getLatitude()), Double.parseDouble(fll.getLongitude()));
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+        //EditText locationSearch = findViewById(R.id.editText);
+        //String location = locationSearch.getText().toString();
+
+
+        /*Log.d("data is ", firebaseLiveLocations.toString() + "");
 
         if (firebaseLiveLocations != null) {
 
@@ -206,7 +306,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                 }
             }
 
-        }
+        }*/
     }
 
     private String getDirectionsUrl(LatLng origin,LatLng dest){
@@ -364,6 +464,51 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
             }
         }
     }
+   /* @Override
+    public Filter getFilter() {
+        return datasetFilterFull;
+    }
+
+    private Filter datasetFilterFull = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            ArrayList<FirebaseLiveLocation> filteredList = new ArrayList<>();
+
+            try {
+
+                if (constraint == null || constraint.length() == 0) {
+                    filteredList.addAll(datasetFilter);
+
+                    //Log.e("called ","calle "+filteredList.size());
+
+                } else {
+                    String filterPattern = constraint.toString().toLowerCase().trim();
+
+                    for (FirebaseLiveLocation item : datasetFilter) {
+
+                        if ((item.getStaff_name().toLowerCase().trim().contains(filterPattern)) || (item.getStaff_id().toLowerCase().trim().contains(filterPattern))) {
+                            filteredList.add(item);
+                        }
+                    }
+                    //Log.e("called1 ", "called1 " + filteredList.size() + " " + datasetFilter.size());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            firebaseLiveLocations.clear();
+            firebaseLiveLocations.addAll((ArrayList) results.values);
+        }
+    };*/
 
 
 }

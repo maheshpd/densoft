@@ -290,7 +290,11 @@ public class MarkAttendanceActivity extends CommonActivity {
                 if (check_param_ok()) {
                     if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(1)) {
                         if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
-                            send_checkIn_checkOut(1);
+                            if(DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(2)) {
+                                send_checkIn_checkOut(1);
+                            }else{
+                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.cannotcheckout), Toast.LENGTH_SHORT).show();
+                            }
                         } else {
                             Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
                         }

@@ -228,19 +228,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }else{
                     return c.getString(2) == null || (c.getString(2).equalsIgnoreCase("0"));
                 }
-            }else {
+            }else if(status == 1){
                 if (c.getCount() == 0) {
                     return true;
                 }else{
                     return c.getString(3) == null || (c.getString(3).equalsIgnoreCase("0"));
                 }
+            }else{
+                return c.getCount() > 0 && c.getString(2) != null;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-
 
     }
 
@@ -328,6 +329,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public String get_latitude(String staffid){
+        createtable_location();
+        String latitude = "";
+        try {
+            SQLiteDatabase db = getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION + " WHERE STAFF_ID = " +staffid;
+            Cursor c = db.rawQuery(query, null);
+
+            if(c.getCount()>0){
+                if (c.moveToFirst()) {
+                    do {
+                            latitude = c.getString(3);
+
+                    } while (c.moveToNext());
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return latitude;
+    }
+
+    public String get_longitude(String staffid){
+        createtable_location();
+        String longitude = "";
+        try {
+            SQLiteDatabase db = getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION + " WHERE STAFF_ID = " +staffid;
+            Cursor c = db.rawQuery(query, null);
+
+            if(c.getCount()>0){
+                if (c.moveToFirst()) {
+                    do {
+                        longitude = c.getString(4);
+
+                    } while (c.moveToNext());
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return longitude;
     }
 
     public void deletebyid(long id) {

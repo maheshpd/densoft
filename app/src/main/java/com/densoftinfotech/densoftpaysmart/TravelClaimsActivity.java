@@ -69,11 +69,13 @@ public class TravelClaimsActivity extends CommonActivity {
         tv_trackme = findViewById(R.id.tv_trackme);
         iv_seemap = findViewById(R.id.iv_seemap);
 
-        databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + Constants.staffDetailsRoom.getCompanyName());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(TravelClaimsActivity.this);
+
+        databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + sharedPreferences.getString("company_name", ""));
         setTitle(getResources().getString(R.string.track_me));
         back();
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(TravelClaimsActivity.this);
+
 
         tv_trackme.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,7 +98,7 @@ public class TravelClaimsActivity extends CommonActivity {
 
     private void add_live_updates_to_firebase(String latitude, String longitude) {
         Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
-        firebaseLiveLocationMap.put(Constants.staffid, new FirebaseLiveLocation(Constants.staffid, Constants.staffDetailsRoom.getPName(), latitude,
+        firebaseLiveLocationMap.put(sharedPreferences.getString("staffid", ""), new FirebaseLiveLocation(Constants.staffid, Constants.staffDetailsRoom.getPName(), latitude,
                 longitude, userLocation.getAddress_fromLatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)), (MapConstants.workinghour_from + "-" + MapConstants.workinghour_to)));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -105,12 +107,12 @@ public class TravelClaimsActivity extends CommonActivity {
                 if (!dataSnapshot.exists()) {
                     databaseReference.setValue(firebaseLiveLocationMap);
 
-                } else {
+                } /*else {
                     //if (firebaseLiveLocation != null && (Double.parseDouble(latitude) >= 17.3)) {
                     databaseReference.updateChildren(firebaseLiveLocationMap);
                     //}
 
-                }
+                }*/
             }
 
             @Override
@@ -118,6 +120,8 @@ public class TravelClaimsActivity extends CommonActivity {
 
             }
         });
+
+        startStep1();
 
         //add_data_toSqlite();
     }
@@ -188,6 +192,8 @@ public class TravelClaimsActivity extends CommonActivity {
 
         if (sharedPreferences != null && sharedPreferences.contains("staffid"))
             DatabaseHelper.getInstance(TravelClaimsActivity.this).get_LiveLocationUpdate(sharedPreferences.getString("staffid", ""));
+
+
     }
 
     private void startStep1() {
