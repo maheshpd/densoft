@@ -30,6 +30,7 @@ import com.densoftinfotech.densoftpaysmart.classes.CheckLeaveStatus;
 import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.classes.ParentEmployee;
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 
@@ -83,6 +84,7 @@ public class LeaveApplicationActivity extends CommonActivity {
     private Bundle b;
     private GetServiceInterface getServiceInterface;
     private SharedPreferences preferences;
+    private StaffDetails staffDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +94,12 @@ public class LeaveApplicationActivity extends CommonActivity {
         setContentView(R.layout.activity_leave);
 
         ButterKnife.bind(this);
+
+        staffDetails = getStaffDetails(LeaveApplicationActivity.this);
+
+        if(staffDetails!=null){
+            tv_employee_name.setText(staffDetails.getPName());
+        }
 
         preferences = PreferenceManager.getDefaultSharedPreferences(LeaveApplicationActivity.this);
 
@@ -112,7 +120,7 @@ public class LeaveApplicationActivity extends CommonActivity {
 
         get_parent_employees();
 
-        tv_employee_name.setText(Constants.staffDetailsRoom.getPName());
+
         et_dateofleave_from.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -160,7 +168,15 @@ public class LeaveApplicationActivity extends CommonActivity {
             @Override
             public void onClick(View view) {
                 if(DateUtils.calculate_validity(Constants.today_date, et_dateofleave_from.getText().toString())) {
-                    submit_leave_application();
+                    if(staffDetails!=null) {
+                        if(spinner_careOfStaff_employees.size()>0 || spinner_parentEmployees.size()>0) {
+                            submit_leave_application();
+                        }else {
+                            Toast.makeText(LeaveApplicationActivity.this, getResources().getString(R.string.error), Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        Toast.makeText(LeaveApplicationActivity.this, getResources().getString(R.string.error), Toast.LENGTH_SHORT).show();
+                    }
                 }else{
                     Toast.makeText(LeaveApplicationActivity.this, getResources().getString(R.string.selectgreaterdate), Toast.LENGTH_SHORT).show();
                 }
@@ -183,7 +199,7 @@ public class LeaveApplicationActivity extends CommonActivity {
         params.put("FromDate", et_dateofleave_from.getText().toString());
         params.put("ToDate", et_dateofleave_to.getText().toString());
         params.put("Description", et_description.getText().toString());
-        params.put("ContactNo", Constants.staffDetailsRoom.getMobile1());
+        params.put("ContactNo", staffDetails.getMobile1());
         params.put("CareOfStaff", spinner_careOfStaff_employees.get(spinner_duties_coveredby.getSelectedItemPosition()).getPatientid());
         params.put("Priority", "0");
         params.put("Status", "0");

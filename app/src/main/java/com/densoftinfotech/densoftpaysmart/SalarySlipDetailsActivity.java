@@ -16,6 +16,7 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
 import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
@@ -55,7 +56,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
     private MonthAdapter monthAdapter;
     private Bundle b;
 
-    private StaffDetailsRoom staffDetails;
+    private StaffDetails staffDetails;
     private GetServiceInterface getServiceInterface;
     private ArrayList<SalarySlip> salarySlips = new ArrayList<>();
     private SharedPreferences preferences;
@@ -77,32 +78,35 @@ public class SalarySlipDetailsActivity extends CommonActivity {
         webview.getSettings().setAllowFileAccess(true);
         webview.getSettings().setBuiltInZoomControls(true);
 
-        staffDetails = Constants.staffDetailsRoom;
+        staffDetails = getStaffDetails(SalarySlipDetailsActivity.this);
 
 
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recycler_view_salaryslipdetails.setLayoutManager(layoutManager);
 
 
+        if (staffDetails != null) {
 
-        b = getIntent().getExtras();
-        if (b != null) {
-            if (b.containsKey("monthpos")) {
-                //gotoselection_showslip(String.valueOf(b.getInt("monthpos")), String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
-                getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), b.getInt("monthpos"));
-                // if option is selected from the card view of Main Activity
-            }
-        }else{
-            if (staffDetails != null) {
-                getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), -1);
-                // if option is selected from Quick Actions
+            b = getIntent().getExtras();
+            if (b != null) {
+                if (b.containsKey("monthpos")) {
+                    //gotoselection_showslip(String.valueOf(b.getInt("monthpos")), String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+                    getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), b.getInt("monthpos"));
+                    // if option is selected from the card view of Main Activity
+                }
+            } else {
+                if (staffDetails != null) {
+                    getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), -1);
+                    // if option is selected from Quick Actions
+                }
             }
         }
 
     }
 
     private void gotoselection_showslip(String month_number, String year) {
-        webview.loadUrl(URLS.dynamic_url_webroute(Constants.staffDetailsRoom.getDomainUrl()) + "AdminRpt/EmployeeSalarySlip.htm?CategoryId=233&" + "month=" + month_number +
+
+        webview.loadUrl(URLS.dynamic_url_webroute(staffDetails.getDomainUrl()) + "AdminRpt/EmployeeSalarySlip.htm?CategoryId=233&" + "month=" + month_number +
                 "&year=" + year + "&StaffId=" + Constants.staffid + "&mText=" + get_monthName(Integer.parseInt(month_number)));
     }
 

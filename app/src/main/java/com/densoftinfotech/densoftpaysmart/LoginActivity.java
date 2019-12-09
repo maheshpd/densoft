@@ -24,6 +24,7 @@ import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -174,6 +175,34 @@ public class LoginActivity extends CommonActivity {
             edit.putString("company_name", staffDetailsArrayList.get(0).getCompanyName());
 
             Paysmart_roomdatabase.get_PaysmartDatabase(LoginActivity.this).staffDetails_dao().insertAll(staffDetailsRoom);
+            StaffDetails staffDetails = new StaffDetails();
+            staffDetails.setAadharCardNo(staffDetailsArrayList.get(0).getAadharCardNo());
+            staffDetails.setAccHolderName(staffDetailsArrayList.get(0).getAccHolderName());
+            staffDetails.setAccNo(staffDetailsArrayList.get(0).getAccNo());
+            staffDetails.setAccType(staffDetailsArrayList.get(0).getAccType());
+            staffDetails.setMobile1(staffDetailsArrayList.get(0).getMobile1());
+            staffDetails.setBankName(staffDetailsArrayList.get(0).getBankName());
+            staffDetails.setBranchName(staffDetailsArrayList.get(0).getBranchName());
+            staffDetails.setCompanyName(staffDetailsArrayList.get(0).getCompanyName());
+            staffDetails.setDepartment(staffDetailsArrayList.get(0).getDepartment());
+            staffDetails.setDesignation(staffDetailsArrayList.get(0).getDesignation());
+            staffDetails.setDOB(staffDetailsArrayList.get(0).getDOB());
+            staffDetails.setDomainUrl(staffDetailsArrayList.get(0).getDomainUrl());
+            staffDetails.setEmail1(staffDetailsArrayList.get(0).getEmail1());
+            staffDetails.setESIC(staffDetailsArrayList.get(0).getESIC());
+            staffDetails.setFSCICode(staffDetailsArrayList.get(0).getFSCICode());
+            staffDetails.setGender(staffDetailsArrayList.get(0).getGender());
+            staffDetails.setJoiningDate(staffDetailsArrayList.get(0).getJoiningDate());
+            staffDetails.setPanCardNo(staffDetailsArrayList.get(0).getPanCardNo());
+            staffDetails.setPFAccNo(staffDetailsArrayList.get(0).getPFAccNo());
+            staffDetails.setPName(staffDetailsArrayList.get(0).getPName());
+            staffDetails.setStaffId(staffDetailsArrayList.get(0).getStaffId());
+            staffDetails.setStaffPhoto(staffDetailsArrayList.get(0).getStaffPhoto());
+            staffDetails.setUANNO(staffDetailsArrayList.get(0).getUANNO());
+
+            Gson gson = new Gson();
+            String json = gson.toJson(staffDetails);
+            edit.putString("StaffDetails", json);
 
             return null;
         }
@@ -183,6 +212,7 @@ public class LoginActivity extends CommonActivity {
 
             edit.putBoolean("login", true);
             edit.apply();
+
             Intent i = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(i);
             finish();

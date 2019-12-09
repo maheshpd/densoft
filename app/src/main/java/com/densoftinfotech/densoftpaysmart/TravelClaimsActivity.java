@@ -21,8 +21,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +35,7 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.location_utilities.LocationMonitoringService;
 import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
 import com.densoftinfotech.densoftpaysmart.location_utilities.MapConstants;
@@ -44,13 +50,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TravelClaimsActivity extends CommonActivity {
 
-    TextView tv_trackme;
-    ImageView iv_seemap;
+    TextView tv_trackme, tv_stoptracking;
+    Spinner spinner_mode_of_transport;
     private UserLocation userLocation;
     private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference;
@@ -60,6 +67,10 @@ public class TravelClaimsActivity extends CommonActivity {
     private boolean mAlreadyStartedService = false;
     private LocationRequest mLocationRequest;
     private SharedPreferences sharedPreferences;
+    private StaffDetails staffDetails;
+    private ArrayList<FirebaseLiveLocation> firebaseLiveLocations = new ArrayList<>();
+    private ArrayList<String> modes_transport = new ArrayList<>();
+    ArrayAdapter<String> spinner_modes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,52 +78,134 @@ public class TravelClaimsActivity extends CommonActivity {
         setContentView(R.layout.activity_travel_claims);
 
         tv_trackme = findViewById(R.id.tv_trackme);
-        iv_seemap = findViewById(R.id.iv_seemap);
+        tv_stoptracking = findViewById(R.id.tv_stoptracking);
+        spinner_mode_of_transport = findViewById(R.id.spinner_mode_of_transport);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(TravelClaimsActivity.this);
+        modes_transport.add("Please Select");
+        modes_transport.add("Driving");
+        modes_transport.add("Cycling");
+        modes_transport.add("Walking");
+        spinner_modes = new ArrayAdapter<>(TravelClaimsActivity.this, R.layout.autocomplete_layout, R.id.actv_text, modes_transport);
+        spinner_modes.setDropDownViewResource(R.layout.autocomplete_layout);
+        spinner_mode_of_transport.setAdapter(spinner_modes);
 
         databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + sharedPreferences.getString("company_name", ""));
-        setTitle(getResources().getString(R.string.track_me));
+        setTitle(getResources().getString(R.string.travel_claims));
         back();
 
+        staffDetails = getStaffDetails(TravelClaimsActivity.this);
 
+        update_table();
 
         tv_trackme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (check_param_ok()) {
-                    live_track();
+                    if (staffDetails != null) {
+                        if (modes_transport.get(spinner_mode_of_transport.getSelectedItemPosition()).equalsIgnoreCase("Please Select")) {
+                            Toast.makeText(TravelClaimsActivity.this, getResources().getString(R.string.select_mode_of_transport), Toast.LENGTH_SHORT).show();
+                        } else {
+                            open_alert(1);
+                        }
+                    }
                 }
             }
         });
 
-        iv_seemap.setOnClickListener(new View.OnClickListener() {
+        tv_stoptracking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(TravelClaimsActivity.this, GoogleMapActivity.class);
-                startActivity(i);
+                open_alert(0);
             }
         });
 
     }
 
+    private void update_table() {
+        firebaseLiveLocations = DatabaseHelper.getInstance(TravelClaimsActivity.this).get_LiveLocationUpdate(sharedPreferences.getString("staffid", ""));
+        if (firebaseLiveLocations != null && firebaseLiveLocations.size() > 0) {
+            if (firebaseLiveLocations.get(0).getAllow_tracking() == 1) {
+                tv_trackme.setText(getResources().getString(R.string.live_tracking_started));
+                //live_track();
+            } else {
+                tv_trackme.setText(getResources().getString(R.string.resume_tracking));
+                stopService(new Intent(this, LocationMonitoringService.class));
+                mAlreadyStartedService = false;
+                update_firebase();
+            }
+        }
+    }
+
+    private void open_alert(int flag) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(TravelClaimsActivity.this);
+
+        if (flag == 1) {
+            alert.setTitle(getResources().getString(R.string.realtime_tracking));
+            alert.setMessage(getResources().getString(R.string.alert_message_for_tracking));
+
+            alert.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    tv_trackme.setText(getResources().getString(R.string.live_tracking_started));
+                    live_track();
+
+                }
+            });
+        } else {
+            alert.setTitle(getResources().getString(R.string.stop_tracking));
+            alert.setMessage(getResources().getString(R.string.alert_message_for_stoptracking));
+
+            alert.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    stopService(new Intent(TravelClaimsActivity.this, LocationMonitoringService.class));
+                    mAlreadyStartedService = false;
+                    update_firebase();
+                    add_data_toSqlite(0);
+                    update_table();
+                }
+            });
+        }
+
+        alert.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        alert.show();
+    }
+
     private void add_live_updates_to_firebase(String latitude, String longitude) {
-        Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
-        firebaseLiveLocationMap.put(sharedPreferences.getString("staffid", ""), new FirebaseLiveLocation(Constants.staffid, Constants.staffDetailsRoom.getPName(), latitude,
-                longitude, userLocation.getAddress_fromLatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)), (MapConstants.workinghour_from + "-" + MapConstants.workinghour_to)));
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+
+        /*firebaseLiveLocationMap.put(sharedPreferences.getString("staffid", ""), new FirebaseLiveLocation(staffDetails.getStaffId(), staffDetails.getPName(), latitude,
+                longitude, userLocation.getAddress_fromLatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)), (MapConstants.workinghour_from + "-" + MapConstants.workinghour_to)));*/
+        databaseReference.child(sharedPreferences.getString("staffid", "")).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
+                firebaseLiveLocationMap.put("staff_id", sharedPreferences.getString("staffid", ""));
+                firebaseLiveLocationMap.put("staff_name", staffDetails.getPName());
+                firebaseLiveLocationMap.put("latitude", latitude);
+                firebaseLiveLocationMap.put("longitude", longitude);
+                firebaseLiveLocationMap.put("address", userLocation.getAddress_fromLatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)));
+                firebaseLiveLocationMap.put("workinghours", (MapConstants.workinghour_from + "-" + MapConstants.workinghour_to));
+                firebaseLiveLocationMap.put("allow_tracking", 1);
+                firebaseLiveLocationMap.put("transport_mode", modes_transport.get(spinner_mode_of_transport.getSelectedItemPosition()).toLowerCase());
                 //FirebaseLiveLocation firebaseLiveLocation = dataSnapshot.getValue(FirebaseLiveLocation.class);
                 if (!dataSnapshot.exists()) {
-                    databaseReference.setValue(firebaseLiveLocationMap);
+                    databaseReference.child(sharedPreferences.getString("staffid", "")).setValue(firebaseLiveLocationMap);
 
-                } /*else {
+                } else {
                     //if (firebaseLiveLocation != null && (Double.parseDouble(latitude) >= 17.3)) {
-                    databaseReference.updateChildren(firebaseLiveLocationMap);
+                    databaseReference.child(sharedPreferences.getString("staffid", "")).updateChildren(firebaseLiveLocationMap);
                     //}
 
-                }*/
+                }
             }
 
             @Override
@@ -126,20 +219,34 @@ public class TravelClaimsActivity extends CommonActivity {
         //add_data_toSqlite();
     }
 
-    private void add_data_toSqlite() {
+    private void update_firebase() {
+        Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
+        firebaseLiveLocationMap.put("allow_tracking", 0);
+        databaseReference.child(sharedPreferences.getString("staffid", "")).updateChildren(firebaseLiveLocationMap);
+    }
+
+    private void add_data_toSqlite(int flag) {
         userLocation = new UserLocation(TravelClaimsActivity.this);
         ContentValues c = new ContentValues();
         c.put(DatabaseHelper.STAFF_ID, Constants.staffid);
-        c.put(DatabaseHelper.STAFF_NAME, Constants.staffDetailsRoom.getPName());
+        c.put(DatabaseHelper.STAFF_NAME, staffDetails.getPName());
         c.put(DatabaseHelper.LATITUDE, userLocation.getLatitude());
         c.put(DatabaseHelper.LONGITUDE, userLocation.getLongitude());
         c.put(DatabaseHelper.ADDRESS, userLocation.getAddress());
         c.put(DatabaseHelper.WORKING_HOUR_FROM, MapConstants.workinghour_from);
         c.put(DatabaseHelper.WORKING_HOUR_TO, MapConstants.workinghour_to);
         c.put(DatabaseHelper.SAVEDTIME, DateUtils.getSqliteTime());
-        DatabaseHelper.getInstance(TravelClaimsActivity.this).save_location(c, Constants.staffid);
+        if (flag == 1) {
+            c.put(DatabaseHelper.ALLOW_TRACKING, 1);
+            DatabaseHelper.getInstance(TravelClaimsActivity.this).save_location(c, Constants.staffid);
+            add_live_updates_to_firebase(String.valueOf(userLocation.getLatitude()), String.valueOf(userLocation.getLongitude()));
 
-        add_live_updates_to_firebase(String.valueOf(userLocation.getLatitude()), String.valueOf(userLocation.getLongitude()));
+        } else {
+            c.put(DatabaseHelper.ALLOW_TRACKING, 0);
+            DatabaseHelper.getInstance(TravelClaimsActivity.this).save_location(c, Constants.staffid);
+        }
+
+
     }
 
     private boolean check_param_ok() {
@@ -165,7 +272,7 @@ public class TravelClaimsActivity extends CommonActivity {
         mLocationRequest.setInterval(Constants.LOCATION_INTERVAL);
         mLocationRequest.setFastestInterval(Constants.FASTEST_LOCATION_INTERVAL);
 
-        add_data_toSqlite();
+        add_data_toSqlite(1);
 
         /*LocalBroadcastManager.getInstance(this).registerReceiver(
                 new BroadcastReceiver() {
@@ -191,7 +298,6 @@ public class TravelClaimsActivity extends CommonActivity {
         super.onResume();
         if (sharedPreferences != null && sharedPreferences.contains("staffid"))
             DatabaseHelper.getInstance(TravelClaimsActivity.this).get_LiveLocationUpdate(sharedPreferences.getString("staffid", ""));
-
 
     }
 
@@ -365,6 +471,26 @@ public class TravelClaimsActivity extends CommonActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.google_map, menu);
+        return true;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.google_map:
+                Intent i = new Intent(TravelClaimsActivity.this, GoogleMapActivity.class);
+                startActivity(i);
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onDestroy() {

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.AttributeSet;
 
 import android.util.Log;
@@ -16,14 +17,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.densoftinfotech.densoftpaysmart.MainActivity;
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.adapter.CalendarGridAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import androidx.preference.PreferenceManager;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,7 +63,7 @@ public class CalendarCustomView extends LinearLayout {
     ArrayList<CalendarDetails> calendarDetails = new ArrayList<>();
 
     private GetServiceInterface getServiceInterface;
-    private ProgressDialog progressDoalog;
+    private ProgressDialog progressDialog;
 
     public CalendarCustomView(Context context, ArrayList<CalendarDetails> calendarDetails) {
         super(context);
@@ -94,39 +101,51 @@ public class CalendarCustomView extends LinearLayout {
 
     private void setPreviousButtonClickEvent() {
 
-        Calendar ctest = (Calendar) cal.clone();
-        ctest.add(Calendar.MONTH, -1);
-        String joiningdate = Constants.staffDetailsRoom.getJoiningDate().split("-")[1] + "-" + Constants.staffDetailsRoom.getJoiningDate().split("-")[2];
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        if (preferences.contains("StaffDetails")) {
+            String json = preferences.getString("StaffDetails", "");
+            Type type = new TypeToken<StaffDetails>() {
+            }.getType();
+            final StaffDetails staffDetails = new Gson().fromJson(json, type);
 
-        boolean val = calculate_validity(joiningdate, new SimpleDateFormat("MM-yyyy").format(ctest.getTime()));
+            if (staffDetails != null) {
 
-        nextButton.setVisibility(VISIBLE);
-        if (val) {
-            previousButton.setVisibility(VISIBLE);
 
-        } else {
-            previousButton.setVisibility(INVISIBLE);
-        }
+                Calendar ctest = (Calendar) cal.clone();
+                ctest.add(Calendar.MONTH, -1);
+                String joiningdate = staffDetails.getJoiningDate().split("-")[1] + "-" + staffDetails.getJoiningDate().split("-")[2];
 
-        previousButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String joiningdate = Constants.staffDetailsRoom.getJoiningDate().split("-")[1] + "-" + Constants.staffDetailsRoom.getJoiningDate().split("-")[2];
-                cal.add(Calendar.MONTH, -1);
-                boolean val = calculate_validity(joiningdate, new SimpleDateFormat("MM-yyyy").format(cal.getTime()));
+                boolean val = calculate_validity(joiningdate, new SimpleDateFormat("MM-yyyy").format(ctest.getTime()));
 
                 nextButton.setVisibility(VISIBLE);
                 if (val) {
                     previousButton.setVisibility(VISIBLE);
 
-                    add_loader();
-                    //setUpCalendarAdapter();
                 } else {
                     previousButton.setVisibility(INVISIBLE);
                 }
+
+                previousButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        String joiningdate = staffDetails.getJoiningDate().split("-")[1] + "-" + staffDetails.getJoiningDate().split("-")[2];
+                        cal.add(Calendar.MONTH, -1);
+                        boolean val = calculate_validity(joiningdate, new SimpleDateFormat("MM-yyyy").format(cal.getTime()));
+
+                        nextButton.setVisibility(VISIBLE);
+                        if (val) {
+                            previousButton.setVisibility(VISIBLE);
+
+                            add_loader();
+                            //setUpCalendarAdapter();
+                        } else {
+                            previousButton.setVisibility(INVISIBLE);
+                        }
+                    }
+                });
             }
-        });
+        }
     }
 
     private void setNextButtonClickEvent() {
@@ -180,15 +199,15 @@ public class CalendarCustomView extends LinearLayout {
     private void add_loader() {
 
         if (!((Activity) context).isFinishing()) {
-            progressDoalog = ProgressDialog.show(context, "Loading", "Please wait...");
-            progressDoalog.setCancelable(false);
+            progressDialog = ProgressDialog.show(context, "Loading", "Please wait...");
+            progressDialog.setCancelable(false);
             setUpCalendarAdapter();
         }
     }
 
-    private void dismiss_loader(){
-        if (progressDoalog != null) {
-            progressDoalog.dismiss();
+    private void dismiss_loader() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
         }
     }
 

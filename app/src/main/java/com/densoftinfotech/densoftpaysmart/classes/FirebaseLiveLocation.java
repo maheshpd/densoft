@@ -14,18 +14,22 @@ public class FirebaseLiveLocation implements Serializable/* implements ClusterIt
     private String longitude = "";
     private String address = "";
     private String workinghours = "";
+    private int allow_tracking = 0;
+    private String transport_mode = "";
 
     public FirebaseLiveLocation(){
 
     }
 
-    public FirebaseLiveLocation(String staff_id, String staff_name, String latitude, String longitude, String address, String workinghours){
+    public FirebaseLiveLocation(String staff_id, String staff_name, String latitude, String longitude, String address, String workinghours, int allow_tracking, String transport_mode){
         this.staff_id = staff_id;
         this.staff_name = staff_name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
         this.workinghours = workinghours;
+        this.allow_tracking = allow_tracking;
+        this.transport_mode = transport_mode;
     }
 
     public String getStaff_id() {
@@ -76,7 +80,23 @@ public class FirebaseLiveLocation implements Serializable/* implements ClusterIt
         this.workinghours = workinghours;
     }
 
-    /*String title = "";
+    public int getAllow_tracking() {
+        return allow_tracking;
+    }
+
+    public void setAllow_tracking(int allow_tracking) {
+        this.allow_tracking = allow_tracking;
+    }
+
+    public String getTransport_mode() {
+        return transport_mode;
+    }
+
+    public void setTransport_mode(String transport_mode) {
+        this.transport_mode = transport_mode;
+    }
+
+   /*String title = "";
     LatLng latLng = null;
     String snippet = "";
     public FirebaseLiveLocation(String title, LatLng latLng, String snippet) {

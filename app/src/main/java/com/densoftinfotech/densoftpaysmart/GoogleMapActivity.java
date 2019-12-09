@@ -1,6 +1,7 @@
 package com.densoftinfotech.densoftpaysmart;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.location_utilities.DirectionJSONParser;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,14 +44,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.ui.IconGenerator;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -58,6 +64,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
+import androidx.preference.PreferenceManager;
 
 public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -71,6 +78,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
     ArrayList<String>firebaseList_search = new ArrayList<>();
     ArrayAdapter<String>adapter_search;
     ArrayList<FirebaseLiveLocation> datasetFilter = new ArrayList<>();
+    SharedPreferences preferences;
 
     Marker marker;
 
@@ -86,7 +94,13 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
             supportMapFragment.getMapAsync(this);
         }
 
-        databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + Constants.staffDetailsRoom.getCompanyName());
+        preferences = PreferenceManager.getDefaultSharedPreferences(GoogleMapActivity.this);
+
+        if(preferences.contains("company_name")) {
+            databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + preferences.getString("company_name", ""));
+        }
+
+
     }
 
     @Override
@@ -146,19 +160,11 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
 
 
-                            draw_routes(latLng_office, latLng1);
+                            draw_routes(latLng_office, latLng1, firebaseLiveLocation.getTransport_mode());
                         }
                     }
 
                     autocomplete(googlemap);
-
-                    /*btn_search.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            searchLocation(googlemap);
-                        }
-                    });*/
-
 
                 } else {
                     Log.d("does not ", "exist");
@@ -172,8 +178,8 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         });
     }
 
-    private void draw_routes(LatLng origin, LatLng dest) {
-        String url = getDirectionsUrl(origin, dest);
+    private void draw_routes(LatLng origin, LatLng dest, String mode_transport) {
+        String url = getDirectionsUrl(origin, dest, mode_transport);
 
         DownloadTask downloadTask = new DownloadTask();
         downloadTask.execute(url);
@@ -287,43 +293,20 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
             }
         });
 
-
-
-        //EditText locationSearch = findViewById(R.id.editText);
-        //String location = locationSearch.getText().toString();
-
-
-        /*Log.d("data is ", firebaseLiveLocations.toString() + "");
-
-        if (firebaseLiveLocations != null) {
-
-            for (int i = 0; i < firebaseLiveLocations.size(); i++) {
-                if (firebaseLiveLocations.get(i).getStaff_name().toLowerCase().trim().contains(location.toLowerCase().trim()) ||
-                        firebaseLiveLocations.get(i).getStaff_id().toLowerCase().trim().contains(location.toLowerCase().trim())) {
-                    LatLng latLng = new LatLng(Double.parseDouble(firebaseLiveLocations.get(i).getLatitude()), Double.parseDouble(firebaseLiveLocations.get(i).getLongitude()));
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                }
-            }
-
-        }*/
     }
 
-    private String getDirectionsUrl(LatLng origin,LatLng dest){
+    private String getDirectionsUrl(LatLng origin,LatLng dest, String mode_transport){
 
         // Origin of route
         String str_origin = "origin="+origin.latitude+","+origin.longitude;
-
         // Destination of route
         String str_dest = "destination="+dest.latitude+","+dest.longitude;
-
         // Sensor enabled
         String sensor = "sensor=false";
-
         String key = "key="+getResources().getString(R.string.map_api_key);
 
         // Building the parameters to the web service
-        String parameters = str_origin+"&"+str_dest+"&"+key+"&"+sensor;
+        String parameters = str_origin+"&"+str_dest+"&"+key+"&"+sensor+"&"+"mode="+mode_transport;
 
         // Output format
         String output = "json";
@@ -418,7 +401,8 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                 jObject = new JSONObject(jsonData[0]);
                 DirectionJSONParser parser = new DirectionJSONParser();
                 routes = parser.parse(jObject);
-                Log.d("line options ", jsonData[0] + " routes " + routes + "");
+
+                //Log.d("line options ", jsonData[0] + " routes " + routes + "");
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -464,51 +448,5 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
             }
         }
     }
-   /* @Override
-    public Filter getFilter() {
-        return datasetFilterFull;
-    }
-
-    private Filter datasetFilterFull = new Filter() {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            ArrayList<FirebaseLiveLocation> filteredList = new ArrayList<>();
-
-            try {
-
-                if (constraint == null || constraint.length() == 0) {
-                    filteredList.addAll(datasetFilter);
-
-                    //Log.e("called ","calle "+filteredList.size());
-
-                } else {
-                    String filterPattern = constraint.toString().toLowerCase().trim();
-
-                    for (FirebaseLiveLocation item : datasetFilter) {
-
-                        if ((item.getStaff_name().toLowerCase().trim().contains(filterPattern)) || (item.getStaff_id().toLowerCase().trim().contains(filterPattern))) {
-                            filteredList.add(item);
-                        }
-                    }
-                    //Log.e("called1 ", "called1 " + filteredList.size() + " " + datasetFilter.size());
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            FilterResults results = new FilterResults();
-            results.values = filteredList;
-
-            return results;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            firebaseLiveLocations.clear();
-            firebaseLiveLocations.addAll((ArrayList) results.values);
-        }
-    };*/
-
 
 }

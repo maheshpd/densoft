@@ -1,5 +1,7 @@
 package com.densoftinfotech.densoftpaysmart;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -16,6 +18,7 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.SnapHelperOneByOne;
 import com.densoftinfotech.densoftpaysmart.classes.QuickActions;
 import com.densoftinfotech.densoftpaysmart.classes.QuickActionsArray;
 import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
@@ -24,10 +27,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -75,12 +80,14 @@ public class MainActivity extends CommonActivity {
 
     private ArrayList<SalarySlip> salarySlips = new ArrayList<>();
     private ArrayList<QuickActions> quickActions = new ArrayList<>();
-    private StaffDetailsRoom staffDetailsRoom;
+    //private StaffDetailsRoom staffDetailsRoom;
     private SalarySlipAdapter salarySlipAdapter;
 
     private GetServiceInterface getServiceInterface;
     private SharedPreferences preferences;
     private SharedPreferences.Editor edit;
+    private StaffDetails staffDetails;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +101,23 @@ public class MainActivity extends CommonActivity {
 
         ButterKnife.bind(this);
 
-        GetRoomData getRoomData = new GetRoomData();
-        getRoomData.execute();
+        staffDetails = getStaffDetails(MainActivity.this);
+
+        if(staffDetails!=null){
+            Constants.staffid = staffDetails.getStaffId();
+            tv_name.setText(" " + staffDetails.getPName());
+            tv_title.setText(staffDetails.getCompanyName());
+            get_salary_data(staffDetails.getStaffId());
+
+            if (staffDetails.getStaffPhoto() != null && !staffDetails.getStaffPhoto().trim().equals("")) {
+                Picasso.with(MainActivity.this).load(staffDetails.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
+            }
+        }
+
+
+        add_loader1();
+        /*GetRoomData getRoomData = new GetRoomData();
+        getRoomData.execute();*/
 
         LinearSnapHelper linearSnapHelper = new SnapHelperOneByOne();
         layoutManager_salaryslip = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -114,6 +136,7 @@ public class MainActivity extends CommonActivity {
         iv_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Logout_DeleteUser logout_deleteUser = new Logout_DeleteUser();
                 logout_deleteUser.execute();
 
@@ -187,6 +210,7 @@ public class MainActivity extends CommonActivity {
 
                         salarySlipAdapter = new SalarySlipAdapter(MainActivity.this, newset, response.body());
                         recycler_view_salaryslip.setAdapter(salarySlipAdapter);
+                        dismiss_loader1();
 
 
                     } else {
@@ -233,12 +257,12 @@ public class MainActivity extends CommonActivity {
         }
     }
 
-    private class GetRoomData extends AsyncTask<Void, Void, Void> {
+    /*private class GetRoomData extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
             staffDetailsRoom = Paysmart_roomdatabase.get_PaysmartDatabase(MainActivity.this).staffDetails_dao().getAll();
             Constants.staffid = staffDetailsRoom.getStaffId();
-            Constants.staffDetailsRoom = staffDetailsRoom;
+            //Constants.staffDetailsRoom = staffDetailsRoom;
             return null;
         }
 
@@ -255,7 +279,7 @@ public class MainActivity extends CommonActivity {
             }
 
         }
-    }
+    }*/
 
 
     private class Logout_DeleteUser extends AsyncTask<Void, Void, Void> {
@@ -274,6 +298,20 @@ public class MainActivity extends CommonActivity {
             startActivity(i);
             finish();
 
+        }
+    }
+
+    private void add_loader1() {
+
+        if (!((Activity) MainActivity.this).isFinishing()) {
+            progressDialog = ProgressDialog.show(MainActivity.this, "Loading", "Please wait...");
+            progressDialog.setCancelable(false);
+        }
+    }
+
+    private void dismiss_loader1() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
         }
     }
 }

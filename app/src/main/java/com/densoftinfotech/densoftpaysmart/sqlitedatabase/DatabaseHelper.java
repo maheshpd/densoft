@@ -45,6 +45,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String STAFF_NAME = "staff_name";
     public static final String WORKING_HOUR_FROM = "working_hour_from";
     public static final String WORKING_HOUR_TO = "working_hour_to";
+    public static final String ALLOW_TRACKING = "allow_tracking";
+    public static final String TRANSPORT_MODE = "transport_mode";
+
 
 
     public DatabaseHelper(Context context) {
@@ -72,7 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query_liveupdates = "CREATE TABLE IF NOT EXISTS " + TABLE_FIREBASE_LIVE_LOCATION + "("
                 + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + STAFF_NAME + " TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT,"
-                + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + SAVEDTIME + " TEXT)";
+                + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + ALLOW_TRACKING + " INTEGER NOT NULL," + TRANSPORT_MODE + " TEXT," + SAVEDTIME + " TEXT)";
         db.execSQL(query_liveupdates);
     }
 
@@ -106,7 +109,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = getWritableDatabase();
             String query_liveupdates = "CREATE TABLE IF NOT EXISTS " + TABLE_FIREBASE_LIVE_LOCATION + "("
                     + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + STAFF_NAME + " TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT,"
-                    + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + SAVEDTIME + " TEXT)";
+                    + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + ALLOW_TRACKING + " INTEGER DEFAULT 0," + TRANSPORT_MODE + " TEXT," + SAVEDTIME + " TEXT)";
             db.execSQL(query_liveupdates);
         } catch (Exception e) {
             e.printStackTrace();
@@ -314,8 +317,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             obj.put("longitude", c.getString(4));
                             obj.put("address", c.getString(5));
                             obj.put("workinghours", c.getString(6)+"-"+c.getString(7));
+                            obj.put("allow_tracking", c.getInt(8));
+                            obj.put("transport_mode", c.getString(9));
                             //Log.d("obj_notification", "obj " + obj.toString());
-                            list.add(new FirebaseLiveLocation(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5), (c.getString(6)+"-"+c.getString(7))));
+                            list.add(new FirebaseLiveLocation(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5), (c.getString(6)+"-"+c.getString(7)), c.getInt(8),
+                                    c.getString(9)));
                         } catch (JSONException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();

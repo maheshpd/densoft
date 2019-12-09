@@ -1,5 +1,9 @@
 package com.densoftinfotech.densoftpaysmart.location_utilities;
 
+import com.densoftinfotech.densoftpaysmart.classes.LegsObject;
+import com.densoftinfotech.densoftpaysmart.classes.PolylineObject;
+import com.densoftinfotech.densoftpaysmart.classes.RouteObject;
+import com.densoftinfotech.densoftpaysmart.classes.StepsObject;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -104,6 +108,33 @@ public class DirectionJSONParser {
             poly.add(p);
         }
         return poly;
+    }
+
+    private List<LatLng> getDirectionPolylines(List<RouteObject> routes){
+        List<LatLng> directionList = new ArrayList<LatLng>();
+        for(RouteObject route : routes){
+            List<LegsObject> legs = route.getLegs();
+            for(LegsObject leg : legs){
+                /*String routeDistance = leg.getDistance().getText();
+                String routeDuration = leg.getDuration().getText();
+                setRouteDistanceAndDuration(routeDistance, routeDuration);*/
+                List<StepsObject> steps = leg.getSteps();
+                for(StepsObject step : steps){
+                    PolylineObject polyline = step.getPolyline();
+                    String points = polyline.getPoints();
+                    List<LatLng> singlePolyline = decodePoly(points);
+                    for (LatLng direction : singlePolyline){
+                        directionList.add(direction);
+                    }
+                }
+            }
+        }
+        return directionList;
+    }
+
+    private void getDistance(String distance, String duration){
+        /*distanceValue.setText(distance);
+        durationValue.setText(duration);*/
     }
 
 }

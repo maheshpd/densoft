@@ -157,19 +157,26 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
     private void add_live_updates_to_firebase(UserLocation userLocation, String staffid, String company_name) {
 
-        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name);
-        Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
-        firebaseLiveLocationMap.put("staff_id", staffid);
-        firebaseLiveLocationMap.put("latitude", String.valueOf(userLocation.getLatitude()));
-        firebaseLiveLocationMap.put("longitude", String.valueOf(userLocation.getLongitude()));
-        firebaseLiveLocationMap.put("address", userLocation.getAddress());
+        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name + "/" + company_name);
 
-        databaseReference.child(company_name).child(staffid).addListenerForSingleValueEvent(new ValueEventListener() {
+
+        databaseReference.child(staffid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    databaseReference.updateChildren(firebaseLiveLocationMap);
-                    Log.d("location map ", firebaseLiveLocationMap.toString());
+
+                    FirebaseLiveLocation firebaseLiveLocation = dataSnapshot.getValue(FirebaseLiveLocation.class);
+
+                    if(firebaseLiveLocation!=null && (firebaseLiveLocation.getAllow_tracking() == 1)){
+                        Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
+                        firebaseLiveLocationMap.put("staff_id", staffid);
+                        firebaseLiveLocationMap.put("latitude", String.valueOf(userLocation.getLatitude()));
+                        firebaseLiveLocationMap.put("longitude", String.valueOf(userLocation.getLongitude()));
+                        firebaseLiveLocationMap.put("address", userLocation.getAddress());
+                        databaseReference.child(staffid).updateChildren(firebaseLiveLocationMap);
+                        Log.d("location map ", firebaseLiveLocationMap.toString());
+                    }
+
                 }
             }
 

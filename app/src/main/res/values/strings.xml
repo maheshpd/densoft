@@ -97,7 +97,8 @@
     <string name="checkin_once">You can only Check In once in a day</string>
     <string name="checkout_once">You can only Check Out once in a day</string>
     <string name="unabletofindlocation">We are not able to get your location. Please try again later!</string>
-    <string name="track_me">Track me live</string>
+    <string name="travel_claims">Travel Claims</string>
+    <string name="track_me">Allow company to track me Live in office hours</string>
     <string name="pleasecheckinternet">Please check your Network</string>
     <string name="permission_rationale">Set Permissions</string>
     <string name="no_google_playservice_available">no google playservice available</string>
@@ -109,5 +110,14 @@
     <string name="leaves_available">Available Leaves</string>
     <string name="leave_request_status">Leave Request Status</string>
     <string name="cannotcheckout">Please Check In first</string>
+    <string name="error">Error submitting the form. Please try again!</string>
+    <string name="realtime_tracking">Realtime Tracking</string>
+    <string name="alert_message_for_tracking">We will track you only when we send you out during office hours. Are you OK with that?</string>
+    <string name="alert_message_for_stoptracking">Are you sure you want to stop being tracked?</string>
+    <string name="live_tracking_started">Live Tracking started</string>
+    <string name="live_tracking_stopped">Live Tracking stopped</string>
+    <string name="stop_tracking">Stop Tracking</string>
+    <string name="select_mode_of_transport">Select Mode of Transport</string>
+    <string name="resume_tracking">Resume Tracking</string>
 
 </resources>

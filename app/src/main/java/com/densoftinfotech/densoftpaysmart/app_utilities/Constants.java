@@ -2,6 +2,7 @@ package com.densoftinfotech.densoftpaysmart.app_utilities;
 
 import android.text.format.DateFormat;
 
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 
 import java.util.Calendar;
@@ -18,7 +19,8 @@ public class Constants {
     public static String staffid = "";
     public static String current_year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
     public static String current_month = String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
-    public static StaffDetailsRoom staffDetailsRoom = new StaffDetailsRoom();
+    //public static StaffDetailsRoom staffDetailsRoom = new StaffDetailsRoom();
+    public static StaffDetails staffDetails = new StaffDetails();
 
     public static Date d = new Date();
     public static CharSequence s = DateFormat.format("yyyy-MM-dd", d.getTime());

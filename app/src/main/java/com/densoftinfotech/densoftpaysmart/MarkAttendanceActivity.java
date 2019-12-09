@@ -21,6 +21,7 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.classes.CheckLeaveStatus;
 import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
@@ -91,6 +92,8 @@ public class MarkAttendanceActivity extends CommonActivity {
     private String formattedDate = "";
     private String formattedTime = "";
 
+    private StaffDetails staffDetails;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +105,8 @@ public class MarkAttendanceActivity extends CommonActivity {
         ButterKnife.bind(this);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(MarkAttendanceActivity.this);
+
+        staffDetails = getStaffDetails(MarkAttendanceActivity.this);
 
         b = getIntent().getExtras();
         if (b != null) {
@@ -199,7 +204,7 @@ public class MarkAttendanceActivity extends CommonActivity {
         params.put("UserID", Constants.staffid);
         params.put("lag", userLocation.getLatitude());
         params.put("logi", userLocation.getLongitude());
-        params.put("Mobile", Constants.staffDetailsRoom.getMobile1());
+        params.put("Mobile", staffDetails.getMobile1());
         params.put("address", userLocation.getAddress());
         params.put("CustomerId", preferences.getString("customerid", ""));
 
@@ -330,7 +335,7 @@ public class MarkAttendanceActivity extends CommonActivity {
 
     private void getset_spinner_data(int year_of_joining, int month1, String staffid, int flag) {
 
-        for (int i = Integer.parseInt(Constants.staffDetailsRoom.getJoiningDate().split("-")[2]); i <= Calendar.getInstance().get(Calendar.YEAR); i++) {
+        for (int i = Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]); i <= Calendar.getInstance().get(Calendar.YEAR); i++) {
             years.add(i);
         }
 

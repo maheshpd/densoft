@@ -12,6 +12,11 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.densoftinfotech.densoftpaysmart.R;
+import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -84,6 +89,24 @@ public class CommonActivity extends AppCompatActivity {
         });
     }
 
+    public StaffDetails getStaffDetails(Context context){
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        if(preferences.contains("StaffDetails")){
+            String json = preferences.getString("StaffDetails", "");
+            StaffDetails staffDetails = new StaffDetails();
+            Type type = new TypeToken<StaffDetails>(){}.getType();
+            staffDetails = new Gson().fromJson(json, type);
+
+            if(staffDetails!=null){
+                Constants.staffid = staffDetails.getStaffId();
+            }
+
+            return staffDetails;
+        }else {
+            return null;
+        }
+    }
+
     public void add_loader() {
 
         if (!((Activity) context).isFinishing()) {
@@ -94,9 +117,9 @@ public class CommonActivity extends AppCompatActivity {
     }
 
     public void dismiss_loader(){
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
     }
 
     public String get_monthName(int i) {
