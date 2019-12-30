@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.MainActivity;
 import com.densoftinfotech.densoftpaysmart.R;
-import com.densoftinfotech.densoftpaysmart.classes.QuickActions;
+import com.densoftinfotech.densoftpaysmart.model.QuickActions;
 
 import java.util.ArrayList;
 

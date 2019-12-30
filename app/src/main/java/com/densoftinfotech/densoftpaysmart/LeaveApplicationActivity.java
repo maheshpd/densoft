@@ -25,12 +25,12 @@ import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
-import com.densoftinfotech.densoftpaysmart.classes.CareOfStaff_Employee;
-import com.densoftinfotech.densoftpaysmart.classes.CheckLeaveStatus;
-import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
+import com.densoftinfotech.densoftpaysmart.model.CareOfStaff_Employee;
+import com.densoftinfotech.densoftpaysmart.model.CheckLeaveStatus;
+import com.densoftinfotech.densoftpaysmart.model.LeaveDetails;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
-import com.densoftinfotech.densoftpaysmart.classes.ParentEmployee;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.model.ParentEmployee;
+import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 
@@ -187,6 +187,7 @@ public class LeaveApplicationActivity extends CommonActivity {
 
     private void submit_leave_application() {
 
+        add_loader(LeaveApplicationActivity.this);
         Map<String, Object> params = new HashMap<>();
 
         params.put("customerid", preferences.getString("customerid", ""));
@@ -231,6 +232,8 @@ public class LeaveApplicationActivity extends CommonActivity {
                 } else {
 
                         if (response.body() != null) {
+
+                            dismiss_loader();
 
                             switch (response.body().get(0).getStatus()) {
                                 case "1":

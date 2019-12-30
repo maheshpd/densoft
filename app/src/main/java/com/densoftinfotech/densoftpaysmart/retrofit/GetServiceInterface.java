@@ -1,14 +1,16 @@
 package com.densoftinfotech.densoftpaysmart.retrofit;
 
-import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
-import com.densoftinfotech.densoftpaysmart.classes.CareOfStaff_Employee;
-import com.densoftinfotech.densoftpaysmart.classes.CheckLeaveStatus;
-import com.densoftinfotech.densoftpaysmart.classes.LeaveAppliedDetails;
-import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
-import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
-import com.densoftinfotech.densoftpaysmart.classes.ParentEmployee;
-import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.model.BranchDetails;
+import com.densoftinfotech.densoftpaysmart.model.CalendarDetails;
+import com.densoftinfotech.densoftpaysmart.model.CareOfStaff_Employee;
+import com.densoftinfotech.densoftpaysmart.model.CheckLeaveStatus;
+import com.densoftinfotech.densoftpaysmart.model.LeaveAppliedDetails;
+import com.densoftinfotech.densoftpaysmart.model.LeaveDetails;
+import com.densoftinfotech.densoftpaysmart.model.MarkAttendanceDetails;
+import com.densoftinfotech.densoftpaysmart.model.ParentEmployee;
+import com.densoftinfotech.densoftpaysmart.model.SalarySlip;
+import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.model.TeamList;
 
 import java.util.ArrayList;
 
@@ -64,7 +66,12 @@ public interface GetServiceInterface {
     Call<ArrayList<CheckLeaveStatus>>
     request_checkOut(@Body RequestBody requestBody);
 
+    @POST("LocationPunching_App")
+    Call<ArrayList<BranchDetails>>
+    request_branch_details(@Body RequestBody requestBody);
 
-
+    @POST("Get_StaffLeave_App")
+    Call<ArrayList<TeamList>>
+    request_team_list(@Body RequestBody requestBody);
 
 }

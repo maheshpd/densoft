@@ -101,14 +101,14 @@
     <string name="track_me">Allow company to track me Live in office hours</string>
     <string name="pleasecheckinternet">Please check your Network</string>
     <string name="permission_rationale">Set Permissions</string>
-    <string name="no_google_playservice_available">no google playservice available</string>
-    <string name="title_alert_no_intenet">no intenet</string>
-    <string name="msg_alert_no_internet">please check your intenet connection</string>
+    <string name="no_google_playservice_available">No google playservice available</string>
+    <string name="title_alert_no_intenet">No intenet</string>
+    <string name="msg_alert_no_internet">Please check your intenet connection</string>
     <string name="btn_label_refresh">Refresh</string>
-    <string name="permission_denied_explanation">permission denied. please allow permissions</string>
+    <string name="permission_denied_explanation">Permission denied. Please allow permissions</string>
     <string name="settings">Go to Settings</string>
     <string name="leaves_available">Available Leaves</string>
-    <string name="leave_request_status">Leave Request Status</string>
+    <string name="leave_request_status">Leave Request Status for</string>
     <string name="cannotcheckout">Please Check In first</string>
     <string name="error">Error submitting the form. Please try again!</string>
     <string name="realtime_tracking">Realtime Tracking</string>
@@ -119,5 +119,18 @@
     <string name="stop_tracking">Stop Tracking</string>
     <string name="select_mode_of_transport">Select Mode of Transport</string>
     <string name="resume_tracking">Resume Tracking</string>
+    <string name="view_details">View Details</string>
+    <string name="week_off">Week Off</string>
+    <string name="select_branch">Select Branch</string>
+    <string name="please_select">Please Select</string>
+    <string name="please_select_branch">Please select the branch to proceed</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
+    <string name="onhold">On Hold</string>
+    <string name="out_of_office_range">You are out of range of the office</string>
+    <string name="unabletogetlocation">We are unable to get the location</string>
+    <string name="accepted">Accepted</string>
+    <string name="rejected">Rejected</string>
+    <string name="putonhold">Put On Hold</string>
 
 </resources>

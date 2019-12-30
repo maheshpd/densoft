@@ -6,33 +6,34 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.adapter.QuickActionsAdapter;
 import com.densoftinfotech.densoftpaysmart.adapter.SalarySlipAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
 import com.densoftinfotech.densoftpaysmart.app_utilities.SnapHelperOneByOne;
-import com.densoftinfotech.densoftpaysmart.classes.QuickActions;
-import com.densoftinfotech.densoftpaysmart.classes.QuickActionsArray;
-import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.model.QuickActions;
+import com.densoftinfotech.densoftpaysmart.model.QuickActionsArray;
+import com.densoftinfotech.densoftpaysmart.model.SalarySlip;
+import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
-import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -107,15 +108,23 @@ public class MainActivity extends CommonActivity {
             Constants.staffid = staffDetails.getStaffId();
             tv_name.setText(" " + staffDetails.getPName());
             tv_title.setText(staffDetails.getCompanyName());
-            get_salary_data(staffDetails.getStaffId());
 
             if (staffDetails.getStaffPhoto() != null && !staffDetails.getStaffPhoto().trim().equals("")) {
                 Picasso.with(MainActivity.this).load(staffDetails.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
             }
         }
 
+        if(InternetUtils.getInstance(MainActivity.this).available()){
+            if(staffDetails!=null){
+                get_salary_data(staffDetails.getStaffId());
+                add_loader1();
+            }
 
-        add_loader1();
+        }else{
+            Toast.makeText(MainActivity.this, getResources().getString(R.string.msg_alert_no_internet), Toast.LENGTH_SHORT).show();
+        }
+
+
         /*GetRoomData getRoomData = new GetRoomData();
         getRoomData.execute();*/
 
@@ -214,7 +223,7 @@ public class MainActivity extends CommonActivity {
 
 
                     } else {
-
+                        dismiss_loader1();
                     }
                 }
             }
@@ -243,16 +252,18 @@ public class MainActivity extends CommonActivity {
                 startActivity(iattendance);
                 break;
             case R.mipmap.travel_claims:
-                Intent itravel = new Intent(MainActivity.this, TravelClaimsActivity.class);
-                startActivity(itravel);
                 break;
             case R.mipmap.leaves:
                 Intent ileave = new Intent(MainActivity.this, LeaveListActivity.class);
                 startActivity(ileave);
                 break;
             case R.mipmap.team:
-                /*Intent iteam = new Intent(MainActivity.this, TeamActivity.class);
-                startActivity(iteam);*/
+                Intent iteam = new Intent(MainActivity.this, TeamActivity.class);
+                startActivity(iteam);
+                break;
+            case R.mipmap.map_marker:
+                Intent itravel = new Intent(MainActivity.this, LiveTrackingActivity.class);
+                startActivity(itravel);
                 break;
         }
     }
@@ -312,6 +323,19 @@ public class MainActivity extends CommonActivity {
     private void dismiss_loader1() {
         if (progressDialog != null) {
             progressDialog.dismiss();
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_VOLUME_UP){
+            Toast.makeText(MainActivity.this, " Pressed Volume Up", Toast.LENGTH_SHORT).show();
+            return true;
+        }else if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
+            Toast.makeText(MainActivity.this, " Pressed Volume Down", Toast.LENGTH_SHORT).show();
+            return true;
+        }else {
+            return super.onKeyDown(keyCode, event);
         }
     }
 }

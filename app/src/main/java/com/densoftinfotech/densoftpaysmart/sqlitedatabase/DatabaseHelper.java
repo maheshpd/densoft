@@ -5,12 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
-import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
-import com.densoftinfotech.densoftpaysmart.classes.NotificationReceived;
+import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
+import com.densoftinfotech.densoftpaysmart.model.NotificationReceived;
 
 import org.json.JSONException;
 import org.json.JSONObject;

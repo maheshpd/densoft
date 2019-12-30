@@ -2,8 +2,7 @@ package com.densoftinfotech.densoftpaysmart.app_utilities;
 
 import android.text.format.DateFormat;
 
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
-import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
+import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -14,6 +13,7 @@ public class Constants {
     public static String channel_description = "densoftinfotech_2000";
     public static String ip = "api.densoftinfotech.in";
     //public static String ip = "demo.paysmart.net.in";
+    //public static String ip = "physio.paysmart.net.in";
     public static String db_name = "densoftpaysmart";
     public static final String table_staff_details = "table_staff_details";
     public static String staffid = "";

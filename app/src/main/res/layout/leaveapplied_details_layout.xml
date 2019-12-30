@@ -16,7 +16,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Name"
+            android:text="Paid Leave (PL)"
             android:textAlignment="center"
             android:padding="10dp"
             android:textColor="@color/black"/>
@@ -25,8 +25,8 @@
             android:id="@+id/tv_balance_leave"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="01"
+            android:layout_weight="0.8"
+            android:text="2019-11-18"
             android:textAlignment="center"
             android:padding="10dp"
             android:textColor="@color/black"/>
@@ -35,8 +35,8 @@
             android:id="@+id/tv_takenleave"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="01"
+            android:layout_weight="0.8"
+            android:text="2019-11-18"
             android:textAlignment="center"
             android:padding="10dp"
             android:textColor="@color/black"/>
@@ -45,8 +45,8 @@
             android:id="@+id/tv_totalassigned"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="01"
+            android:layout_weight="0.4"
+            android:text="3.0"
             android:textAlignment="center"
             android:padding="10dp"
             android:textColor="@color/black"/>
@@ -56,7 +56,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="01"
+            android:text="Waiting"
             android:textAlignment="center"
             android:padding="10dp"
             android:textColor="@color/black"/>

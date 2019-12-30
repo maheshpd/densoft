@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.R;
-import com.densoftinfotech.densoftpaysmart.classes.NotificationReceived;
+import com.densoftinfotech.densoftpaysmart.model.NotificationReceived;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.squareup.picasso.Picasso;
 

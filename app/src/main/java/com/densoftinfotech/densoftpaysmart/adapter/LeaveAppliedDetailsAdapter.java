@@ -8,9 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.R;
-import com.densoftinfotech.densoftpaysmart.classes.LeaveAppliedDetails;
-
-import org.w3c.dom.Text;
+import com.densoftinfotech.densoftpaysmart.model.LeaveAppliedDetails;
 
 import java.util.ArrayList;
 

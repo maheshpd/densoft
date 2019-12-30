@@ -1,18 +1,25 @@
 package com.densoftinfotech.densoftpaysmart.adapter;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.densoftinfotech.densoftpaysmart.PlannerActivityv1;
 import com.densoftinfotech.densoftpaysmart.R;
-import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.model.CalendarDetails;
 
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,6 +65,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.GONE);
             holder.linear_holidayname.setVisibility(View.GONE);
             holder.linear_overtime.setVisibility(View.GONE);
+
         } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("2")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.lateby));
             holder.linear_absent.setVisibility(View.GONE);
@@ -67,6 +75,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.VISIBLE);
             holder.linear_holidayname.setVisibility(View.GONE);
             holder.linear_overtime.setVisibility(View.GONE);
+
         } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("3")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.weekoff_holiday));
             holder.linear_absent.setVisibility(View.GONE);
@@ -76,6 +85,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.GONE);
             holder.linear_holidayname.setVisibility(View.VISIBLE);
             holder.linear_overtime.setVisibility(View.GONE);
+
         } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("4")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.workdone_onholiday));
             holder.linear_absent.setVisibility(View.GONE);
@@ -85,6 +95,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.GONE);
             holder.linear_holidayname.setVisibility(View.VISIBLE);
             holder.linear_overtime.setVisibility(View.GONE);
+
         } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("5")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.takenleave));
             holder.linear_absent.setVisibility(View.GONE);
@@ -94,6 +105,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.GONE);
             holder.linear_holidayname.setVisibility(View.VISIBLE);
             holder.linear_overtime.setVisibility(View.GONE);
+
         } else if (calendarDetails.get(position).getStatus().equalsIgnoreCase("6")) {
             holder.tv_status.setBackgroundColor(context.getResources().getColor(R.color.overtime));
             holder.linear_absent.setVisibility(View.GONE);
@@ -103,6 +115,7 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             holder.linear_lateby.setVisibility(View.GONE);
             holder.linear_holidayname.setVisibility(View.GONE);
             holder.linear_overtime.setVisibility(View.VISIBLE);
+
         }
     }
 
@@ -128,12 +141,21 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
         @BindView(R.id.linear_lateby)
         LinearLayout linear_lateby;
 
-        TextView tv_absent, tv_intime, tv_outtime, tv_lateby, tv_working_hours, tv_holiday_name, tv_overtime, tv_status;
+        @BindView(R.id.linearlayout_one)
+        LinearLayout linearlayout_one;
+        @BindView(R.id.linearlayout_two)
+        LinearLayout linearlayout_two;
+
+        TextView tv_viewdetails, tv_status, tv_cdate, tv_absent, tv_intime, tv_outtime, tv_lateby, tv_working_hours, tv_holiday_name, tv_overtime;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);
+
+            tv_viewdetails = itemView.findViewById(R.id.tv_viewdetails);
+            tv_status = itemView.findViewById(R.id.tv_status);
+            tv_cdate = itemView.findViewById(R.id.tv_cdate);
 
             tv_absent = itemView.findViewById(R.id.tv_absent);
             tv_intime = itemView.findViewById(R.id.tv_intime);
@@ -142,20 +164,26 @@ public class CalendarDetailsAdapter extends RecyclerView.Adapter<CalendarDetails
             tv_working_hours = itemView.findViewById(R.id.tv_working_hours);
             tv_holiday_name = itemView.findViewById(R.id.tv_holiday_name);
             tv_overtime = itemView.findViewById(R.id.tv_overtime);
-            tv_status = itemView.findViewById(R.id.tv_status);
         }
     }
 
     private void setdata(MyViewHolder holder, int position, int i) {
-
-        holder.tv_status.setText("" + i);
-        holder.tv_intime.setText(": " + calendarDetails.get(position).getInTime());
-        holder.tv_outtime.setText(": " + calendarDetails.get(position).getOutTime());
-        holder.tv_lateby.setText(": " + calendarDetails.get(position).getLateBy());
-        holder.tv_working_hours.setText(": " + calendarDetails.get(position).getWorkingHour());
-        holder.tv_holiday_name.setText("" + calendarDetails.get(position).getHoliDayName());
-        holder.tv_overtime.setText(": " + calendarDetails.get(position).getOutTime());
-
+        holder.tv_cdate.setText("" + i);
+        /*if(calendarDetails.get(position).getStatus().equalsIgnoreCase("3") && !calendarDetails.get(position).getWeekOff().trim().equals("")){
+            holder.tv_viewdetails.setText("" + "Week Off");
+        }else{
+            holder.tv_viewdetails.setText(""+ context.getResources().getString(R.string.view_details));
+        }*/
+        if(calendarDetails.get(position).getStatus().equalsIgnoreCase("3") && !calendarDetails.get(position).getWeekOff().trim().equals("")){
+            holder.tv_holiday_name.setText("" + context.getResources().getString(R.string.week_off));
+        }else{
+            holder.tv_intime.setText(": " + calendarDetails.get(position).getInTime());
+            holder.tv_outtime.setText(": " + calendarDetails.get(position).getOutTime());
+            holder.tv_lateby.setText(": " + calendarDetails.get(position).getLateBy());
+            holder.tv_working_hours.setText(": " + calendarDetails.get(position).getWorkingHour());
+            holder.tv_holiday_name.setText("" + calendarDetails.get(position).getHoliDayName());
+            holder.tv_overtime.setText(": " + calendarDetails.get(position).getOutTime());
+        }
     }
 }
 

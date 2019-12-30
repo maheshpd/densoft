@@ -15,11 +15,10 @@ import com.densoftinfotech.densoftpaysmart.adapter.MonthAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.URLS;
-import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.model.SalarySlip;
+import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
-import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 
 import org.json.JSONObject;
 
@@ -91,12 +90,12 @@ public class SalarySlipDetailsActivity extends CommonActivity {
             if (b != null) {
                 if (b.containsKey("monthpos")) {
                     //gotoselection_showslip(String.valueOf(b.getInt("monthpos")), String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
-                    getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), b.getInt("monthpos"));
+                    getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), b.getInt("monthpos"));
                     // if option is selected from the card view of Main Activity
                 }
             } else {
                 if (staffDetails != null) {
-                    getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), staffDetails.getStaffId(), -1);
+                    getset_spinner_data(Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]), -1);
                     // if option is selected from Quick Actions
                 }
             }
@@ -110,7 +109,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
                 "&year=" + year + "&StaffId=" + Constants.staffid + "&mText=" + get_monthName(Integer.parseInt(month_number)));
     }
 
-    private void getset_spinner_data(int year_of_joining, String staffid, int monthpos) {
+    private void getset_spinner_data(int year_of_joining, int monthpos) {
 
         for (int i = year_of_joining; i <= Calendar.getInstance().get(Calendar.YEAR); i++) {
             years.add(i);

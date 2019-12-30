@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
-import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
+import com.densoftinfotech.densoftpaysmart.model.CalendarDetails;
 
 import java.util.ArrayList;
 import java.util.Calendar;

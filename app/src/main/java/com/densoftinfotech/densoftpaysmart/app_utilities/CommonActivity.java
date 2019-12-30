@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.densoftinfotech.densoftpaysmart.R;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -36,9 +36,6 @@ public class CommonActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState, persistentState);
     }
 
-    public void getsharedpref(Context context) {
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-    }
 
     public void toolbar_common() {
         ButterKnife.bind(this);
@@ -107,7 +104,7 @@ public class CommonActivity extends AppCompatActivity {
         }
     }
 
-    public void add_loader() {
+    public void add_loader(Context context) {
 
         if (!((Activity) context).isFinishing()) {
             progressDialog = ProgressDialog.show(context, "Loading", "Please wait...");

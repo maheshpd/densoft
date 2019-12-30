@@ -13,7 +13,7 @@ import android.util.Log;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
-import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
+import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -143,9 +143,11 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
         c.put(DatabaseHelper.SAVEDTIME, DateUtils.getSqliteTime());
         DatabaseHelper.getInstance(this).save_location(c, staffid);
         //Log.d("update ", DatabaseHelper.getInstance(this).get_LiveLocationUpdate(staffid) + "");
+
+        /*//uncomment to add realtime update of location to firebase
         if (!staffid.trim().equals("") && !company_name.trim().equals("")) {
             add_live_updates_to_firebase(userLocation, staffid, company_name);
-        }
+        }*/
     }
 
     @Override
@@ -167,7 +169,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
                     FirebaseLiveLocation firebaseLiveLocation = dataSnapshot.getValue(FirebaseLiveLocation.class);
 
-                    if(firebaseLiveLocation!=null && (firebaseLiveLocation.getAllow_tracking() == 1)){
+                    if (firebaseLiveLocation != null && (firebaseLiveLocation.getAllow_tracking() == 1)) {
                         Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
                         firebaseLiveLocationMap.put("staff_id", staffid);
                         firebaseLiveLocationMap.put("latitude", String.valueOf(userLocation.getLatitude()));

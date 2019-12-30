@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.LeaveApplicationActivity;
 import com.densoftinfotech.densoftpaysmart.R;
-import com.densoftinfotech.densoftpaysmart.classes.LeaveDetails;
+import com.densoftinfotech.densoftpaysmart.model.LeaveDetails;
 
 import java.util.ArrayList;
 

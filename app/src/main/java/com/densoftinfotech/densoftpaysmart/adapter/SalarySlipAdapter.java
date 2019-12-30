@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.SalarySlipDetailsActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
-import com.densoftinfotech.densoftpaysmart.classes.SalarySlip;
+import com.densoftinfotech.densoftpaysmart.model.SalarySlip;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;

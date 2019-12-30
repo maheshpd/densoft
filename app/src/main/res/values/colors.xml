@@ -97,5 +97,13 @@
     <color name="icon_color_leaves">#7D00C5</color>
     <color name="icon_color_team">#D95200</color>
 
+    <color name="light_green">#F5FBF5</color>
+    <color name="light_red">#FEF5F5</color>
+    <color name="light_yellow">#FEF8E7</color>
+
+    <color name="dark_green">#39A937</color>
+    <color name="dark_red">#DD3030</color>
+    <color name="dark_yellow">#FFC200</color>
+
 
 </resources>

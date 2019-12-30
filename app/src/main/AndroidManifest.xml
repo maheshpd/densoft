@@ -18,8 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".GoogleMapActivity"></activity>
-        <activity android:name=".TravelClaimsActivity" />
+        <activity android:name=".TeamActivity"></activity>
+        <activity android:name=".HolidayPlannerActivity" />
+        <activity android:name=".GoogleMapActivity" />
+        <activity android:name=".LiveTrackingActivity" />
         <activity android:name=".NotificationActivity" />
         <activity android:name=".LeaveListActivity" />
         <activity android:name=".PlannerActivityv1" />
@@ -51,9 +53,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <service android:name=".location_utilities.LocationMonitoringService"
-            android:enabled="true"/>
+        <service
+            android:name=".location_utilities.LocationMonitoringService"
+            android:enabled="true" />
 
         <activity android:name=".MarkAttendanceActivity" />
         <activity

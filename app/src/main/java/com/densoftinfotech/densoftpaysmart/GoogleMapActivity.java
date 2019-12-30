@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,24 +18,20 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
-import com.densoftinfotech.densoftpaysmart.classes.FirebaseLiveLocation;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
+import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
 import com.densoftinfotech.densoftpaysmart.location_utilities.DirectionJSONParser;
-import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -44,18 +39,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.ui.IconGenerator;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -71,16 +62,14 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
     GoogleMap googlemap;
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference;
-    ArrayList<FirebaseLiveLocation> firebaseLiveLocations = new ArrayList<>();
     Button btn_search;
     ImageView search, cancel;
     AutoCompleteTextView actv_search;
-    ArrayList<String>firebaseList_search = new ArrayList<>();
-    ArrayAdapter<String>adapter_search;
-    ArrayList<FirebaseLiveLocation> datasetFilter = new ArrayList<>();
+    ArrayList<String> firebaseList_search = new ArrayList<>();
+    ArrayAdapter<String> adapter_search;
     SharedPreferences preferences;
 
-    Marker marker;
+    HashMap<String, MarkerOptions> markerMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,10 +85,9 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
         preferences = PreferenceManager.getDefaultSharedPreferences(GoogleMapActivity.this);
 
-        if(preferences.contains("company_name")) {
-            databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + preferences.getString("company_name", ""));
+        if (preferences.contains("company_name")) {
+            databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + preferences.getString("company_name", "").replace(".", ""));
         }
-
 
     }
 
@@ -113,6 +101,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
     private void live_tracking(GoogleMap googlemap) {
 
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -120,48 +109,24 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                 IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
                 googlemap.clear();
                 firebaseList_search.clear();
-                firebaseLiveLocations.clear();
-                datasetFilter.clear();
                 if (dataSnapshot.exists()) {
                     LatLng latLng_office = new LatLng(19.0175853, 72.830392);
                     LatLng latLng1;
                     //markerpoints.add(latLng_office);
-                    addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng_office);
+                    addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng_office, "Admin");
                     googlemap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng_office, 16.0f));
 
                     for (DataSnapshot children : dataSnapshot.getChildren()) {
                         FirebaseLiveLocation firebaseLiveLocation = children.getValue(FirebaseLiveLocation.class);
-                        firebaseLiveLocations.add(firebaseLiveLocation);
-                        datasetFilter.add(firebaseLiveLocation);
-                        firebaseList_search.add(firebaseLiveLocation.getStaff_name() + " (Staff id: " + firebaseLiveLocation.getStaff_id() +")");
-                        if (firebaseLiveLocation != null) {
+                        firebaseList_search.add(firebaseLiveLocation.getStaff_name() + " (Staff id: " + firebaseLiveLocation.getStaff_id() + ")");
+                        //if (firebaseLiveLocation != null && firebaseLiveLocation.getAllow_tracking()==1) {
                             //Log.d("datasnapshot child ", " " + firebaseLiveLocation.getLatitude() + "  " + firebaseLiveLocation.getLongitude());
 
                             latLng1 = new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude()));
                             //markerpoints.add(latLng1);
 
-                            if (marker == null) {
-                                Location location1 = new Location("");
-                                location1.setLatitude(19.0175853);
-                                location1.setLongitude(72.830392);
-                                Location location2 = new Location("");
-                                location2.setLatitude(Double.parseDouble(firebaseLiveLocation.getLatitude()));
-                                location2.setLongitude(Double.parseDouble(firebaseLiveLocation.getLongitude()));
-                                float distanceInMeters = location1.distanceTo(location2);
-                                int speedIs10MetersPerMinute = 100;
-                                float estimatedDriveTimeInMinutes = distanceInMeters / speedIs10MetersPerMinute;
-                                addIcon(googlemap, iconFactory, firebaseLiveLocation.getStaff_id() + "\nEstimated distance ="+(distanceInMeters/1000) +"km"+ "\nEstimated time ="+estimatedDriveTimeInMinutes+"mins", firebaseLiveLocation.getStaff_name(), new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude())));
-
-                            } else {
-                                marker.setPosition(latLng1);
-                                marker.remove();
-                            }
-
-
-
-
-                            draw_routes(latLng_office, latLng1, firebaseLiveLocation.getTransport_mode());
-                        }
+                            draw_routes(latLng_office, latLng1, firebaseLiveLocation.getTransport_mode(), firebaseLiveLocation.getStaff_id());
+                        //}
                     }
 
                     autocomplete(googlemap);
@@ -178,20 +143,29 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         });
     }
 
-    private void draw_routes(LatLng origin, LatLng dest, String mode_transport) {
-        String url = getDirectionsUrl(origin, dest, mode_transport);
+    private void draw_routes(LatLng origin, LatLng dest, String mode_transport, String staff_id) {
 
-        DownloadTask downloadTask = new DownloadTask();
-        downloadTask.execute(url);
+        if(InternetUtils.getInstance(GoogleMapActivity.this).available()) {
+            String url = getDirectionsUrl(origin, dest, mode_transport);
+
+            DownloadTask downloadTask = new DownloadTask(staff_id);
+            downloadTask.execute(url);
+        }else{
+            Toast.makeText(GoogleMapActivity.this, getResources().getString(R.string.msg_alert_no_internet), Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void addIcon(GoogleMap googleMap, IconGenerator iconFactory, String staff_id, String staff_name, LatLng latLng) {
-        MarkerOptions markerOptions = new MarkerOptions().
-                icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(staff_id, staff_name))).
-                position(latLng).
-                anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+    private void addIcon(GoogleMap googleMap, IconGenerator iconFactory, String text, String staff_name, LatLng latLng, String staff_id) {
 
-        googleMap.addMarker(markerOptions);
+        if(!staff_id.equalsIgnoreCase("Admin")) {
+            MarkerOptions markerOptions = new MarkerOptions().
+                    icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(text, staff_name))).
+                    position(latLng).
+                    anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+
+            markerMap.put(staff_id, markerOptions);
+            googleMap.addMarker(markerOptions);
+        }
 
     }
 
@@ -219,7 +193,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         return returnedBitmap;
     }
 
-    private void autocomplete(final GoogleMap googleMap){
+    private void autocomplete(final GoogleMap googleMap) {
         actv_search = findViewById(R.id.actv_search);
         adapter_search = new ArrayAdapter<String>(GoogleMapActivity.this, R.layout.autocomplete_layout, R.id.actv_text, firebaseList_search);
         actv_search.setThreshold(0);
@@ -277,9 +251,9 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                if(dataSnapshot.exists()) {
+                if (dataSnapshot.exists()) {
                     FirebaseLiveLocation fll = dataSnapshot.getValue(FirebaseLiveLocation.class);
-                    if(fll!=null) {
+                    if (fll != null) {
                         LatLng latLng = new LatLng(Double.parseDouble(fll.getLatitude()), Double.parseDouble(fll.getLongitude()));
                         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -295,34 +269,36 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
     }
 
-    private String getDirectionsUrl(LatLng origin,LatLng dest, String mode_transport){
+    private String getDirectionsUrl(LatLng origin, LatLng dest, String mode_transport) {
 
         // Origin of route
-        String str_origin = "origin="+origin.latitude+","+origin.longitude;
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
         // Destination of route
-        String str_dest = "destination="+dest.latitude+","+dest.longitude;
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
         // Sensor enabled
         String sensor = "sensor=false";
-        String key = "key="+getResources().getString(R.string.map_api_key);
+        String key = "key=" + getResources().getString(R.string.map_api_key);
 
         // Building the parameters to the web service
-        String parameters = str_origin+"&"+str_dest+"&"+key+"&"+sensor+"&"+"mode="+mode_transport;
+        String parameters = str_origin + "&" + str_dest + "&" + key + "&" + sensor + "&" + "mode=" + mode_transport;
 
         // Output format
         String output = "json";
 
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/"+output+"?"+parameters;
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
 
         return url;
     }
 
-    /** A method to download json data from url */
+    /**
+     * A method to download json data from url
+     */
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
-        try{
+        try {
             URL url = new URL(strUrl);
 
             // Creating an http connection to communicate with url
@@ -336,10 +312,10 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
 
-            StringBuffer sb  = new StringBuffer();
+            StringBuffer sb = new StringBuffer();
 
             String line = "";
-            while( ( line = br.readLine())  != null){
+            while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
 
@@ -347,9 +323,9 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
             br.close();
 
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.d("Exception url", e.toString());
-        }finally{
+        } finally {
             iStream.close();
             urlConnection.disconnect();
         }
@@ -357,7 +333,13 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     // Fetches data from url passed
-    private class DownloadTask extends AsyncTask<String, Void, String>{
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        String staff_id = "";
+
+        public DownloadTask(String staff_id) {
+            this.staff_id = staff_id;
+        }
 
         // Downloading data in non-ui thread
         @Override
@@ -367,11 +349,11 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
             String data = "";
 
-            try{
+            try {
                 // Fetching the data from web service
                 data = downloadUrl(url[0]);
-            }catch(Exception e){
-                Log.d("Background Task",e.toString());
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
             }
             return data;
         }
@@ -382,14 +364,20 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            ParserTask parserTask = new ParserTask();
+            ParserTask parserTask = new ParserTask(staff_id);
 
             // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
         }
     }
 
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,String>>> >{
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        String staff_id = "";
+
+        public ParserTask(String staff_id) {
+            this.staff_id = staff_id;
+        }
 
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
@@ -397,13 +385,40 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
             JSONObject jObject;
             List<List<HashMap<String, String>>> routes = null;
 
-            try{
+            try {
                 jObject = new JSONObject(jsonData[0]);
                 DirectionJSONParser parser = new DirectionJSONParser();
                 routes = parser.parse(jObject);
 
+                String distance_duration = parser.getDirectionPolylines(jObject);
+
+                Log.d("distance duration ", distance_duration + "");
+
+                databaseReference.child(staff_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+
+                            IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
+                            FirebaseLiveLocation firebaseLiveLocation = dataSnapshot.getValue(FirebaseLiveLocation.class);
+                            if (firebaseLiveLocation != null) {
+                                addIcon(googlemap, iconFactory, firebaseLiveLocation.getStaff_id() + "\nEstimated distance = " + distance_duration.split(",")[0] + "\nEstimated time = "
+                                                + distance_duration.split(",")[1],
+                                        firebaseLiveLocation.getStaff_name(), new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude())),
+                                        firebaseLiveLocation.getStaff_id());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
                 //Log.d("line options ", jsonData[0] + " routes " + routes + "");
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return routes;
@@ -416,7 +431,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
             PolylineOptions lineOptions = null;
 
             // Traversing through all the routes
-            for(int i=0;i<result.size();i++){
+            for (int i = 0; i < result.size(); i++) {
                 points = new ArrayList<LatLng>();
                 lineOptions = new PolylineOptions();
 
@@ -424,8 +439,8 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                 List<HashMap<String, String>> path = result.get(i);
 
                 // Fetching all the points in i-th route
-                for(int j=0;j<path.size();j++){
-                    HashMap<String,String> point = path.get(j);
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
 
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
@@ -443,10 +458,46 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
             // Drawing polyline in the Google Map for the i-th route
 
-            if(lineOptions!=null) {
+            if (lineOptions != null) {
                 googlemap.addPolyline(lineOptions);
             }
         }
     }
+
+    /*private void update_marker(GoogleMap googleMap, String id, double lat, double lng, String route_direct) {
+
+        LatLng ll = null;
+
+        if (markerMap.containsKey(id) && marker!=null) {
+
+            // Update the location.
+            marker = markerMap.get(id);
+            marker.remove();
+            markerMap.remove(id); //added
+
+            ll = new LatLng(lat, lng);
+            if (lat != 0 && lng != 0 && !route_direct.isEmpty()) {
+                MarkerOptions markerOpt = new MarkerOptions()
+                        .title(route_direct).position(ll).visible(true);
+                marker = googleMap.addMarker(markerOpt);
+                markerMap.put(id, marker); //added
+
+            }
+
+        } else {
+
+            ll = new LatLng(lat, lng);
+            if (lat != 0 && lng != 0 && !route_direct.isEmpty()) {
+                MarkerOptions markerOpt = new MarkerOptions()
+                        .title(route_direct).position(ll).visible(true);
+                marker = googleMap.addMarker(markerOpt);
+                markerMap.put(id, marker);
+
+            }
+
+        }
+
+    }*/
+
 
 }

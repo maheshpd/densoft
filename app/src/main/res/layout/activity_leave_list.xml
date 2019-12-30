@@ -105,16 +105,44 @@
                 android:layout_height="wrap_content"
                 tools:listitem="@layout/leave_layout" />
 
-            <TextView
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/leave_request_status"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/colorPrimaryDark"
-                android:padding="5dp"
-                android:textAlignment="center"
-                android:background="@drawable/textview_unselected"
-                android:layout_marginTop="5dp"/>
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:id="@+id/tv_leavestatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/leave_request_status"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:textAlignment="center"
+                    android:background="@drawable/textview_unselected"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"/>
+
+                <Spinner
+                    android:id="@+id/spinner_month"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="5dp"
+                    android:layout_gravity="center"/>
+
+                <Spinner
+                    android:id="@+id/spinner_year"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="5dp"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -136,7 +164,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
+                    android:layout_weight="0.8"
                     android:padding="10dp"
                     android:text="Date (From)"
                     android:textAlignment="center"
@@ -146,7 +174,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
+                    android:layout_weight="0.8"
                     android:padding="10dp"
                     android:text="Date (To)"
                     android:textAlignment="center"
@@ -156,7 +184,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
+                    android:layout_weight="0.4"
                     android:padding="10dp"
                     android:text="@string/days"
                     android:textAlignment="center"

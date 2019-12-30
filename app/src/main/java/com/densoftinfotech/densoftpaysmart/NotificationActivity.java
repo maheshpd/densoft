@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import com.densoftinfotech.densoftpaysmart.adapter.NotificationAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
-import com.densoftinfotech.densoftpaysmart.classes.NotificationReceived;
+import com.densoftinfotech.densoftpaysmart.model.NotificationReceived;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 
 import java.util.ArrayList;

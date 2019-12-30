@@ -19,21 +19,25 @@ import com.densoftinfotech.densoftpaysmart.adapter.MarkAttendanceAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
-import com.densoftinfotech.densoftpaysmart.classes.CheckLeaveStatus;
-import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
-import com.densoftinfotech.densoftpaysmart.classes.StaffDetails;
+import com.densoftinfotech.densoftpaysmart.model.BranchDetails;
+import com.densoftinfotech.densoftpaysmart.model.CheckLeaveStatus;
+import com.densoftinfotech.densoftpaysmart.model.MarkAttendanceDetails;
+import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.densoftinfotech.densoftpaysmart.room_database.Staff.StaffDetailsRoom;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
 
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,6 +71,8 @@ public class MarkAttendanceActivity extends CommonActivity {
     Spinner spinner_month;
     @BindView(R.id.spinner_year)
     Spinner spinner_year;
+    @BindView(R.id.spinner_branch)
+    Spinner spinner;
 
     private UserLocation userLocation;
     private int year_of_joining = 2000;
@@ -94,6 +100,10 @@ public class MarkAttendanceActivity extends CommonActivity {
 
     private StaffDetails staffDetails;
 
+    ArrayList<BranchDetails> branchDetails = new ArrayList<>();
+    ArrayAdapter<BranchDetails> arrayAdapter_branch;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,7 +122,7 @@ public class MarkAttendanceActivity extends CommonActivity {
         if (b != null) {
             if (b.containsKey("planner_month") && b.containsKey("planner_year")) {
                 getset_spinner_data(Integer.parseInt(b.getString("planner_year", "")), Integer.parseInt(b.getString("planner_month", "")), Constants.staffid, 0);
-                get_monthandyear(Constants.staffid, b.getString("planner_month", ""), b.getString("planner_year", ""));
+                get_monthandyear(b.getString("planner_month", ""), b.getString("planner_year", ""));
 
             }
         } else {
@@ -120,7 +130,7 @@ public class MarkAttendanceActivity extends CommonActivity {
             get_attendance.execute();
         }
 
-        layoutManager = new LinearLayoutManager(MarkAttendanceActivity.this, LinearLayoutManager.VERTICAL, true);
+        layoutManager = new LinearLayoutManager(MarkAttendanceActivity.this, LinearLayoutManager.VERTICAL, false);
         recycler_view_markattendance.setLayoutManager(layoutManager);
 
     }
@@ -143,7 +153,51 @@ public class MarkAttendanceActivity extends CommonActivity {
         }
     }
 
-    private void get_attendance_details(String staffid, String month_send, String year_send) {
+    private void get_branches() {
+        Retrofit retrofit = RetrofitClient.getRetrofit();
+        getServiceInterface = retrofit.create(GetServiceInterface.class);
+        Map<String, Object> params = new HashMap<>();
+        params.put("StaffId", preferences.getString("staffid", ""));
+        params.put("customerid", preferences.getString("customerid", ""));
+        JSONObject obj = new JSONObject(params);
+        Log.d("params ", obj + "");
+
+        RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (obj).toString());
+
+        Call<ArrayList<BranchDetails>> call = getServiceInterface.request_branch_details(requestBody);
+        call.enqueue(new Callback<ArrayList<BranchDetails>>() {
+            @Override
+            public void onResponse(Call<ArrayList<BranchDetails>> call, Response<ArrayList<BranchDetails>> response) {
+                if (!response.isSuccessful()) {
+                    //Log.d("response code ", response.code() + " ");
+                } else {
+                    //Log.d("response ", response.body() + "");
+
+                    if (response.body() != null && !response.body().isEmpty()) {
+                        branchDetails = response.body();
+                        BranchDetails badd = new BranchDetails();
+                        badd.setBranchId("-1");
+                        badd.setName(getResources().getString(R.string.please_select));
+                        branchDetails.add(badd);
+                        Collections.reverse(branchDetails);
+                        arrayAdapter_branch = new ArrayAdapter<BranchDetails>(MarkAttendanceActivity.this, R.layout.custom_spinnerlayout, R.id.text1, branchDetails);
+                        spinner.setAdapter(arrayAdapter_branch);
+
+                    } else {
+                        linearLayout11.setVisibility(View.GONE);
+                        recycler_view_markattendance.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<BranchDetails>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void get_attendance_details(String month_send, String year_send) {
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
         getServiceInterface = retrofit.create(GetServiceInterface.class);
@@ -151,7 +205,7 @@ public class MarkAttendanceActivity extends CommonActivity {
 
         params.put("customerid", preferences.getString("customerid", ""));
         params.put("ActionId", "0");
-        params.put("StaffId", staffid);
+        params.put("StaffId", preferences.getString("staffid", ""));
         params.put("Month", month_send);
         params.put("Year", year_send);
 
@@ -173,6 +227,7 @@ public class MarkAttendanceActivity extends CommonActivity {
                         linearLayout11.setVisibility(View.VISIBLE);
                         recycler_view_markattendance.setVisibility(View.VISIBLE);
                         markAttendanceDetails = response.body();
+                        Collections.reverse(markAttendanceDetails);
                         markAttendanceAdapter = new MarkAttendanceAdapter(MarkAttendanceActivity.this, markAttendanceDetails);
                         recycler_view_markattendance.setAdapter(markAttendanceAdapter);
                     } else {
@@ -188,12 +243,15 @@ public class MarkAttendanceActivity extends CommonActivity {
             }
         });
 
+        get_branches();
+
     }
 
     private void send_checkIn_checkOut(int flag) {
 
         //{"UserID":"50", "lag":"19", "logi":"72", "Mobile":"", "address":"", "CustomerId":0}
 
+        markAttendanceDetails.clear();
         userLocation = new UserLocation(MarkAttendanceActivity.this);
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
@@ -206,7 +264,7 @@ public class MarkAttendanceActivity extends CommonActivity {
         params.put("logi", userLocation.getLongitude());
         params.put("Mobile", staffDetails.getMobile1());
         params.put("address", userLocation.getAddress());
-        params.put("CustomerId", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getString("customerid", ""));
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(params)).toString());
         Call<ArrayList<CheckLeaveStatus>> call;
@@ -280,31 +338,91 @@ public class MarkAttendanceActivity extends CommonActivity {
             case R.id.menu_checkin:
 
                 if (check_param_ok()) {
-                    if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(0)) {
-                        if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
-                            send_checkIn_checkOut(0);
+
+                    if (branchDetails != null && branchDetails.size() > 0) {
+                        if (!branchDetails.get(spinner.getSelectedItemPosition()).getName().equalsIgnoreCase(getResources().getString(R.string.please_select))) {
+
+                            if(!branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("") && !branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("")){
+                                LatLng lat1 = new LatLng(Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().replace("°", "").replace("N", "")
+                                        .replace("E", "").replace("W", "").replace("S", "").trim()/*"19.0595"*/),
+                                        Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLongitude().replace("°", "").replace("N", "")
+                                                .replace("E", "").replace("W", "").replace("S", "").trim()/*"72.8343"*/));
+
+                                LatLng lat2 = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+
+                                if (distanceBetween(lat1, lat2)) {
+                                    Log.d("true ", "distance <= 500 ");
+                                    if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(0)) {
+                                        if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
+                                            send_checkIn_checkOut(0);
+                                        } else {
+                                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkin_once), Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+                                    Log.d("true ", "distance > 500 ");
+                                    Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.out_of_office_range), Toast.LENGTH_SHORT).show();
+                                }
+                            }else {
+                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.unabletogetlocation), Toast.LENGTH_SHORT).show();
+                            }
+
                         } else {
-                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.please_select_branch), Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkin_once), Toast.LENGTH_LONG).show();
+                        Toast.makeText(MarkAttendanceActivity.this, "Error Checking In", Toast.LENGTH_SHORT).show();
                     }
+
+
                 }
                 break;
             case R.id.menu_checkout:
+
+
                 if (check_param_ok()) {
-                    if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(1)) {
-                        if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
-                            if(DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(2)) {
-                                send_checkIn_checkOut(1);
-                            }else{
-                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.cannotcheckout), Toast.LENGTH_SHORT).show();
+                    if (branchDetails != null && branchDetails.size() > 0) {
+                        if (!branchDetails.get(spinner.getSelectedItemPosition()).getName().equalsIgnoreCase(getResources().getString(R.string.please_select))) {
+
+                            if(!branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("") && !branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("")){
+                                LatLng lat1 = new LatLng(Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().replace("°", "").replace("N", "")
+                                        .replace("E", "").replace("W", "").replace("S", "").trim()/*"19.0595"*/),
+                                        Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLongitude().replace("°", "").replace("N", "")
+                                                .replace("E", "").replace("W", "").replace("S", "").trim()/*"72.8343"*/));
+
+                                LatLng lat2 = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+
+                                if (distanceBetween(lat1, lat2)) {
+                                    Log.d("true ", "distance <= 500 ");
+                                    if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(1)) {
+                                        if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
+                                            if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(2)) {
+                                                send_checkIn_checkOut(1);
+                                            } else {
+                                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.cannotcheckout), Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkout_once), Toast.LENGTH_LONG).show();
+                                    }
+                                }else {
+                                    Log.d("true ", "distance > 500 ");
+                                    Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.out_of_office_range), Toast.LENGTH_SHORT).show();
+                                }
+                            }else {
+                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.unabletogetlocation), Toast.LENGTH_SHORT).show();
                             }
+
                         } else {
-                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.please_select_branch), Toast.LENGTH_SHORT).show();
                         }
+
                     } else {
-                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkout_once), Toast.LENGTH_LONG).show();
+                        Toast.makeText(MarkAttendanceActivity.this, "Error Checking Out", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -322,7 +440,7 @@ public class MarkAttendanceActivity extends CommonActivity {
 
             StaffDetailsRoom staffDetails = Paysmart_roomdatabase.get_PaysmartDatabase(MarkAttendanceActivity.this).staffDetails_dao().getAll();
 
-            if (staffDetails != null) {
+            if (staffDetails != null && spinner != null) {
                 //get_attendance_details(staffDetails.getStaffId(), voids[0]);
                 year_of_joining = Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]);
 
@@ -358,7 +476,7 @@ public class MarkAttendanceActivity extends CommonActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                 month = spinner_month.getItemAtPosition(i).toString();
-                get_monthandyear(staffid, month, year);
+                get_monthandyear(month, year);
 
             }
 
@@ -372,7 +490,7 @@ public class MarkAttendanceActivity extends CommonActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 year = spinner_year.getItemAtPosition(i).toString();
-                get_monthandyear(staffid, month, year);
+                get_monthandyear(month, year);
             }
 
             @Override
@@ -382,7 +500,7 @@ public class MarkAttendanceActivity extends CommonActivity {
         });
     }
 
-    private void get_monthandyear(String staffid, String month, String year1) {
+    private void get_monthandyear(String month, String year1) {
 
         if (year.equals("")) {
             year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
@@ -393,7 +511,7 @@ public class MarkAttendanceActivity extends CommonActivity {
         if (month.equals("")) {
             month = String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
         }
-        get_attendance_details(staffid, get_monthNumber(month), year);
+        get_attendance_details(get_monthNumber(month), year);
 
     }
 
@@ -406,5 +524,14 @@ public class MarkAttendanceActivity extends CommonActivity {
         } else {
             Log.d("validity ", DatabaseHelper.getInstance(MarkAttendanceActivity.this).check_sqliteDate() + " " + Constants.today_date);
         }
+    }
+
+    public static boolean distanceBetween(LatLng point1, LatLng point2) {
+        if (point1 == null || point2 == null) {
+            return false;
+        }
+        double distance = SphericalUtil.computeDistanceBetween(point1, point2);
+        Log.d("true ", "distance is " + distance);
+        return distance <= 500.0;
     }
 }

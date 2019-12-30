@@ -1,14 +1,13 @@
 package com.densoftinfotech.densoftpaysmart.location_utilities;
 
-import com.densoftinfotech.densoftpaysmart.classes.LegsObject;
-import com.densoftinfotech.densoftpaysmart.classes.PolylineObject;
-import com.densoftinfotech.densoftpaysmart.classes.RouteObject;
-import com.densoftinfotech.densoftpaysmart.classes.StepsObject;
+import com.densoftinfotech.densoftpaysmart.model.DistanceObject;
+import com.densoftinfotech.densoftpaysmart.model.DurationObject;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,40 +24,43 @@ public class DirectionJSONParser {
      This method must produce a Route object that contains a Leg object for each leg found in the JSON response.
      Each Leg object must contain a LatLng point for each point in each step of the leg.
       */
-    /** Receives a JSONObject and returns a list of lists containing latitude and longitude */
-    public List<List<HashMap<String,String>>> parse(JSONObject jObject){
 
-        List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String,String>>>() ;
+    /**
+     * Receives a JSONObject and returns a list of lists containing latitude and longitude
+     */
+    public List<List<HashMap<String, String>>> parse(JSONObject jObject) {
+
+        List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String, String>>>();
         JSONArray jRoutes = null;
         JSONArray jLegs = null;
         JSONArray jSteps = null;
-        ArrayList<String> directions = new ArrayList<String>();
+        //ArrayList<String> directions = new ArrayList<String>();
 
         try {
 
             jRoutes = jObject.getJSONArray("routes");
 
             /** Traversing all routes */
-            for(int i=0;i<jRoutes.length();i++){
-                jLegs = ( (JSONObject)jRoutes.get(i)).getJSONArray("legs");
+            for (int i = 0; i < jRoutes.length(); i++) {
+                jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
                 List path = new ArrayList<HashMap<String, String>>();
 
                 /** Traversing all legs */
-                for(int j=0;j<jLegs.length();j++){
-                    jSteps = ( (JSONObject)jLegs.get(j)).getJSONArray("steps");
+                for (int j = 0; j < jLegs.length(); j++) {
+                    jSteps = ((JSONObject) jLegs.get(j)).getJSONArray("steps");
 
                     /** Traversing all steps */
-                    for(int k=0;k<jSteps.length();k++){
+                    for (int k = 0; k < jSteps.length(); k++) {
                         String polyline = "";
                         //directions.add();
-                        polyline = (String)((JSONObject)((JSONObject)jSteps.get(k)).get("polyline")).get("points");
+                        polyline = (String) ((JSONObject) ((JSONObject) jSteps.get(k)).get("polyline")).get("points");
                         List<LatLng> list = decodePoly(polyline);
 
                         /** Traversing all points */
-                        for(int l=0;l<list.size();l++){
+                        for (int l = 0; l < list.size(); l++) {
                             HashMap<String, String> hm = new HashMap<String, String>();
-                            hm.put("lat", Double.toString(list.get(l).latitude) );
-                            hm.put("lng", Double.toString(list.get(l).longitude) );
+                            hm.put("lat", Double.toString(list.get(l).latitude));
+                            hm.put("lng", Double.toString(list.get(l).longitude));
                             path.add(hm);
                         }
                     }
@@ -68,7 +70,7 @@ public class DirectionJSONParser {
 
         } catch (JSONException e) {
             e.printStackTrace();
-        }catch (Exception e){
+        } catch (Exception e) {
         }
         return routes;
     }
@@ -76,7 +78,7 @@ public class DirectionJSONParser {
     /**
      * Method to decode polyline points
      * Courtesy : jeffreysambells.com/2010/05/27/decoding-polylines-from-google-maps-direction-api-with-java
-     * */
+     */
     private List<LatLng> decodePoly(String encoded) {
 
         List<LatLng> poly = new ArrayList<LatLng>();
@@ -110,31 +112,33 @@ public class DirectionJSONParser {
         return poly;
     }
 
-    private List<LatLng> getDirectionPolylines(List<RouteObject> routes){
-        List<LatLng> directionList = new ArrayList<LatLng>();
-        for(RouteObject route : routes){
-            List<LegsObject> legs = route.getLegs();
-            for(LegsObject leg : legs){
-                /*String routeDistance = leg.getDistance().getText();
-                String routeDuration = leg.getDuration().getText();
-                setRouteDistanceAndDuration(routeDistance, routeDuration);*/
-                List<StepsObject> steps = leg.getSteps();
-                for(StepsObject step : steps){
-                    PolylineObject polyline = step.getPolyline();
-                    String points = polyline.getPoints();
-                    List<LatLng> singlePolyline = decodePoly(points);
-                    for (LatLng direction : singlePolyline){
-                        directionList.add(direction);
-                    }
-                }
+    public String getDirectionPolylines(JSONObject jObject) {
+        StringBuilder distance_duration = new StringBuilder();
+        JSONArray jRoutes = null;
+        JSONArray jLegs = null;
+
+
+        try {
+
+            jRoutes = jObject.getJSONArray("routes");
+
+            /** Traversing all routes */
+            for (int i = 0; i < jRoutes.length(); i++) {
+                jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
+
+                DistanceObject object = new DistanceObject(Objects.requireNonNull(jLegs.optJSONObject(i).optJSONObject("distance")));
+                distance_duration.append(object.getText()).append(",");
+
+                DurationObject object1 = new DurationObject(Objects.requireNonNull(jLegs.optJSONObject(i).optJSONObject("duration")));
+                distance_duration.append(object1.getText());
+
             }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
         }
-        return directionList;
-    }
 
-    private void getDistance(String distance, String duration){
-        /*distanceValue.setText(distance);
-        durationValue.setText(duration);*/
+        return distance_duration.toString();
     }
-
 }

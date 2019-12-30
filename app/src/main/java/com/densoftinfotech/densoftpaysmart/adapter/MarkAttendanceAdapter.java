@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.densoftinfotech.densoftpaysmart.R;
-import com.densoftinfotech.densoftpaysmart.classes.MarkAttendanceDetails;
+import com.densoftinfotech.densoftpaysmart.model.MarkAttendanceDetails;
 
 import java.util.ArrayList;
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragments.MyPlannerFragment">
+    tools:context=".PlannerActivityv1">
 
     <include
         layout="@layout/toolbar"/>
@@ -18,10 +18,11 @@
         android:fitsSystemWindows="false"
         android:focusableInTouchMode="true">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/constraintlayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/iv_history"
@@ -32,15 +33,10 @@
                 android:drawableRight="@drawable/history"
                 android:drawablePadding="5dp"
                 android:text="Check History"
-                app:layout_constraintBottom_toTopOf="@+id/custom_calendar"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.958"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:gravity="center"
+                android:layout_gravity="end"
                 android:textColor="@color/blue2"/>
 
-            <com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView
+            <com.densoftinfotech.densoftpaysmart.CalendarCustomView
                 android:id="@+id/custom_calendar"
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
@@ -48,30 +44,21 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_marginBottom="5dp"
-                app:layout_constraintBottom_toTopOf="@id/view"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                android:layout_marginBottom="5dp">
 
-            </com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView>
+            </com.densoftinfotech.densoftpaysmart.CalendarCustomView>
 
             <View
                 android:id="@+id/view"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/blue"
-                app:layout_constraintBottom_toTopOf="@+id/linear1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:background="@color/blue"/>
 
             <LinearLayout
                 android:id="@+id/linear1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/view"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -195,13 +182,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/linear1"
-                tools:listitem="@layout/calendar_details_layout" />
+                tools:listitem="@layout/calendar_details_layout"/>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </ScrollView>
 

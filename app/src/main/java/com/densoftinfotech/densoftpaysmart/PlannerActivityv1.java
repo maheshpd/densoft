@@ -1,7 +1,5 @@
 package com.densoftinfotech.densoftpaysmart;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,8 +15,7 @@ import android.widget.TextView;
 import com.densoftinfotech.densoftpaysmart.adapter.CalendarDetailsAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
-import com.densoftinfotech.densoftpaysmart.classes.CalendarCustomView;
-import com.densoftinfotech.densoftpaysmart.classes.CalendarDetails;
+import com.densoftinfotech.densoftpaysmart.model.CalendarDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
 import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
@@ -33,6 +30,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import androidx.core.view.ViewCompat;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
@@ -96,7 +94,7 @@ public class PlannerActivityv1 extends CommonActivity {
             }
         });
 
-        add_loader();
+        add_loader(PlannerActivityv1.this);
 
         Calendar mCal = (Calendar) cal.clone();
         mCal.add(Calendar.MONTH, 1);
@@ -107,9 +105,6 @@ public class PlannerActivityv1 extends CommonActivity {
             GetRoomData getRoomData = new GetRoomData();
             getRoomData.execute(String.valueOf(mCal.get(Calendar.MONTH)));
         }
-
-
-
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -189,16 +184,19 @@ public class PlannerActivityv1 extends CommonActivity {
                     if (response.body() != null && !response.body().isEmpty()) {
                         calendarDetails = response.body();
 
-                        Collections.reverse(calendarDetails);
+                        //Collections.reverse(calendarDetails);
 
                         calendarDetailsAdapter = new CalendarDetailsAdapter(PlannerActivityv1.this, calendarDetails);
                         recyclerview_planner.setAdapter(calendarDetailsAdapter);
                         dismiss_loader();
 
+                    }else{
+                        dismiss_loader();
                     }
 
                 }else{
                     Log.d("response code ", response.code() + " ");
+                    dismiss_loader();
                 }
             }
 
