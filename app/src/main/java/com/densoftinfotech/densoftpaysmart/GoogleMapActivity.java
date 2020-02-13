@@ -161,6 +161,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
     private void addIcon(GoogleMap googleMap, IconGenerator iconFactory, String text, String staff_name, LatLng latLng, String staff_id) {
 
         //if(!staff_id.equalsIgnoreCase("Admin")) {
+
             MarkerOptions markerOptions = new MarkerOptions().
                     icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(text, staff_name))).
                     position(latLng).
