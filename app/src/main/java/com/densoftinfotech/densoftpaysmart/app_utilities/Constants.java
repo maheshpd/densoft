@@ -38,4 +38,7 @@ public class Constants {
     public static final double current_loc_latitude = 19.0175853;
     public static final double current_loc_longitude = 72.830392;
 
+
+    public static String delete_constant_staffid = "";
+
 }

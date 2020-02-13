@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.adapter.CalendarDetailsAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
@@ -63,7 +64,7 @@ public class PlannerActivityv1 extends CommonActivity {
     private Calendar cal = Calendar.getInstance(Locale.ENGLISH);
     private SharedPreferences preferences;
 
-    private int month = Calendar.getInstance().get(Calendar.MONTH)+1;
+    private int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
     private int year = Calendar.getInstance().get(Calendar.YEAR);
 
     @Override
@@ -100,10 +101,10 @@ public class PlannerActivityv1 extends CommonActivity {
         mCal.add(Calendar.MONTH, 1);
         if (mCal.get(Calendar.MONTH) == 0) {
             GetRoomData getRoomData = new GetRoomData();
-            getRoomData.execute(String.valueOf(12));
+            getRoomData.execute(String.valueOf(12), String.valueOf(year));
         } else {
             GetRoomData getRoomData = new GetRoomData();
-            getRoomData.execute(String.valueOf(mCal.get(Calendar.MONTH)));
+            getRoomData.execute(String.valueOf(mCal.get(Calendar.MONTH)), String.valueOf(year));
         }
     }
 
@@ -111,38 +112,42 @@ public class PlannerActivityv1 extends CommonActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             //Log.d("recvd value ", "in Plannerv1");
-            if (intent.hasExtra("status_month")) {
-                month = intent.getIntExtra("status_month", 0);
-                //Log.d("month by broadcast ", month + " PlannerV1Activity");
 
-                if (month == 0) {
-                    month = 12;
-                    GetRoomData getRoomData = new GetRoomData();
-                    getRoomData.execute(String.valueOf(12));
-                } else {
-                    GetRoomData getRoomData = new GetRoomData();
-                    getRoomData.execute(String.valueOf(month));
-                }
-
-            } else if (intent.hasExtra("scrolltoposition")) {
-                //recyclerview.getLayoutManager().smoothScrollToPosition(recyclerview, new RecyclerView.State(), intent.getIntExtra("scrolltoposition", 0));
-                int scrollpos = intent.getIntExtra("scrolltoposition", 0) - Constants.count_before_firstpos;
-
-                Log.d("scroll to ",  + scrollpos + "");
-
-                LinearSmoothScroller smoothScroller = new LinearSmoothScroller(PlannerActivityv1.this) {
-                    @Override
-                    protected int getVerticalSnapPreference() {
-                        return LinearSmoothScroller.SNAP_TO_START;
+            if (intent.getExtras() != null) {
+                if (intent.getExtras().containsKey("status_month")) {
+                    month = intent.getExtras().getInt("status_month", 0);
+                    //Log.d("month by broadcast ", month + " PlannerV1Activity");
+                    if (intent.getExtras().containsKey("status_year")) {
+                        year = intent.getExtras().getInt("status_year", 2020);
                     }
-                };
+                    if (month == 0) {
+                        month = 12;
+                        GetRoomData getRoomData = new GetRoomData();
+                        getRoomData.execute(String.valueOf(12), String.valueOf(year));
+                    } else {
+                        GetRoomData getRoomData = new GetRoomData();
+                        getRoomData.execute(String.valueOf(month), String.valueOf(year));
+                    }
 
-                smoothScroller.setTargetPosition(scrollpos);  // pos on which item you want to scroll recycler view
-                recyclerview_planner.getLayoutManager().startSmoothScroll(smoothScroller);
+
+                } else if (intent.getExtras().containsKey("scrolltoposition")) {
+                    //recyclerview.getLayoutManager().smoothScrollToPosition(recyclerview, new RecyclerView.State(), intent.getIntExtra("scrolltoposition", 0));
+                    int scrollpos = intent.getIntExtra("scrolltoposition", 0) - Constants.count_before_firstpos;
+
+                    Log.d("scroll to ", +scrollpos + "");
+
+                    LinearSmoothScroller smoothScroller = new LinearSmoothScroller(PlannerActivityv1.this) {
+                        @Override
+                        protected int getVerticalSnapPreference() {
+                            return LinearSmoothScroller.SNAP_TO_START;
+                        }
+                    };
+
+                    smoothScroller.setTargetPosition(scrollpos);  // pos on which item you want to scroll recycler view
+                    recyclerview_planner.getLayoutManager().startSmoothScroll(smoothScroller);
+                }
             }
-            if(intent.hasExtra("status_year")){
-                year = intent.getIntExtra("status_year",2019);
-            }
+
         }
     };
 
@@ -151,14 +156,14 @@ public class PlannerActivityv1 extends CommonActivity {
         protected Void doInBackground(String... voids) {
             staffDetailsRoom = Paysmart_roomdatabase.get_PaysmartDatabase(PlannerActivityv1.this).staffDetails_dao().getAll();
             if (staffDetailsRoom != null) {
-                get_attendance_details(staffDetailsRoom.getStaffId(), voids[0]);
+                get_attendance_details(staffDetailsRoom.getStaffId(), voids[0], voids[1]);
                 Constants.staffid = staffDetailsRoom.getStaffId();
             }
             return null;
         }
     }
 
-    private void get_attendance_details(String staffid, String month_send) {
+    private void get_attendance_details(String staffid, String month_send, String year) {
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
         getServiceInterface = retrofit.create(GetServiceInterface.class);
@@ -169,7 +174,7 @@ public class PlannerActivityv1 extends CommonActivity {
         params.put("ActionId", "1");
         params.put("StaffId", staffid);
         params.put("Month", String.valueOf(month_send));
-        params.put("Year", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+        params.put("Year", year);
 
         JSONObject obj = new JSONObject(params);
         Log.d("params ", obj + "");
@@ -190,11 +195,11 @@ public class PlannerActivityv1 extends CommonActivity {
                         recyclerview_planner.setAdapter(calendarDetailsAdapter);
                         dismiss_loader();
 
-                    }else{
+                    } else {
                         dismiss_loader();
                     }
 
-                }else{
+                } else {
                     Log.d("response code ", response.code() + " ");
                     dismiss_loader();
                 }
@@ -202,7 +207,9 @@ public class PlannerActivityv1 extends CommonActivity {
 
             @Override
             public void onFailure(Call<ArrayList<CalendarDetails>> call, Throwable t) {
-
+                Log.d("error ", t.getMessage());
+                Toast.makeText(PlannerActivityv1.this, "Please try again in sometime.", Toast.LENGTH_SHORT).show();
+                dismiss_loader();
             }
         });
 
@@ -214,7 +221,11 @@ public class PlannerActivityv1 extends CommonActivity {
         unregisterReceiver(broadcastReceiver);
 
         super.onDestroy();
+
     }
+
+
+
 
 
 }

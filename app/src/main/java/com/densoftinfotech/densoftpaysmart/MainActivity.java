@@ -155,9 +155,17 @@ public class MainActivity extends CommonActivity {
         layoutManager_quickaction = new GridLayoutManager(this, 3);
         recycler_view_quickactions.setLayoutManager(layoutManager_quickaction);
 
-        for (int i = 0; i < QuickActionsArray.names.length; i++) {
+        quickActions.add(new QuickActions("Salary Details", R.mipmap.salary_details));
+        quickActions.add(new QuickActions("Planner", R.mipmap.planner));
+        quickActions.add(new QuickActions("Attendance History", R.mipmap.attendance_history));
+        //quickActions.add(new QuickActions("Travel Claims", R.mipmap.travel_claims));
+        quickActions.add(new QuickActions("Leaves", R.mipmap.leaves));
+        quickActions.add(new QuickActions("Team", R.mipmap.team));
+        quickActions.add(new QuickActions("Live Tracking", R.mipmap.map_marker));
+
+        /*for (int i = 0; i < QuickActionsArray.names.length; i++) {
             quickActions.add(new QuickActions(QuickActionsArray.names[i], QuickActionsArray.image[i]));
-        }
+        }*/
 
         quickActionsAdapter = new QuickActionsAdapter(MainActivity.this, quickActions);
         recycler_view_quickactions.setAdapter(quickActionsAdapter);

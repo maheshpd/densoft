@@ -471,6 +471,20 @@ public class LiveTrackingActivity extends CommonActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.google_map, menu);
+
+        MenuItem item = menu.getItem(0);
+
+        if (sharedPreferences != null && sharedPreferences.contains("deletestaffid")) {
+            if (sharedPreferences.getString("deletestaffid", "").equalsIgnoreCase("5448")) {
+                item.setVisible(true);
+            } else {
+                item.setVisible(false);
+            }
+        }else {
+            item.setVisible(false);
+        }
+
+
         return true;
 
     }

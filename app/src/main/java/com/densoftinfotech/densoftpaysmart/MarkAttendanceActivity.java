@@ -73,6 +73,8 @@ public class MarkAttendanceActivity extends CommonActivity {
     Spinner spinner_year;
     @BindView(R.id.spinner_branch)
     Spinner spinner;
+    @BindView(R.id.tv_selectbranch)
+    TextView tv_selectbranch;
 
     private UserLocation userLocation;
     private int year_of_joining = 2000;
@@ -102,6 +104,8 @@ public class MarkAttendanceActivity extends CommonActivity {
 
     ArrayList<BranchDetails> branchDetails = new ArrayList<>();
     ArrayAdapter<BranchDetails> arrayAdapter_branch;
+
+    int flag_no_branch = 0;
 
 
     @Override
@@ -175,13 +179,23 @@ public class MarkAttendanceActivity extends CommonActivity {
 
                     if (response.body() != null && !response.body().isEmpty()) {
                         branchDetails = response.body();
-                        BranchDetails badd = new BranchDetails();
-                        badd.setBranchId("-1");
-                        badd.setName(getResources().getString(R.string.please_select));
-                        branchDetails.add(badd);
-                        Collections.reverse(branchDetails);
-                        arrayAdapter_branch = new ArrayAdapter<BranchDetails>(MarkAttendanceActivity.this, R.layout.custom_spinnerlayout, R.id.text1, branchDetails);
-                        spinner.setAdapter(arrayAdapter_branch);
+
+                        if(branchDetails.get(0).getColumn1().equalsIgnoreCase("Without Location")){
+                            spinner.setVisibility(View.GONE);
+                            tv_selectbranch.setVisibility(View.GONE);
+                            flag_no_branch = 1;
+                        }else{
+                            flag_no_branch = 0;
+                            spinner.setVisibility(View.VISIBLE);
+                            tv_selectbranch.setVisibility(View.VISIBLE);
+                            BranchDetails badd = new BranchDetails();
+                            badd.setBranchId("-1");
+                            badd.setName(getResources().getString(R.string.please_select));
+                            branchDetails.add(badd);
+                            Collections.reverse(branchDetails);
+                            arrayAdapter_branch = new ArrayAdapter<BranchDetails>(MarkAttendanceActivity.this, R.layout.custom_spinnerlayout, R.id.text1, branchDetails);
+                            spinner.setAdapter(arrayAdapter_branch);
+                        }
 
                     } else {
                         linearLayout11.setVisibility(View.GONE);
@@ -339,90 +353,116 @@ public class MarkAttendanceActivity extends CommonActivity {
 
                 if (check_param_ok()) {
 
-                    if (branchDetails != null && branchDetails.size() > 0) {
-                        if (!branchDetails.get(spinner.getSelectedItemPosition()).getName().equalsIgnoreCase(getResources().getString(R.string.please_select))) {
+                    if(flag_no_branch == 1){
+                        if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(0)) {
+                            if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
+                                send_checkIn_checkOut(0);
+                            } else {
+                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkin_once), Toast.LENGTH_LONG).show();
+                        }
+                    }else{
+                        if (branchDetails != null && branchDetails.size() > 0) {
+                            if (!branchDetails.get(spinner.getSelectedItemPosition()).getName().equalsIgnoreCase(getResources().getString(R.string.please_select))) {
 
-                            if(!branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("") && !branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("")){
-                                LatLng lat1 = new LatLng(Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().replace("°", "").replace("N", "")
-                                        .replace("E", "").replace("W", "").replace("S", "").trim()/*"19.0595"*/),
-                                        Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLongitude().replace("°", "").replace("N", "")
-                                                .replace("E", "").replace("W", "").replace("S", "").trim()/*"72.8343"*/));
+                                if(!branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("") && !branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("")){
+                                    LatLng lat1 = new LatLng(Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().replace("°", "").replace("N", "")
+                                            .replace("E", "").replace("W", "").replace("S", "").trim()/*"19.0595"*/),
+                                            Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLongitude().replace("°", "").replace("N", "")
+                                                    .replace("E", "").replace("W", "").replace("S", "").trim()/*"72.8343"*/));
 
-                                LatLng lat2 = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+                                    LatLng lat2 = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
 
-                                if (distanceBetween(lat1, lat2)) {
-                                    Log.d("true ", "distance <= 500 ");
-                                    if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(0)) {
-                                        if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
-                                            send_checkIn_checkOut(0);
+                                    if (distanceBetween(lat1, lat2)) {
+                                        Log.d("true ", "distance <= 500 ");
+                                        if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(0)) {
+                                            if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
+                                                send_checkIn_checkOut(0);
+                                            } else {
+                                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                                            }
                                         } else {
-                                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkin_once), Toast.LENGTH_LONG).show();
                                         }
                                     } else {
-                                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkin_once), Toast.LENGTH_LONG).show();
+                                        Log.d("true ", "distance > 500 ");
+                                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.out_of_office_range), Toast.LENGTH_SHORT).show();
                                     }
-                                } else {
-                                    Log.d("true ", "distance > 500 ");
-                                    Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.out_of_office_range), Toast.LENGTH_SHORT).show();
+                                }else {
+                                    Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.unabletogetlocation), Toast.LENGTH_SHORT).show();
                                 }
-                            }else {
-                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.unabletogetlocation), Toast.LENGTH_SHORT).show();
+
+                            } else {
+                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.please_select_branch), Toast.LENGTH_SHORT).show();
                             }
-
                         } else {
-                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.please_select_branch), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MarkAttendanceActivity.this, "Error Checking In", Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Toast.makeText(MarkAttendanceActivity.this, "Error Checking In", Toast.LENGTH_SHORT).show();
                     }
-
-
                 }
                 break;
             case R.id.menu_checkout:
 
-
                 if (check_param_ok()) {
-                    if (branchDetails != null && branchDetails.size() > 0) {
-                        if (!branchDetails.get(spinner.getSelectedItemPosition()).getName().equalsIgnoreCase(getResources().getString(R.string.please_select))) {
 
-                            if(!branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("") && !branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("")){
-                                LatLng lat1 = new LatLng(Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().replace("°", "").replace("N", "")
-                                        .replace("E", "").replace("W", "").replace("S", "").trim()/*"19.0595"*/),
-                                        Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLongitude().replace("°", "").replace("N", "")
-                                                .replace("E", "").replace("W", "").replace("S", "").trim()/*"72.8343"*/));
+                    if(flag_no_branch == 1){
+                        if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(1)) {
+                            if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
+                                if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(2)) {
+                                    send_checkIn_checkOut(1);
+                                } else {
+                                    Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.cannotcheckout), Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkout_once), Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        if (branchDetails != null && branchDetails.size() > 0) {
+                            if (!branchDetails.get(spinner.getSelectedItemPosition()).getName().equalsIgnoreCase(getResources().getString(R.string.please_select))) {
 
-                                LatLng lat2 = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+                                if(!branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("") && !branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().equals("")){
+                                    LatLng lat1 = new LatLng(Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLatitude().replace("°", "").replace("N", "")
+                                            .replace("E", "").replace("W", "").replace("S", "").trim()/*"19.0595"*/),
+                                            Double.parseDouble(branchDetails.get(spinner.getSelectedItemPosition()).getLongitude().replace("°", "").replace("N", "")
+                                                    .replace("E", "").replace("W", "").replace("S", "").trim()/*"72.8343"*/));
 
-                                if (distanceBetween(lat1, lat2)) {
-                                    Log.d("true ", "distance <= 500 ");
-                                    if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(1)) {
-                                        if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
-                                            if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(2)) {
-                                                send_checkIn_checkOut(1);
+                                    LatLng lat2 = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+
+                                    if (distanceBetween(lat1, lat2)) {
+                                        Log.d("true ", "distance <= 500 ");
+                                        if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(1)) {
+                                            if (month_short[spinner_month.getSelectedItemPosition()].equalsIgnoreCase(get_monthName(Calendar.getInstance().get(Calendar.MONTH) + 1))) {
+                                                if (DatabaseHelper.getInstance(MarkAttendanceActivity.this).allow_check(2)) {
+                                                    send_checkIn_checkOut(1);
+                                                } else {
+                                                    Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.cannotcheckout), Toast.LENGTH_SHORT).show();
+                                                }
                                             } else {
-                                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.cannotcheckout), Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
                                             }
                                         } else {
-                                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.selectcurrentmonth), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkout_once), Toast.LENGTH_LONG).show();
                                         }
-                                    } else {
-                                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.checkout_once), Toast.LENGTH_LONG).show();
+                                    }else {
+                                        Log.d("true ", "distance > 500 ");
+                                        Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.out_of_office_range), Toast.LENGTH_SHORT).show();
                                     }
                                 }else {
-                                    Log.d("true ", "distance > 500 ");
-                                    Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.out_of_office_range), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.unabletogetlocation), Toast.LENGTH_SHORT).show();
                                 }
-                            }else {
-                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.unabletogetlocation), Toast.LENGTH_SHORT).show();
+
+                            } else {
+                                Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.please_select_branch), Toast.LENGTH_SHORT).show();
                             }
 
                         } else {
-                            Toast.makeText(MarkAttendanceActivity.this, getResources().getString(R.string.please_select_branch), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MarkAttendanceActivity.this, "Error Checking Out", Toast.LENGTH_SHORT).show();
                         }
-
-                    } else {
-                        Toast.makeText(MarkAttendanceActivity.this, "Error Checking Out", Toast.LENGTH_SHORT).show();
                     }
                 }
 

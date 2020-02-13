@@ -231,6 +231,7 @@ public class CalendarCustomView extends LinearLayout {
         Intent intent = new Intent("notifyrecycler");
         intent.putExtra("status_month", mCal.get(Calendar.MONTH));
         intent.putExtra("status_year", mCal.get(Calendar.YEAR));
+        Log.d("month ", mCal.get(Calendar.MONTH) + " year " + mCal.get(Calendar.YEAR));
         context.sendBroadcast(intent);
 
         String sDate = formatter.format(cal.getTime());

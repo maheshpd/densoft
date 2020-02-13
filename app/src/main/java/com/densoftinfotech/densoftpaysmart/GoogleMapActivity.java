@@ -121,11 +121,13 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                         firebaseList_search.add(firebaseLiveLocation.getStaff_name() + " (Staff id: " + firebaseLiveLocation.getStaff_id() + ")");
                         //if (firebaseLiveLocation != null && firebaseLiveLocation.getAllow_tracking()==1) {
                             //Log.d("datasnapshot child ", " " + firebaseLiveLocation.getLatitude() + "  " + firebaseLiveLocation.getLongitude());
+                            if(!firebaseLiveLocation.getLatitude().trim().equalsIgnoreCase("") && !firebaseLiveLocation.getLongitude().trim().equalsIgnoreCase("")){
+                                latLng1 = new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude()));
+                                //markerpoints.add(latLng1);
 
-                            latLng1 = new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude()));
-                            //markerpoints.add(latLng1);
+                                draw_routes(latLng_office, latLng1, firebaseLiveLocation.getTransport_mode(), firebaseLiveLocation.getStaff_id());
+                            }
 
-                            draw_routes(latLng_office, latLng1, firebaseLiveLocation.getTransport_mode(), firebaseLiveLocation.getStaff_id());
                         //}
                     }
 

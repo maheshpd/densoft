@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
+import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
 import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
@@ -103,6 +104,8 @@ public class LoginActivity extends CommonActivity {
         params.put("password", et_password.getText().toString());
 
         edit.putString("customerid", et_customerid.getText().toString());
+        edit.putString("deletestaffid", et_staffid.getText().toString());
+
 
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(params)).toString());

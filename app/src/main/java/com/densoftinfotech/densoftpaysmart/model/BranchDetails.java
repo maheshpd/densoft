@@ -8,6 +8,7 @@ public class BranchDetails {
     private String Name = "";
     private String Latitude = "";
     private String Longitude = "";
+    private String Column1 = "";
 
     public String getBranchId() {
         return BranchId;
@@ -39,6 +40,14 @@ public class BranchDetails {
 
     public void setLongitude(String longitude) {
         Longitude = longitude;
+    }
+
+    public String getColumn1() {
+        return Column1;
+    }
+
+    public void setColumn1(String column1) {
+        Column1 = column1;
     }
 
     @NonNull
