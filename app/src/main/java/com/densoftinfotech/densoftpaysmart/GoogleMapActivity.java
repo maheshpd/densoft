@@ -110,7 +110,8 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                 googlemap.clear();
                 firebaseList_search.clear();
                 if (dataSnapshot.exists()) {
-                    LatLng latLng_office = new LatLng(19.0175853, 72.830392);
+                    //LatLng latLng_office = new LatLng(19.0175853, 72.830392); - Siddhivinayak
+                    LatLng latLng_office = new LatLng(21.213530, 79.194070);
                     LatLng latLng1;
                     //markerpoints.add(latLng_office);
                     addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng_office, "Admin");
@@ -159,7 +160,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
     private void addIcon(GoogleMap googleMap, IconGenerator iconFactory, String text, String staff_name, LatLng latLng, String staff_id) {
 
-        if(!staff_id.equalsIgnoreCase("Admin")) {
+        //if(!staff_id.equalsIgnoreCase("Admin")) {
             MarkerOptions markerOptions = new MarkerOptions().
                     icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(text, staff_name))).
                     position(latLng).
@@ -167,7 +168,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
             markerMap.put(staff_id, markerOptions);
             googleMap.addMarker(markerOptions);
-        }
+        //}
 
     }
 
