@@ -21,6 +21,6 @@ public interface StaffDetails_Dao {
         void insertAll(StaffDetailsRoom users);
 
         @Query("DELETE FROM table_staff_details where staff_id = :staffid")
-        void delete(String staffid);
+        void delete(int staffid);
 
 }

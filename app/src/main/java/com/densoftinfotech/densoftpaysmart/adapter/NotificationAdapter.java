@@ -49,7 +49,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         if(!notificationList.get(i).getBig_picture().trim().equals("")) {
-            Picasso.with(context)
+            Picasso.get()
                     .load(notificationList.get(i).getBig_picture())
                     .placeholder(R.mipmap.ic_launcher)
                     .error(R.mipmap.ic_launcher)

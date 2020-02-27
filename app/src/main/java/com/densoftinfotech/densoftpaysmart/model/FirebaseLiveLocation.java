@@ -5,20 +5,24 @@ import java.io.Serializable;
 import androidx.annotation.NonNull;
 
 public class FirebaseLiveLocation implements Serializable/* implements ClusterItem*/{
-    private String staff_id = "";
+    private int staff_id = 0;
     private String staff_name = "";
-    private String latitude = "";
-    private String longitude = "";
+    private double latitude = 0;
+    private double longitude = 0;
     private String address = "";
     private String workinghours = "";
     private int allow_tracking = 0;
     private String transport_mode = "";
+    private String photo_url = "";
+    private String estimated_distance = "";
+    private String estimated_time = "";
+    private long timestamp = 0;
 
     public FirebaseLiveLocation(){
 
     }
 
-    public FirebaseLiveLocation(String staff_id, String staff_name, String latitude, String longitude, String address, String workinghours, int allow_tracking, String transport_mode){
+    public FirebaseLiveLocation(int staff_id, String staff_name, double latitude, double longitude, String address, String workinghours, int allow_tracking, String transport_mode, String photo_url, long timestamp) {
         this.staff_id = staff_id;
         this.staff_name = staff_name;
         this.latitude = latitude;
@@ -27,13 +31,16 @@ public class FirebaseLiveLocation implements Serializable/* implements ClusterIt
         this.workinghours = workinghours;
         this.allow_tracking = allow_tracking;
         this.transport_mode = transport_mode;
+        this.photo_url = photo_url;
+        this.timestamp = timestamp;
     }
 
-    public String getStaff_id() {
+
+    public int getStaff_id() {
         return staff_id;
     }
 
-    public void setStaff_id(String staff_id) {
+    public void setStaff_id(int staff_id) {
         this.staff_id = staff_id;
     }
 
@@ -45,19 +52,19 @@ public class FirebaseLiveLocation implements Serializable/* implements ClusterIt
         this.staff_name = staff_name;
     }
 
-    public String getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public String getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(String longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
@@ -93,7 +100,39 @@ public class FirebaseLiveLocation implements Serializable/* implements ClusterIt
         this.transport_mode = transport_mode;
     }
 
-   /*String title = "";
+    public String getPhoto_url() {
+        return photo_url;
+    }
+
+    public void setPhoto_url(String photo_url) {
+        this.photo_url = photo_url;
+    }
+
+    public String getEstimated_distance() {
+        return estimated_distance;
+    }
+
+    public void setEstimated_distance(String estimated_distance) {
+        this.estimated_distance = estimated_distance;
+    }
+
+    public String getEstimated_time() {
+        return estimated_time;
+    }
+
+    public void setEstimated_time(String estimated_time) {
+        this.estimated_time = estimated_time;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /*String title = "";
     LatLng latLng = null;
     String snippet = "";
     public FirebaseLiveLocation(String title, LatLng latLng, String snippet) {

@@ -72,6 +72,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".location_utilities.LocationTrackerService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".LiveTrackingActivityv1"/>
+
+        <activity android:name=".GoogleMapActivityv1"/>
+
+
     </application>
 
 </manifest>

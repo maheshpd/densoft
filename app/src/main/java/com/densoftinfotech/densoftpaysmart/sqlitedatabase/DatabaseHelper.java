@@ -69,11 +69,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(query_notification);
 
         String query_attendance = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTENDANCE + "("
-                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + CHECK_IN_TIME + " TEXT," + CHECK_OUT_TIME + " TEXT," + TODAY_DATE + " TEXT," + SAVEDTIME + " TEXT)";
+                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " INTEGER DEFAULT 0," + CHECK_IN_TIME + " TEXT," + CHECK_OUT_TIME + " TEXT," + TODAY_DATE + " TEXT," + SAVEDTIME + " TEXT)";
         db.execSQL(query_attendance);
 
         String query_liveupdates = "CREATE TABLE IF NOT EXISTS " + TABLE_FIREBASE_LIVE_LOCATION + "("
-                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + STAFF_NAME + " TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT,"
+                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " INTEGER DEFAULT 0," + STAFF_NAME + " TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT,"
                 + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + ALLOW_TRACKING + " INTEGER NOT NULL," + TRANSPORT_MODE + " TEXT," + SAVEDTIME + " TEXT)";
         db.execSQL(query_liveupdates);
     }
@@ -95,7 +95,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = getWritableDatabase();
 
             String query_button = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTENDANCE + "("
-                    + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + CHECK_IN_TIME + " TEXT," + CHECK_OUT_TIME + " TEXT," + TODAY_DATE + " TEXT," + SAVEDTIME + " TEXT)";
+                    + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " INTEGER DEFAULT 0," + CHECK_IN_TIME + " TEXT," + CHECK_OUT_TIME + " TEXT," + TODAY_DATE + " TEXT," + SAVEDTIME + " TEXT)";
             db.execSQL(query_button);
 
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db = getWritableDatabase();
             String query_liveupdates = "CREATE TABLE IF NOT EXISTS " + TABLE_FIREBASE_LIVE_LOCATION + "("
-                    + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " TEXT," + STAFF_NAME + " TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT,"
+                    + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " INTEGER DEFAULT 0," + STAFF_NAME + " TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT,"
                     + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + ALLOW_TRACKING + " INTEGER DEFAULT 0," + TRANSPORT_MODE + " TEXT," + SAVEDTIME + " TEXT)";
             db.execSQL(query_liveupdates);
         } catch (Exception e) {
@@ -133,7 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return index;
     }
 
-    public long save_location(ContentValues c, String staffid) {
+    public long save_location(ContentValues c, int staffid) {
         long index = 0;
         try {
             createtable_location();
@@ -156,7 +156,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return index;
     }
 
-    public long save_time(String staffid, String checkin, String checkout, String today_date) {
+    public long save_time(int staffid, String checkin, String checkout, String today_date) {
         long index = 0;
         createTable_forAttendance();
         SQLiteDatabase db = getWritableDatabase();
@@ -193,7 +193,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return index;
     }
 
-    public void update_time(SQLiteDatabase db, String staffid, String checkin, String checkout, String today_date) {
+    public void update_time(SQLiteDatabase db, int staffid, String checkin, String checkout, String today_date) {
 
         try {
 
@@ -297,7 +297,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    public ArrayList<FirebaseLiveLocation> get_LiveLocationUpdate(String staffid) {
+    public ArrayList<FirebaseLiveLocation> get_LiveLocationUpdate(int staffid) {
         createtable_location();
         ArrayList<FirebaseLiveLocation> list = new ArrayList<FirebaseLiveLocation>();
         try {
@@ -310,7 +310,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     do {
                         JSONObject obj = new JSONObject();
                         try {
-                            obj.put("staff_id", c.getString(1));
+                            obj.put("staff_id", c.getInt(1));
                             obj.put("staff_name", c.getString(2));
                             obj.put("latitude", c.getString(3));
                             obj.put("longitude", c.getString(4));
@@ -319,8 +319,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             obj.put("allow_tracking", c.getInt(8));
                             obj.put("transport_mode", c.getString(9));
                             //Log.d("obj_notification", "obj " + obj.toString());
-                            list.add(new FirebaseLiveLocation(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5), (c.getString(6)+"-"+c.getString(7)), c.getInt(8),
-                                    c.getString(9)));
+                            list.add(new FirebaseLiveLocation(c.getInt(1), c.getString(2), Double.parseDouble(c.getString(3)), Double.parseDouble(c.getString(4)), c.getString(5), (c.getString(6)+"-"+c.getString(7)), c.getInt(8),
+                                    c.getString(9), "", System.currentTimeMillis()));
                         } catch (JSONException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -336,7 +336,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    public String get_latitude(String staffid){
+    public String get_latitude(int staffid){
         createtable_location();
         String latitude = "";
         try {
@@ -359,7 +359,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return latitude;
     }
 
-    public String get_longitude(String staffid){
+    public String get_longitude(int staffid){
         createtable_location();
         String longitude = "";
         try {
@@ -392,7 +392,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteEntry(String table, String staffid)
+    public void deleteEntry(String table, int staffid)
     {
 
         if (table.equals(TABLE_NOTIFICATION)) {

@@ -164,6 +164,8 @@ public class UserLocation extends Service implements LocationListener {
     public double getLatitude(){
         if(location != null){
             latitude = location.getLatitude();
+        }else{
+            latitude = 0;
         }
 
         // return latitude
@@ -176,6 +178,8 @@ public class UserLocation extends Service implements LocationListener {
     public double getLongitude(){
         if(location != null){
             longitude = location.getLongitude();
+        }else{
+            longitude = 0;
         }
 
         // return longitude

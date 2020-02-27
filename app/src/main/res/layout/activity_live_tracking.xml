@@ -71,7 +71,8 @@
         android:textColor="@color/blue2"
         android:background="@drawable/textview_rounded"
         android:padding="10dp"
-        android:layout_margin="20dp"/>
+        android:layout_margin="20dp"
+        android:visibility="gone"/>
 
 
 </LinearLayout>

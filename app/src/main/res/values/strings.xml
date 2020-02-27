@@ -132,5 +132,7 @@
     <string name="accepted">Accepted</string>
     <string name="rejected">Rejected</string>
     <string name="putonhold">Put On Hold</string>
+    <string name="notification_text">Your tracking is live</string>
+    <string name="enable_location">Kindly enable your location for better tracking</string>
 
 </resources>

@@ -103,7 +103,7 @@ public class LoginActivity extends CommonActivity {
         params.put("user", et_staffid.getText().toString());
         params.put("password", et_password.getText().toString());
 
-        edit.putString("customerid", et_customerid.getText().toString());
+        edit.putInt("customerid", Integer.parseInt(et_customerid.getText().toString()));
         edit.putString("deletestaffid", et_staffid.getText().toString());
 
 
@@ -169,7 +169,7 @@ public class LoginActivity extends CommonActivity {
             staffDetailsRoom = new StaffDetailsRoom(staffDetailsArrayList.get(0).getStaffId(), staffDetailsArrayList.get(0).getPName(), staffDetailsArrayList.get(0).getMobile1(), staffDetailsArrayList.get(0).getEmail1(),
                     staffDetailsArrayList.get(0).getGender(), staffDetailsArrayList.get(0).getJoiningDate(), staffDetailsArrayList.get(0).getCompanyName(), staffDetailsArrayList.get(0).getBranchName(),
                     staffDetailsArrayList.get(0).getDepartment(), staffDetailsArrayList.get(0).getDesignation(), staffDetailsArrayList.get(0).getStaffPhoto(), staffDetailsArrayList.get(0).getDomainUrl());
-            edit.putString("staffid", staffDetailsArrayList.get(0).getStaffId());
+            edit.putInt("staffid", staffDetailsArrayList.get(0).getStaffId());
             edit.putString("company_name", staffDetailsArrayList.get(0).getCompanyName());
 
             Paysmart_roomdatabase.get_PaysmartDatabase(LoginActivity.this).staffDetails_dao().insertAll(staffDetailsRoom);

@@ -163,14 +163,14 @@ public class PlannerActivityv1 extends CommonActivity {
         }
     }
 
-    private void get_attendance_details(String staffid, String month_send, String year) {
+    private void get_attendance_details(int staffid, String month_send, String year) {
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
         getServiceInterface = retrofit.create(GetServiceInterface.class);
 
         Map<String, Object> params = new HashMap<>();
 
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
         params.put("ActionId", "1");
         params.put("StaffId", staffid);
         params.put("Month", String.valueOf(month_send));

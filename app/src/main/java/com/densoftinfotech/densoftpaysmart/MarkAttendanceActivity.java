@@ -161,8 +161,8 @@ public class MarkAttendanceActivity extends CommonActivity {
         Retrofit retrofit = RetrofitClient.getRetrofit();
         getServiceInterface = retrofit.create(GetServiceInterface.class);
         Map<String, Object> params = new HashMap<>();
-        params.put("StaffId", preferences.getString("staffid", ""));
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("StaffId", preferences.getInt("staffid", 0));
+        params.put("customerid", preferences.getInt("customerid", 0));
         JSONObject obj = new JSONObject(params);
         Log.d("params ", obj + "");
 
@@ -217,9 +217,9 @@ public class MarkAttendanceActivity extends CommonActivity {
         getServiceInterface = retrofit.create(GetServiceInterface.class);
         Map<String, Object> params = new HashMap<>();
 
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
         params.put("ActionId", "0");
-        params.put("StaffId", preferences.getString("staffid", ""));
+        params.put("StaffId", preferences.getInt("staffid", 0));
         params.put("Month", month_send);
         params.put("Year", year_send);
 
@@ -278,7 +278,7 @@ public class MarkAttendanceActivity extends CommonActivity {
         params.put("logi", userLocation.getLongitude());
         params.put("Mobile", staffDetails.getMobile1());
         params.put("address", userLocation.getAddress());
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(params)).toString());
         Call<ArrayList<CheckLeaveStatus>> call;
@@ -491,7 +491,7 @@ public class MarkAttendanceActivity extends CommonActivity {
         }
     }
 
-    private void getset_spinner_data(int year_of_joining, int month1, String staffid, int flag) {
+    private void getset_spinner_data(int year_of_joining, int month1, int staffid, int flag) {
 
         for (int i = Integer.parseInt(staffDetails.getJoiningDate().split("-")[2]); i <= Calendar.getInstance().get(Calendar.YEAR); i++) {
             years.add(i);

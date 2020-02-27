@@ -19,6 +19,8 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
 import com.densoftinfotech.densoftpaysmart.app_utilities.SnapHelperOneByOne;
+import com.densoftinfotech.densoftpaysmart.location_utilities.LocationMonitoringService;
+import com.densoftinfotech.densoftpaysmart.location_utilities.LocationTrackerService;
 import com.densoftinfotech.densoftpaysmart.model.QuickActions;
 import com.densoftinfotech.densoftpaysmart.model.QuickActionsArray;
 import com.densoftinfotech.densoftpaysmart.model.SalarySlip;
@@ -28,6 +30,8 @@ import com.densoftinfotech.densoftpaysmart.retrofit.RetrofitClient;
 import com.densoftinfotech.densoftpaysmart.room_database.Paysmart_roomdatabase;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.squareup.picasso.Picasso;
@@ -41,6 +45,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -89,6 +94,7 @@ public class MainActivity extends CommonActivity {
     private SharedPreferences.Editor edit;
     private StaffDetails staffDetails;
     private ProgressDialog progressDialog;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,13 +110,15 @@ public class MainActivity extends CommonActivity {
 
         staffDetails = getStaffDetails(MainActivity.this);
 
+        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name + "/" + preferences.getInt("customerid", 0));
+
         if(staffDetails!=null){
             Constants.staffid = staffDetails.getStaffId();
             tv_name.setText(" " + staffDetails.getPName());
             tv_title.setText(staffDetails.getCompanyName());
 
             if (staffDetails.getStaffPhoto() != null && !staffDetails.getStaffPhoto().trim().equals("")) {
-                Picasso.with(MainActivity.this).load(staffDetails.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
+                Picasso.get().load(staffDetails.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
             }
         }
 
@@ -145,6 +153,10 @@ public class MainActivity extends CommonActivity {
         iv_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                Intent stopIntent = new Intent(MainActivity.this, LocationTrackerService.class);
+                stopIntent.setAction("stop");
+                startService(stopIntent);
 
                 Logout_DeleteUser logout_deleteUser = new Logout_DeleteUser();
                 logout_deleteUser.execute();
@@ -189,14 +201,14 @@ public class MainActivity extends CommonActivity {
 
     }
 
-    private void get_salary_data(String staffid) {
+    private void get_salary_data(int staffid) {
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
         getServiceInterface = retrofit.create(GetServiceInterface.class);
 
         Map<String, Object> params = new HashMap<>();
 
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
         params.put("ActionId", "0");
         params.put("StaffId", staffid);
         params.put("Month", 0);
@@ -270,7 +282,7 @@ public class MainActivity extends CommonActivity {
                 startActivity(iteam);
                 break;
             case R.mipmap.map_marker:
-                Intent itravel = new Intent(MainActivity.this, LiveTrackingActivity.class);
+                Intent itravel = new Intent(MainActivity.this, LiveTrackingActivityv1.class);
                 startActivity(itravel);
                 break;
         }
@@ -311,6 +323,7 @@ public class MainActivity extends CommonActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
 
+            databaseReference.child(String.valueOf(preferences.getInt("staffid", 0))).child("allow_tracking").setValue(0);
             edit.clear();
             edit.apply();
             Intent i = new Intent(MainActivity.this, LoginActivity.class);
@@ -337,10 +350,10 @@ public class MainActivity extends CommonActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_VOLUME_UP){
-            Toast.makeText(MainActivity.this, " Pressed Volume Up", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, " Pressed Volume Up", Toast.LENGTH_SHORT).show();
             return true;
         }else if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
-            Toast.makeText(MainActivity.this, " Pressed Volume Down", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, " Pressed Volume Down", Toast.LENGTH_SHORT).show();
             return true;
         }else {
             return super.onKeyDown(keyCode, event);

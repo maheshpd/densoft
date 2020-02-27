@@ -134,7 +134,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
 
     }
 
-    private void get_salary_data(String staffid, String year, int monthpos) {
+    private void get_salary_data(int staffid, String year, int monthpos) {
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
         getServiceInterface = retrofit.create(GetServiceInterface.class);
@@ -142,7 +142,7 @@ public class SalarySlipDetailsActivity extends CommonActivity {
         Map<String, Object> params = new HashMap<>();
 
         salarySlips.clear();
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
         params.put("ActionId", "0");
         params.put("StaffId", staffid);
         params.put("Month", "0");

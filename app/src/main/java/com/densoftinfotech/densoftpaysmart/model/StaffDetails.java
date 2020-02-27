@@ -3,7 +3,7 @@ package com.densoftinfotech.densoftpaysmart.model;
 
 public class StaffDetails{
 
-    private String StaffId = "";
+    private int StaffId = 0;
     private String PName = "";
     private String Mobile1 = "";
     private String Email1 = "";
@@ -28,11 +28,11 @@ public class StaffDetails{
     private String ESIC = "";
     private String Column1 = "";
 
-    public String getStaffId() {
+    public int getStaffId() {
         return StaffId;
     }
 
-    public void setStaffId(String staffId) {
+    public void setStaffId(int staffId) {
         StaffId = staffId;
     }
 

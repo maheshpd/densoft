@@ -46,7 +46,8 @@
                     android:hint="@string/customerid"
                     android:maxLines="1"
                     android:textColor="@color/blue"
-                    android:textColorHint="@color/blue"/>
+                    android:textColorHint="@color/blue"
+                    android:inputType="number"/>
 
 
             </LinearLayout>
@@ -76,7 +77,8 @@
                     android:hint="@string/enterstaffid"
                     android:maxLines="1"
                     android:textColor="@color/blue"
-                    android:textColorHint="@color/blue" />
+                    android:textColorHint="@color/blue"
+                    android:inputType="number"/>
 
 
             </LinearLayout>

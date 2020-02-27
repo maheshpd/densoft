@@ -104,7 +104,7 @@ public class LeaveListActivity extends CommonActivity {
         Retrofit retrofit = RetrofitClient.getRetrofit();
         getServiceInterface = retrofit.create(GetServiceInterface.class);
 
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
         params.put("ActionId", "0");
         params.put("StaffId", staffid);
 
@@ -146,9 +146,9 @@ public class LeaveListActivity extends CommonActivity {
         getServiceInterface = retrofit.create(GetServiceInterface.class);
 
         params = new HashMap<>();
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
         params.put("ActionId", "0");
-        params.put("StaffId", preferences.getString("staffid", ""));
+        params.put("StaffId", preferences.getInt("staffid", 0));
         params.put("Month", month);
         params.put("Year", year);
 

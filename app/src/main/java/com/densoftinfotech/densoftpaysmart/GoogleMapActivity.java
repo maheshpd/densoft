@@ -77,6 +77,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         setContentView(R.layout.activity_google_map);
         SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         btn_search = findViewById(R.id.btn_search);
+        actv_search = findViewById(R.id.actv_search);
         search = findViewById(R.id.search1);
         cancel = findViewById(R.id.cancel);
         if (supportMapFragment != null) {
@@ -85,8 +86,8 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
         preferences = PreferenceManager.getDefaultSharedPreferences(GoogleMapActivity.this);
 
-        if (preferences.contains("company_name")) {
-            databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + preferences.getString("company_name", "").replace(".", ""));
+        if (preferences.contains("customerid")) {
+            databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + preferences.getInt("customerid", 0));
         }
 
     }
@@ -106,37 +107,54 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
-                googlemap.clear();
-                firebaseList_search.clear();
-                if (dataSnapshot.exists()) {
-                    //LatLng latLng_office = new LatLng(19.0175853, 72.830392); - Siddhivinayak
-                    LatLng latLng_office = new LatLng(21.213530, 79.194070);
-                    LatLng latLng1;
-                    //markerpoints.add(latLng_office);
-                    addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng_office, "Admin");
-                    googlemap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng_office, 16.0f));
+                new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            public void run() {
 
-                    for (DataSnapshot children : dataSnapshot.getChildren()) {
-                        FirebaseLiveLocation firebaseLiveLocation = children.getValue(FirebaseLiveLocation.class);
-                        firebaseList_search.add(firebaseLiveLocation.getStaff_name() + " (Staff id: " + firebaseLiveLocation.getStaff_id() + ")");
-                        //if (firebaseLiveLocation != null && firebaseLiveLocation.getAllow_tracking()==1) {
-                            //Log.d("datasnapshot child ", " " + firebaseLiveLocation.getLatitude() + "  " + firebaseLiveLocation.getLongitude());
-                            if(!firebaseLiveLocation.getLatitude().trim().equalsIgnoreCase("") && !firebaseLiveLocation.getLongitude().trim().equalsIgnoreCase("")){
+                                IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
+                                googlemap.clear();
+                                firebaseList_search.clear();
+                                firebaseList_search.add("View All");
+                                if (dataSnapshot.exists()) {
+                                    //LatLng latLng_office = new LatLng(19.0175853, 72.830392); - Siddhivinayak
+                                    LatLng latLng_office = new LatLng(21.213530, 79.194070);
+                                    LatLng latLng1;
+                                    //markerpoints.add(latLng_office);
+                                    addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng_office, "Admin");
+                                    googlemap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng_office, 16.0f));
+
+                                    for (DataSnapshot children : dataSnapshot.getChildren()) {
+
+                                        if (children != null) {
+                                            FirebaseLiveLocation firebaseLiveLocation = children.getValue(FirebaseLiveLocation.class);
+                                            firebaseList_search.add(firebaseLiveLocation.getStaff_name() + " (Staff id: " + firebaseLiveLocation.getStaff_id() + ")");
+                                            //if (firebaseLiveLocation != null && firebaseLiveLocation.getAllow_tracking()==1) {
+                                            //Log.d("datasnapshot child ", " " + firebaseLiveLocation.getLatitude() + "  " + firebaseLiveLocation.getLongitude());
+                            /*if(!firebaseLiveLocation.getLatitude().trim().equalsIgnoreCase("") && !firebaseLiveLocation.getLongitude().trim().equalsIgnoreCase("")){
                                 latLng1 = new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude()));
-                                //markerpoints.add(latLng1);
-
                                 draw_routes(latLng_office, latLng1, firebaseLiveLocation.getTransport_mode(), firebaseLiveLocation.getStaff_id());
+                            }*/
+
+                                            //}
+                                        }
+
+                                    }
+
+                                    if (!actv_search.getText().toString().trim().equals("")) {
+                                        searchLocation(googlemap, actv_search.getText().toString());
+                                    }
+                                    autocomplete(googlemap);
+
+                                } else {
+                                    Log.d("does not ", "exist");
+                                }
+
+
                             }
+                        },
+                        20000);
 
-                        //}
-                    }
 
-                    autocomplete(googlemap);
-
-                } else {
-                    Log.d("does not ", "exist");
-                }
             }
 
             @Override
@@ -148,12 +166,12 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
     private void draw_routes(LatLng origin, LatLng dest, String mode_transport, String staff_id) {
 
-        if(InternetUtils.getInstance(GoogleMapActivity.this).available()) {
+        if (InternetUtils.getInstance(GoogleMapActivity.this).available()) {
             String url = getDirectionsUrl(origin, dest, mode_transport);
 
             DownloadTask downloadTask = new DownloadTask(staff_id);
             downloadTask.execute(url);
-        }else{
+        } else {
             Toast.makeText(GoogleMapActivity.this, getResources().getString(R.string.msg_alert_no_internet), Toast.LENGTH_SHORT).show();
         }
     }
@@ -162,13 +180,15 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
 
         //if(!staff_id.equalsIgnoreCase("Admin")) {
 
-            MarkerOptions markerOptions = new MarkerOptions().
-                    icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(text, staff_name))).
-                    position(latLng).
-                    anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+        MarkerOptions markerOptions = new MarkerOptions().
+                icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(text, staff_name))).
+                position(latLng).
+                anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
 
-            markerMap.put(staff_id, markerOptions);
-            googleMap.addMarker(markerOptions);
+        markerOptions.flat(true);
+
+        markerMap.put(staff_id, markerOptions);
+        googleMap.addMarker(markerOptions);
         //}
 
     }
@@ -250,26 +270,91 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     public void searchLocation(GoogleMap googleMap, String querystring) {
+        googlemap.clear();
+        if (querystring.equalsIgnoreCase("View All")) {
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-        databaseReference.child(querystring.split(":")[1].trim().split("\\)")[0]).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
 
-                if (dataSnapshot.exists()) {
-                    FirebaseLiveLocation fll = dataSnapshot.getValue(FirebaseLiveLocation.class);
-                    if (fll != null) {
-                        LatLng latLng = new LatLng(Double.parseDouble(fll.getLatitude()), Double.parseDouble(fll.getLongitude()));
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    }
+                                    IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
+
+
+                                    if (dataSnapshot.exists()) {
+                                        //LatLng latLng_office = new LatLng(19.0175853, 72.830392); - Siddhivinayak
+                                        LatLng latLng_office = new LatLng(21.213530, 79.194070);
+                                        LatLng latLng1;
+                                        //markerpoints.add(latLng_office);
+                                        addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng_office, "Admin");
+                                        googlemap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng_office, 16.0f));
+
+                                        for (DataSnapshot children : dataSnapshot.getChildren()) {
+                                            FirebaseLiveLocation firebaseLiveLocation = children.getValue(FirebaseLiveLocation.class);
+                                            if (firebaseLiveLocation != null && firebaseLiveLocation.getAllow_tracking() == 1) {
+                                                //Log.d("datasnapshot child ", " " + firebaseLiveLocation.getLatitude() + "  " + firebaseLiveLocation.getLongitude());
+                                                if (firebaseLiveLocation.getLatitude()!=0 && firebaseLiveLocation.getLongitude()!=0) {
+                                                    latLng1 = new LatLng(firebaseLiveLocation.getLatitude(), firebaseLiveLocation.getLongitude());
+                                                    draw_routes(latLng_office, latLng1, firebaseLiveLocation.getTransport_mode(), String.valueOf(firebaseLiveLocation.getStaff_id()));
+                                                }
+
+                                            }
+                                        }
+
+                                    } else {
+                                        Log.d("does not ", "exist");
+                                    }
+
+
+                                }
+                            },
+                            10000);
+
+
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
+
+        else {
+            databaseReference.child(querystring.split(":")[1].trim().split("\\)")[0]).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+
+                                    if (dataSnapshot.exists()) {
+                                        FirebaseLiveLocation fll = dataSnapshot.getValue(FirebaseLiveLocation.class);
+                                        if (fll != null) {
+                                            LatLng latLng_office = new LatLng(21.213530, 79.194070);
+                                            IconGenerator iconFactory = new IconGenerator(GoogleMapActivity.this);
+                                            addIcon(googlemap, iconFactory, "Admin", "Office Location", latLng_office, "Admin");
+                                            LatLng latLng = new LatLng(fll.getLatitude(), fll.getLongitude());
+                                            googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                                            draw_routes(latLng_office, latLng, fll.getTransport_mode(), String.valueOf(fll.getStaff_id()));
+                                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f));
+                                        }
+                                    }
+                                }
+                            },
+                            5000);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
 
     }
 
@@ -408,8 +493,8 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
                             if (firebaseLiveLocation != null) {
                                 addIcon(googlemap, iconFactory, firebaseLiveLocation.getStaff_id() + "\nEstimated distance = " + distance_duration.split(",")[0] + "\nEstimated time = "
                                                 + distance_duration.split(",")[1],
-                                        firebaseLiveLocation.getStaff_name(), new LatLng(Double.parseDouble(firebaseLiveLocation.getLatitude()), Double.parseDouble(firebaseLiveLocation.getLongitude())),
-                                        firebaseLiveLocation.getStaff_id());
+                                        firebaseLiveLocation.getStaff_name(), new LatLng(firebaseLiveLocation.getLatitude(), firebaseLiveLocation.getLongitude()),
+                                        String.valueOf(firebaseLiveLocation.getStaff_id()));
                             }
                         }
                     }

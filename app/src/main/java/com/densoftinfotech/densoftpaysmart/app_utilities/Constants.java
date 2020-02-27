@@ -16,7 +16,7 @@ public class Constants {
     //public static String ip = "physio.paysmart.net.in";
     public static String db_name = "densoftpaysmart";
     public static final String table_staff_details = "table_staff_details";
-    public static String staffid = "";
+    public static int staffid = 0;
     public static String current_year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
     public static String current_month = String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
     //public static StaffDetailsRoom staffDetailsRoom = new StaffDetailsRoom();
@@ -32,11 +32,14 @@ public class Constants {
     public static int count_before_firstpos = 0;
 
     public static String firebase_database_name = "LiveTracking";
-    public static long LOCATION_INTERVAL = 1000;
-    public static long FASTEST_LOCATION_INTERVAL = 0;
+    public static long LOCATION_INTERVAL = 10000;
+    public static long FASTEST_LOCATION_INTERVAL = 5000;
 
-    public static final double current_loc_latitude = 19.0175853;
-    public static final double current_loc_longitude = 72.830392;
+    //public static final double current_loc_latitude = 19.0175853;
+    //public static final double current_loc_longitude = 72.830392;
+
+    public static final double current_loc_latitude = 21.213530;
+    public static final double current_loc_longitude = 79.194070;
 
 
     public static String delete_constant_staffid = "";

@@ -2,14 +2,17 @@ package com.densoftinfotech.densoftpaysmart;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -86,7 +89,7 @@ public class LiveTrackingActivity extends CommonActivity {
         spinner_modes.setDropDownViewResource(R.layout.autocomplete_layout);
         spinner_mode_of_transport.setAdapter(spinner_modes);
 
-        databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + sharedPreferences.getString("company_name", "").replace(".", ""));
+        databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + sharedPreferences.getInt("customerid", 0));
         setTitle(getResources().getString(R.string.travel_claims));
         back();
 
@@ -119,7 +122,7 @@ public class LiveTrackingActivity extends CommonActivity {
     }
 
     private void update_table() {
-        firebaseLiveLocations = DatabaseHelper.getInstance(LiveTrackingActivity.this).get_LiveLocationUpdate(sharedPreferences.getString("staffid", ""));
+        firebaseLiveLocations = DatabaseHelper.getInstance(LiveTrackingActivity.this).get_LiveLocationUpdate(sharedPreferences.getInt("staffid", 0));
         if (firebaseLiveLocations != null && firebaseLiveLocations.size() > 0) {
             if (firebaseLiveLocations.get(0).getAllow_tracking() == 1) {
                 tv_trackme.setText(getResources().getString(R.string.live_tracking_started));
@@ -180,11 +183,11 @@ public class LiveTrackingActivity extends CommonActivity {
 
         /*firebaseLiveLocationMap.put(sharedPreferences.getString("staffid", ""), new FirebaseLiveLocation(staffDetails.getStaffId(), staffDetails.getPName(), latitude,
                 longitude, userLocation.getAddress_fromLatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)), (MapConstants.workinghour_from + "-" + MapConstants.workinghour_to)));*/
-        databaseReference.child(sharedPreferences.getString("staffid", "")).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
-                firebaseLiveLocationMap.put("staff_id", sharedPreferences.getString("staffid", ""));
+                firebaseLiveLocationMap.put("staff_id", sharedPreferences.getInt("staffid", 0));
                 firebaseLiveLocationMap.put("staff_name", staffDetails.getPName());
                 firebaseLiveLocationMap.put("latitude", latitude);
                 firebaseLiveLocationMap.put("longitude", longitude);
@@ -194,11 +197,11 @@ public class LiveTrackingActivity extends CommonActivity {
                 firebaseLiveLocationMap.put("transport_mode", modes_transport.get(spinner_mode_of_transport.getSelectedItemPosition()).toLowerCase());
                 //FirebaseLiveLocation firebaseLiveLocation = dataSnapshot.getValue(FirebaseLiveLocation.class);
                 if (!dataSnapshot.exists()) {
-                    databaseReference.child(sharedPreferences.getString("staffid", "")).setValue(firebaseLiveLocationMap);
+                    databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).setValue(firebaseLiveLocationMap);
 
                 } else {
                     //if (firebaseLiveLocation != null && (Double.parseDouble(latitude) >= 17.3)) {
-                    databaseReference.child(sharedPreferences.getString("staffid", "")).updateChildren(firebaseLiveLocationMap);
+                    databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).updateChildren(firebaseLiveLocationMap);
                     //}
 
                 }
@@ -218,7 +221,7 @@ public class LiveTrackingActivity extends CommonActivity {
     private void update_firebase() {
         Map<String, Object> firebaseLiveLocationMap = new HashMap<>();
         firebaseLiveLocationMap.put("allow_tracking", 0);
-        databaseReference.child(sharedPreferences.getString("staffid", "")).updateChildren(firebaseLiveLocationMap);
+        databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).updateChildren(firebaseLiveLocationMap);
     }
 
     private void add_data_toSqlite(int flag) {
@@ -270,7 +273,9 @@ public class LiveTrackingActivity extends CommonActivity {
 
         add_data_toSqlite(1);
 
-        /*LocalBroadcastManager.getInstance(this).registerReceiver(
+        startService(new Intent(this, LocationMonitoringService.class));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
                 new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
@@ -284,7 +289,7 @@ public class LiveTrackingActivity extends CommonActivity {
 
                     }
                 }, new IntentFilter(LocationMonitoringService.ACTION_LOCATION_BROADCAST)
-        );*/
+        );
 
 
     }
@@ -293,7 +298,7 @@ public class LiveTrackingActivity extends CommonActivity {
     public void onResume() {
         super.onResume();
         if (sharedPreferences != null && sharedPreferences.contains("staffid"))
-            DatabaseHelper.getInstance(LiveTrackingActivity.this).get_LiveLocationUpdate(sharedPreferences.getString("staffid", ""));
+            DatabaseHelper.getInstance(LiveTrackingActivity.this).get_LiveLocationUpdate(sharedPreferences.getInt("staffid", 0));
 
     }
 
@@ -475,7 +480,7 @@ public class LiveTrackingActivity extends CommonActivity {
         MenuItem item = menu.getItem(0);
 
         if (sharedPreferences != null && sharedPreferences.contains("deletestaffid")) {
-            if (sharedPreferences.getString("deletestaffid", "").equalsIgnoreCase("5448")) {
+            if (sharedPreferences.getString("deletestaffid", "").equalsIgnoreCase("5448") ||sharedPreferences.getString("deletestaffid", "").equalsIgnoreCase("5499") ) {
                 item.setVisible(true);
             } else {
                 item.setVisible(false);

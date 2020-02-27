@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MaterialLeanBack">
+        <attr name="mlb_titleColor" format="color"/>
+        <attr name="mlb_titleSize" format="dimension"/>
+        <attr name="mlb_overlapCards" format="boolean"/>
+        <attr name="mlb_animateCards" format="boolean"/>
+
+        <attr name="mlb_cardElevationEnlarged" format="integer"/>
+        <attr name="mlb_cardElevationReduced" format="integer"/>
+
+        <attr name="mlb_lineSpacing" format="dimension"/>
+
+        <attr name="mlb_paddingTop" format="dimension"/>
+        <attr name="mlb_paddingBottom" format="dimension"/>
+        <attr name="mlb_paddingLeft" format="dimension"/>
+        <attr name="mlb_paddingRight" format="dimension"/>
+
+        <attr name="mlb_background" format="reference"/>
+        <attr name="mlb_backgroundOverlay" format="float"/>
+        <attr name="mlb_backgroundOverlayColor" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="CircularImageView">
+
+        <!-- Whether or not to draw a circular border around the image. -->
+        <attr name="civ_border" format="boolean"/>
+        <!-- The color of the border draw around the image. (if enabled) -->
+        <attr name="civ_borderColor" format="color"/>
+        <!-- Makes the border this pixels wide. (if enabled) -->
+        <attr name="civ_borderWidth" format="dimension"/>
+        <!-- Whether or not to draw a selector on this view upon touch events. -->
+        <attr name="civ_selector" format="boolean"/>
+        <!-- The color of the selector draw on top of the image upon touch events. (if enabled) -->
+        <attr name="civ_selectorColor" format="color"/>
+        <!-- The color of the selector stroke drawn around the image upon touch events. Be sure to provide some opacity. (if enabled) -->
+        <attr name="civ_selectorStrokeColor" format="color"/>
+        <!-- The selector stroke drawn around the image upon touch events this pixels wide. (if enabled) -->
+        <attr name="civ_selectorStrokeWidth" format="dimension"/>
+        <!-- Whether or not to draw a shadow around your circular image. -->
+        <attr name="civ_shadow" format="boolean"/>
+        <!-- The radius for the shadow to extend to. (if enabled) -->
+        <attr name="civ_shadowRadius" format="float"/>
+        <!-- Horizontal shadow offset. (if enabled) -->
+        <attr name="civ_shadowDx" format="float"/>
+        <!-- Vertical shadow offset. (if enabled) -->
+        <attr name="civ_shadowDy" format="float"/>
+        <!-- The color of the shadow drawn around your circular image. (if enabled) -->
+        <attr name="civ_shadowColor" format="color"/>
+    </declare-styleable>
+
+
+    <declare-styleable name="CircularImageViewStyle">
+        <attr name="circularImageViewDefault" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="VimeoPlayerView">
+        <attr name="autoPlay" format="boolean"/>
+        <attr name="loop" format="boolean"/>
+        <attr name="muted" format="boolean"/>
+        <attr name="topicColor" format="color"/>
+        <attr name="backgroundColor" format="color"/>
+        <attr name="showOriginalControls" format="boolean"/>
+        <attr name="showTitle" format="boolean"/>
+        <attr name="showMenuOption" format="boolean"/>
+        <attr name="showFullscreenOption" format="boolean"/>
+        <attr name="aspectRatio" format="float"/>
+        <attr name="quality" format="string"/>
+    </declare-styleable>
+
+</resources>

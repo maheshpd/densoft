@@ -244,7 +244,7 @@ public class CalendarCustomView extends LinearLayout {
         }
     }
 
-    private void get_attendance_details(String staffid, String month_send, List<Date> dayValueInCells) {
+    private void get_attendance_details(int staffid, String month_send, List<Date> dayValueInCells) {
 
         Retrofit retrofit = RetrofitClient.getRetrofit();
 
@@ -254,7 +254,7 @@ public class CalendarCustomView extends LinearLayout {
 
         if(preferences!=null && preferences.contains("customerid")) {
             Map<String, Object> params = new HashMap<>();
-            params.put("customerid", preferences.getString("customerid", ""));
+            params.put("customerid", preferences.getInt("customerid", 0));
             params.put("ActionId", "1");
             params.put("StaffId", staffid);
             params.put("Month", String.valueOf(month_send));

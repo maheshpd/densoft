@@ -65,10 +65,10 @@ public class TeamActivity extends CommonActivity {
         Map<String, Object> params = new HashMap<>();
 
         params.put("ActionId", "1");
-        params.put("StaffId", preferences.getString("staffid",""));
+        params.put("StaffId", preferences.getInt("staffid",0));
         params.put("Month", "");
         params.put("Year", "");
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
 
         JSONObject obj = new JSONObject(params);
         Log.d("params ", obj + "");
@@ -105,7 +105,7 @@ public class TeamActivity extends CommonActivity {
         add_loader(TeamActivity.this);
         Map<String, Object> params = new HashMap<>();
 
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
         params.put("ActionId", "1");
         params.put("StaffId", teamList.getStaffId());
         params.put("Name", teamList.getEmpName());
@@ -123,7 +123,7 @@ public class TeamActivity extends CommonActivity {
         params.put("Reason", "");
         params.put("RemainingLeave", "0");
         params.put("SendTo", "0");
-        params.put("AcceptedBy", preferences.getString("staffid",""));
+        params.put("AcceptedBy", preferences.getInt("staffid",0));
         params.put("aNoOfDays", "0");
         params.put("aFromDate", "");
         params.put("aToDate", "");

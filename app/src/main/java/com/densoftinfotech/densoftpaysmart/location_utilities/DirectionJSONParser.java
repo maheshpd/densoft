@@ -127,10 +127,10 @@ public class DirectionJSONParser {
                 jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
 
                 DistanceObject object = new DistanceObject(Objects.requireNonNull(jLegs.optJSONObject(i).optJSONObject("distance")));
-                distance_duration.append(object.getText()).append(",");
+                distance_duration.append("Estimated distance: ").append(object.getText()).append(", ");
 
                 DurationObject object1 = new DurationObject(Objects.requireNonNull(jLegs.optJSONObject(i).optJSONObject("duration")));
-                distance_duration.append(object1.getText());
+                distance_duration.append("Estimated time: ").append(object1.getText());
 
             }
 

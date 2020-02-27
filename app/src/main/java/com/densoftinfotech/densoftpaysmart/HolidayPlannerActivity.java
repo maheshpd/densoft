@@ -74,9 +74,9 @@ public class HolidayPlannerActivity extends CommonActivity {
 
     private void get_planner_details(String month, String year) {
         params.clear();
-        params.put("customerid", preferences.getString("customerid", ""));
+        params.put("customerid", preferences.getInt("customerid", 0));
         params.put("ActionId", "1");
-        params.put("StaffId", preferences.getString("staffid", ""));
+        params.put("StaffId", preferences.getInt("staffid", 0));
         params.put("Month", month);
         params.put("Year", year);
 

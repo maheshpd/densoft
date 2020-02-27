@@ -84,17 +84,22 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
      */
     @Override
     public void onConnected(Bundle dataBundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            Log.d(TAG, "== Error On onConnected() Permission not granted");
-            //Permission not granted by user so cancel the further execution.
+                Log.d(TAG, "== Error On onConnected() Permission not granted");
+                //Permission not granted by user so cancel the further execution.
 
-            return;
+                return;
+            }
+
+            LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient, mLocationRequest, this);
+
+            Log.d(TAG, "Connected to Google API");
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient, mLocationRequest, this);
-
-        Log.d(TAG, "Connected to Google API");
     }
 
     /*
@@ -123,8 +128,8 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
         Log.d(TAG, "Sending info...");
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (sharedPreferences.contains("staffid") && !sharedPreferences.getString("staffid", "").trim().equals("")) {
-            add_data_toSqlite(sharedPreferences.getString("staffid", ""), sharedPreferences.getString("company_name", ""));
+        if (sharedPreferences.contains("staffid")) {
+            add_data_toSqlite(sharedPreferences.getInt("staffid", 0), sharedPreferences.getInt("customerid", 0));
         }
 
         Intent intent = new Intent(ACTION_LOCATION_BROADCAST);
@@ -133,7 +138,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    private void add_data_toSqlite(String staffid, String company_name) {
+    private void add_data_toSqlite(int staffid, int customerid) {
         userLocation = new UserLocation(this);
         ContentValues c = new ContentValues();
         c.put(DatabaseHelper.STAFF_ID, staffid);
@@ -144,10 +149,10 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
         DatabaseHelper.getInstance(this).save_location(c, staffid);
         //Log.d("update ", DatabaseHelper.getInstance(this).get_LiveLocationUpdate(staffid) + "");
 
-        /*//uncomment to add realtime update of location to firebase
-        if (!staffid.trim().equals("") && !company_name.trim().equals("")) {
-            add_live_updates_to_firebase(userLocation, staffid, company_name);
-        }*/
+        //uncomment to add realtime update of location to firebase
+        //if (!staffid.trim().equals("") && !company_name.trim().equals("")) {
+        add_live_updates_to_firebase(userLocation, staffid, customerid);
+        //}
     }
 
     @Override
@@ -157,12 +162,12 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
     }
 
 
-    private void add_live_updates_to_firebase(UserLocation userLocation, String staffid, String company_name) {
+    private void add_live_updates_to_firebase(UserLocation userLocation, int staffid, int customerid) {
 
-        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name + "/" + company_name);
+        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name + "/" + customerid);
 
 
-        databaseReference.child(staffid).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child(String.valueOf(staffid)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -175,7 +180,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
                         firebaseLiveLocationMap.put("latitude", String.valueOf(userLocation.getLatitude()));
                         firebaseLiveLocationMap.put("longitude", String.valueOf(userLocation.getLongitude()));
                         firebaseLiveLocationMap.put("address", userLocation.getAddress());
-                        databaseReference.child(staffid).updateChildren(firebaseLiveLocationMap);
+                        databaseReference.child(String.valueOf(staffid)).updateChildren(firebaseLiveLocationMap);
                         Log.d("location map ", firebaseLiveLocationMap.toString());
                     }
 

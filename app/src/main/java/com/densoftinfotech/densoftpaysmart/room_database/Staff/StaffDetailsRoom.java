@@ -14,7 +14,7 @@ public class StaffDetailsRoom {
     private int id;
 
     @ColumnInfo(name = "staff_id")
-    private String StaffId = "";
+    private int StaffId = 0;
 
     @ColumnInfo(name = "staff_name")
     private String PName = "";
@@ -49,7 +49,7 @@ public class StaffDetailsRoom {
     @ColumnInfo(name = "staff_domainurl")
     private String DomainUrl = "";
 
-    public StaffDetailsRoom(String staffId, String PName, String mobile1, String email1, String gender, String joiningDate, String companyName, String branchName,
+    public StaffDetailsRoom(int staffId, String PName, String mobile1, String email1, String gender, String joiningDate, String companyName, String branchName,
                             String department, String designation, String StaffPhoto, String DomainUrl) {
 
         this.StaffId = staffId;
@@ -74,11 +74,11 @@ public class StaffDetailsRoom {
         this.id = id;
     }
 
-    public String getStaffId() {
+    public int getStaffId() {
         return StaffId;
     }
 
-    public void setStaffId(String staffId) {
+    public void setStaffId(int staffId) {
         StaffId = staffId;
     }
 
