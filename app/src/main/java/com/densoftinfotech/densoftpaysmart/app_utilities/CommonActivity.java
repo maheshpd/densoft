@@ -1,6 +1,7 @@
 package com.densoftinfotech.densoftpaysmart.app_utilities;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,12 +13,26 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.densoftinfotech.densoftpaysmart.R;
+import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
+import com.densoftinfotech.densoftpaysmart.model.LocationHistoryModel;
 import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -30,6 +45,7 @@ public class CommonActivity extends AppCompatActivity {
     Context context;
     SharedPreferences preferences;
     public ProgressDialog progressDialog;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US) ;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
@@ -51,7 +67,7 @@ public class CommonActivity extends AppCompatActivity {
 
     }
 
-    public void setTitle(String title/*, int color*/){
+    public void setTitle(String title/*, int color*/) {
         ButterKnife.bind(this);
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(title);
@@ -63,7 +79,7 @@ public class CommonActivity extends AppCompatActivity {
         context = this;
     }
 
-    public void fullscreen(){
+    public void fullscreen() {
         /*Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);*/
 
@@ -86,20 +102,21 @@ public class CommonActivity extends AppCompatActivity {
         });
     }
 
-    public StaffDetails getStaffDetails(Context context){
+    public StaffDetails getStaffDetails(Context context) {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if(preferences.contains("StaffDetails")){
+        if (preferences.contains("StaffDetails")) {
             String json = preferences.getString("StaffDetails", "");
             StaffDetails staffDetails = new StaffDetails();
-            Type type = new TypeToken<StaffDetails>(){}.getType();
+            Type type = new TypeToken<StaffDetails>() {
+            }.getType();
             staffDetails = new Gson().fromJson(json, type);
 
-            if(staffDetails!=null){
+            if (staffDetails != null) {
                 Constants.staffid = staffDetails.getStaffId();
             }
 
             return staffDetails;
-        }else {
+        } else {
             return null;
         }
     }
@@ -113,10 +130,10 @@ public class CommonActivity extends AppCompatActivity {
         }
     }
 
-    public void dismiss_loader(){
-            if (progressDialog != null) {
-                progressDialog.dismiss();
-            }
+    public void dismiss_loader() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 
     public String get_monthName(int i) {
@@ -212,5 +229,65 @@ public class CommonActivity extends AppCompatActivity {
 
         return month;
     }
+
+    public static boolean isForegroundServiceRunning(Context context, String serviceName) {
+        boolean serviceRunning = false;
+        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> l = am.getRunningServices(50);
+        Iterator<ActivityManager.RunningServiceInfo> i = l.iterator();
+        while (i.hasNext()) {
+            ActivityManager.RunningServiceInfo runningServiceInfo = i
+                    .next();
+
+            if (runningServiceInfo.service.getClassName().equals(serviceName)) {
+                serviceRunning = true;
+
+                if (runningServiceInfo.foreground) {
+                    //service run in foreground
+                }
+            }
+        }
+        return serviceRunning;
+    }
+
+    /*public static void start_location_history(Context context, int staffid) {
+        //location after 15 mins
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name);
+        UserLocation location = new UserLocation(context);
+
+        ref.child(String.valueOf(staffid)).child("locationhistory").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        if (dataSnapshot.exists()) {
+                            for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                LocationHistoryModel locationHistoryModel = child.getValue(LocationHistoryModel.class);
+                                if (locationHistoryModel != null) {
+                                    long diff = DateUtils.getDateDiff(System.currentTimeMillis(), locationHistoryModel.getTimestamp(), TimeUnit.MILLISECONDS);
+                                    if (diff > 60000) {
+                                        //900000 - 15 mins , 60000 - 1 min
+                                        HashMap<String, Object> firebaselive = new HashMap<>();
+                                        firebaselive.put("timestamp", System.currentTimeMillis());
+                                        firebaselive.put("latitude", location.getLatitude());
+                                        firebaselive.put("longitude", location.getLongitude());
+                                        firebaselive.put("current_time", convertSecondsToHMmSs(System.currentTimeMillis()));
+
+                                        ref.child(String.valueOf(staffid)).child("locationhistory").push().setValue(firebaselive);
+                                    }
+                                }
+                            }
+                        }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }*/
+
+
+
 
 }

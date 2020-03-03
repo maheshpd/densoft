@@ -27,6 +27,11 @@ public class StaffDetails{
     private String UANNO = "";
     private String ESIC = "";
     private String Column1 = "";
+    private double Latitude = 0;
+    private double Longitude = 0;
+    private String OfficeStartTime = "9:00"; //default time 9:00 am
+    private String OfficeEndTime = "18:00"; //default time 6:00 pm
+
 
     public int getStaffId() {
         return StaffId;
@@ -218,5 +223,37 @@ public class StaffDetails{
 
     public void setColumn1(String column1) {
         Column1 = column1;
+    }
+
+    public double getLatitude() {
+        return Latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        Latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return Longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        Longitude = longitude;
+    }
+
+    public String getOfficeStartTime() {
+        return OfficeStartTime;
+    }
+
+    public void setOfficeStartTime(String officeStartTime) {
+        OfficeStartTime = officeStartTime;
+    }
+
+    public String getOfficeEndTime() {
+        return OfficeEndTime;
+    }
+
+    public void setOfficeEndTime(String officeEndTime) {
+        OfficeEndTime = officeEndTime;
     }
 }

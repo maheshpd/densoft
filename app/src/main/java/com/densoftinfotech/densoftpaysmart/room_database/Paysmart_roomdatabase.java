@@ -12,7 +12,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {StaffDetailsRoom.class}, version = 1)
+@Database(entities = {StaffDetailsRoom.class}, version = 1, exportSchema = false)
 public abstract class Paysmart_roomdatabase extends RoomDatabase {
 
     private static Paysmart_roomdatabase INSTANCE;
@@ -29,6 +29,17 @@ public abstract class Paysmart_roomdatabase extends RoomDatabase {
     public static void destroy_instance(){
         INSTANCE = null;
     }
+
+    /*static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            //database.execSQL("ALTER TABLE table_staff_details ADD office_latitude REAL, office_longitude REAL, staff_office_starttime TEXT, staff_office_endtime TEXT" );
+            database.execSQL("ALTER TABLE employees" +
+                    "  ADD last_name VARCHAR(50)," +
+                    "      first_name VARCHAR(40);");
+            // Since we didn't alter the table, there's nothing else to do here.
+        }
+    };*/
 
     /*static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override

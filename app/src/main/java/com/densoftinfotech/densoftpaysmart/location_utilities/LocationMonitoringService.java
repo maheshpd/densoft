@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
+import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService;
 import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.common.ConnectionResult;
@@ -26,6 +27,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +52,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
     SharedPreferences sharedPreferences;
     private UserLocation userLocation;
     private DatabaseReference databaseReference;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm") ;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -124,18 +128,45 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
         }
     }
 
+
     private void sendMessageToUI(String lat, String lng) {
 
-        Log.d(TAG, "Sending info...");
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (sharedPreferences.contains("staffid")) {
-            add_data_toSqlite(sharedPreferences.getInt("staffid", 0), sharedPreferences.getInt("customerid", 0));
-        }
+        try {
 
-        Intent intent = new Intent(ACTION_LOCATION_BROADCAST);
-        intent.putExtra(EXTRA_LATITUDE, lat);
-        intent.putExtra(EXTRA_LONGITUDE, lng);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            Log.d(TAG, "Sending info...");
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            if (sharedPreferences.contains("staffid")) {
+
+                //condition to track only during office hours
+                if (DateUtils.within_office_hours()) {
+                    add_data_toSqlite(sharedPreferences.getInt("staffid", 0), sharedPreferences.getInt("customerid", 0));
+                    Intent intent = new Intent(ACTION_LOCATION_BROADCAST);
+                    intent.putExtra(EXTRA_LATITUDE, lat);
+                    intent.putExtra(EXTRA_LONGITUDE, lng);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                }else{
+                    try{
+                        HashMap<String, Object> update = new HashMap<>();
+                        update.put("allow_tracking", 0);
+                        databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).updateChildren(update);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                    try{
+                        Intent stopIntent = new Intent(this, LocationTrackerService.class);
+                        stopIntent.setAction("stop");
+                        startService(stopIntent);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void add_data_toSqlite(int staffid, int customerid) {
@@ -164,7 +195,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
     private void add_live_updates_to_firebase(UserLocation userLocation, int staffid, int customerid) {
 
-        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name + "/" + customerid);
+        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name/* + "/" + customerid*/);
 
 
         databaseReference.child(String.valueOf(staffid)).addListenerForSingleValueEvent(new ValueEventListener() {

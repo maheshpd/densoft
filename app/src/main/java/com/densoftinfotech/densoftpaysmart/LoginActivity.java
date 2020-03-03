@@ -168,7 +168,9 @@ public class LoginActivity extends CommonActivity {
 
             staffDetailsRoom = new StaffDetailsRoom(staffDetailsArrayList.get(0).getStaffId(), staffDetailsArrayList.get(0).getPName(), staffDetailsArrayList.get(0).getMobile1(), staffDetailsArrayList.get(0).getEmail1(),
                     staffDetailsArrayList.get(0).getGender(), staffDetailsArrayList.get(0).getJoiningDate(), staffDetailsArrayList.get(0).getCompanyName(), staffDetailsArrayList.get(0).getBranchName(),
-                    staffDetailsArrayList.get(0).getDepartment(), staffDetailsArrayList.get(0).getDesignation(), staffDetailsArrayList.get(0).getStaffPhoto(), staffDetailsArrayList.get(0).getDomainUrl());
+                    staffDetailsArrayList.get(0).getDepartment(), staffDetailsArrayList.get(0).getDesignation(), staffDetailsArrayList.get(0).getStaffPhoto(), staffDetailsArrayList.get(0).getDomainUrl(),
+                    staffDetailsArrayList.get(0).getLatitude(), staffDetailsArrayList.get(0).getLongitude(), staffDetailsArrayList.get(0).getOfficeStartTime(),
+                    staffDetailsArrayList.get(0).getOfficeEndTime());
             edit.putInt("staffid", staffDetailsArrayList.get(0).getStaffId());
             edit.putString("company_name", staffDetailsArrayList.get(0).getCompanyName());
 

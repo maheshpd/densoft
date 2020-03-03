@@ -2,51 +2,35 @@ package com.densoftinfotech.densoftpaysmart;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.densoftinfotech.densoftpaysmart.app_utilities.AutoCounter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
-import com.densoftinfotech.densoftpaysmart.location_utilities.LocationMonitoringService;
-import com.densoftinfotech.densoftpaysmart.location_utilities.LocationTrackerService;
+import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService;
 import com.densoftinfotech.densoftpaysmart.location_utilities.MapConstants;
 import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
 import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
 import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,13 +38,14 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
+
+import static com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils.getTime;
 
 public class LiveTrackingActivityv1 extends CommonActivity {
 
     TextView tv_trackme, tv_stoptracking;
-    Spinner spinner_mode_of_transport;
+    //Spinner spinner_mode_of_transport;
     private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference;
 
@@ -69,8 +54,8 @@ public class LiveTrackingActivityv1 extends CommonActivity {
     private SharedPreferences sharedPreferences;
     private StaffDetails staffDetails;
     private ArrayList<FirebaseLiveLocation> firebaseLiveLocations = new ArrayList<>();
-    private ArrayList<String> modes_transport = new ArrayList<>();
-    ArrayAdapter<String> spinner_modes;
+    //private ArrayList<String> modes_transport = new ArrayList<>();
+    //ArrayAdapter<String> spinner_modes;
     int permission = 2; //denied = -1 and granted = 0
 
     @Override
@@ -80,18 +65,18 @@ public class LiveTrackingActivityv1 extends CommonActivity {
 
         tv_trackme = findViewById(R.id.tv_trackme);
         tv_stoptracking = findViewById(R.id.tv_stoptracking);
-        spinner_mode_of_transport = findViewById(R.id.spinner_mode_of_transport);
+        //spinner_mode_of_transport = findViewById(R.id.spinner_mode_of_transport);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LiveTrackingActivityv1.this);
-        modes_transport.add(getResources().getString(R.string.please_select));
+        /*modes_transport.add(getResources().getString(R.string.please_select));
         modes_transport.add("Driving");
         modes_transport.add("Cycling");
         modes_transport.add("Walking");
         spinner_modes = new ArrayAdapter<>(LiveTrackingActivityv1.this, R.layout.autocomplete_layout, R.id.actv_text, modes_transport);
         spinner_modes.setDropDownViewResource(R.layout.autocomplete_layout);
-        spinner_mode_of_transport.setAdapter(spinner_modes);
+        spinner_mode_of_transport.setAdapter(spinner_modes);*/
 
-        databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + sharedPreferences.getInt("customerid", 0));
+        databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name/* + "/" + sharedPreferences.getInt("customerid", 0)*/);
         setTitle(getResources().getString(R.string.travel_claims));
         back();
 
@@ -121,11 +106,11 @@ public class LiveTrackingActivityv1 extends CommonActivity {
             public void onClick(View view) {
 
                     if (staffDetails != null) {
-                        if (modes_transport.get(spinner_mode_of_transport.getSelectedItemPosition()).equalsIgnoreCase(getResources().getString(R.string.please_select))) {
+                        /*if (modes_transport.get(spinner_mode_of_transport.getSelectedItemPosition()).equalsIgnoreCase(getResources().getString(R.string.please_select))) {
                             Toast.makeText(LiveTrackingActivityv1.this, getResources().getString(R.string.select_mode_of_transport), Toast.LENGTH_SHORT).show();
-                        } else {
+                        } else {*/
                             open_alert(1);
-                        }
+                        //}
                     }
 
             }
@@ -213,20 +198,33 @@ public class LiveTrackingActivityv1 extends CommonActivity {
                 firebaseLiveLocationMap.put("staff_id", sharedPreferences.getInt("staffid", 0));
                 firebaseLiveLocationMap.put("staff_name", staffDetails.getPName());
                 firebaseLiveLocationMap.put("photo_url", staffDetails.getStaffPhoto());
+                firebaseLiveLocationMap.put("email", staffDetails.getEmail1());
+                firebaseLiveLocationMap.put("mobile", staffDetails.getMobile1());
                 firebaseLiveLocationMap.put("latitude", userLocation.getLatitude()); //initial
                 firebaseLiveLocationMap.put("longitude", userLocation.getLongitude()); //initial
                 firebaseLiveLocationMap.put("address", userLocation.getAddress()); //initial
                 firebaseLiveLocationMap.put("workinghours", (MapConstants.workinghour_from + "-" + MapConstants.workinghour_to));
                 firebaseLiveLocationMap.put("allow_tracking", 1);
-                firebaseLiveLocationMap.put("transport_mode", modes_transport.get(spinner_mode_of_transport.getSelectedItemPosition()).toLowerCase());
+                firebaseLiveLocationMap.put("transport_mode", "driving"/*modes_transport.get(spinner_mode_of_transport.getSelectedItemPosition()).toLowerCase()*/);
                 firebaseLiveLocationMap.put("timestamp", System.currentTimeMillis());
+                firebaseLiveLocationMap.put("angle", 0);
+                HashMap<String, Object> firebaselive = new HashMap<>();
+                firebaselive.put("timestamp", System.currentTimeMillis());
+                firebaselive.put("latitude", userLocation.getLatitude());
+                firebaselive.put("longitude", userLocation.getLongitude());
+                firebaselive.put("address", userLocation.getAddress());
+                firebaselive.put("current_time", getTime(System.currentTimeMillis()));
+                firebaselive.put("angle", 0);
+
 
                 if (!dataSnapshot.exists()) {
                     databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).setValue(firebaseLiveLocationMap);
+                    databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterPlusOne())).updateChildren(firebaselive);
 
                 } else {
                     //if (firebaseLiveLocation != null && (Double.parseDouble(latitude) >= 17.3)) {
                     databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).updateChildren(firebaseLiveLocationMap);
+                    databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterPlusOne())).updateChildren(firebaselive);
                     //}
 
                 }
@@ -275,7 +273,6 @@ public class LiveTrackingActivityv1 extends CommonActivity {
         } else {
             item.setVisible(false);
         }
-
 
         return true;
 

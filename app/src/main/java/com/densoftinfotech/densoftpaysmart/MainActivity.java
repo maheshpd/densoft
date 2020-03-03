@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,10 +18,8 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
 import com.densoftinfotech.densoftpaysmart.app_utilities.SnapHelperOneByOne;
-import com.densoftinfotech.densoftpaysmart.location_utilities.LocationMonitoringService;
-import com.densoftinfotech.densoftpaysmart.location_utilities.LocationTrackerService;
+import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService;
 import com.densoftinfotech.densoftpaysmart.model.QuickActions;
-import com.densoftinfotech.densoftpaysmart.model.QuickActionsArray;
 import com.densoftinfotech.densoftpaysmart.model.SalarySlip;
 import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
 import com.densoftinfotech.densoftpaysmart.retrofit.GetServiceInterface;
@@ -45,7 +42,6 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import androidx.annotation.NonNull;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -110,7 +106,7 @@ public class MainActivity extends CommonActivity {
 
         staffDetails = getStaffDetails(MainActivity.this);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name + "/" + preferences.getInt("customerid", 0));
+        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name /*+ "/" + preferences.getInt("customerid", 0)*/);
 
         if(staffDetails!=null){
             Constants.staffid = staffDetails.getStaffId();
@@ -156,7 +152,11 @@ public class MainActivity extends CommonActivity {
 
                 Intent stopIntent = new Intent(MainActivity.this, LocationTrackerService.class);
                 stopIntent.setAction("stop");
-                startService(stopIntent);
+                stopService(stopIntent);
+
+                databaseReference.child(String.valueOf(preferences.getInt("staffid", 0))).child("allow_tracking").setValue(0);
+                edit.clear();
+                edit.apply();
 
                 Logout_DeleteUser logout_deleteUser = new Logout_DeleteUser();
                 logout_deleteUser.execute();
@@ -322,10 +322,6 @@ public class MainActivity extends CommonActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-
-            databaseReference.child(String.valueOf(preferences.getInt("staffid", 0))).child("allow_tracking").setValue(0);
-            edit.clear();
-            edit.apply();
             Intent i = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(i);
             finish();

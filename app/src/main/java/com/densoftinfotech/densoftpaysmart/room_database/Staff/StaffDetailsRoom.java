@@ -49,22 +49,41 @@ public class StaffDetailsRoom {
     @ColumnInfo(name = "staff_domainurl")
     private String DomainUrl = "";
 
-    public StaffDetailsRoom(int staffId, String PName, String mobile1, String email1, String gender, String joiningDate, String companyName, String branchName,
-                            String department, String designation, String StaffPhoto, String DomainUrl) {
+    @ColumnInfo(name = "office_latitude")
+    private double Latitude = 0;
 
-        this.StaffId = staffId;
-        this.PName = PName;
-        this.Mobile1 = mobile1;
-        this.Email1 = email1;
-        this.Gender = gender;
-        this.JoiningDate = joiningDate;
-        this.CompanyName = companyName;
-        this.BranchName = branchName;
-        this.Department = department;
-        this.Designation = designation;
-        this.StaffPhoto = StaffPhoto;
-        this.DomainUrl = DomainUrl;
+    @ColumnInfo(name = "office_longitude")
+    private double Longitude = 0;
+
+    @ColumnInfo(name = "staff_office_starttime")
+    private String OfficeStartTime = "9:00"; //default time 9:00 am
+
+    @ColumnInfo(name = "staff_office_endtime")
+    private String OfficeEndTime = "18:00"; //default time 6:00 pm
+
+
+    public StaffDetailsRoom(int staffId, String pName, String mobile1, String email1, String gender, String joiningDate,
+                            String companyName, String branchName, String department, String designation, String staffPhoto,
+                            String domainUrl, double latitude, double longitude, String officeStartTime, String officeEndTime) {
+        this.id = id;
+        StaffId = staffId;
+        PName = pName;
+        Mobile1 = mobile1;
+        Email1 = email1;
+        Gender = gender;
+        JoiningDate = joiningDate;
+        CompanyName = companyName;
+        BranchName = branchName;
+        Department = department;
+        Designation = designation;
+        StaffPhoto = staffPhoto;
+        DomainUrl = domainUrl;
+        Latitude = latitude;
+        Longitude = longitude;
+        OfficeStartTime = officeStartTime;
+        OfficeEndTime = officeEndTime;
     }
+
 
     public int getId() {
         return id;
@@ -171,4 +190,35 @@ public class StaffDetailsRoom {
         DomainUrl = domainUrl;
     }
 
+    public double getLatitude() {
+        return Latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        Latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return Longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        Longitude = longitude;
+    }
+
+    public String getOfficeStartTime() {
+        return OfficeStartTime;
+    }
+
+    public void setOfficeStartTime(String officeStartTime) {
+        OfficeStartTime = officeStartTime;
+    }
+
+    public String getOfficeEndTime() {
+        return OfficeEndTime;
+    }
+
+    public void setOfficeEndTime(String officeEndTime) {
+        OfficeEndTime = officeEndTime;
+    }
 }

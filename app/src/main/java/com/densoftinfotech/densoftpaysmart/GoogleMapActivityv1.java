@@ -10,14 +10,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,17 +23,18 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.adapter.GoogleMapAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CircularImageView;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
-import com.densoftinfotech.densoftpaysmart.app_utilities.LinearLayoutManagerWrapper;
 import com.densoftinfotech.densoftpaysmart.location_utilities.DirectionJSONParser;
-import com.densoftinfotech.densoftpaysmart.location_utilities.LocationTrackerService;
 import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
+import com.densoftinfotech.densoftpaysmart.model.LocationHistoryModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -45,19 +44,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.ui.IconGenerator;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -68,10 +61,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Observable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -93,6 +86,8 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
     ArrayAdapter<String> adapter_search;
     SharedPreferences preferences;
     String distance_duration = "";
+    LinearLayout linearlayout;
+    ImageView iv_fullscreen;
 
     int pos = 0;
     HashMap<String, Marker> markerMap = new HashMap<>();
@@ -102,6 +97,7 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
     ArrayList<FirebaseLiveLocation> firebaseLiveLocations = new ArrayList<>();
     RecyclerView recycler_view;
     RecyclerView.LayoutManager layoutManager;
+    private boolean isFullscreen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +109,8 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
         search = findViewById(R.id.search1);
         cancel = findViewById(R.id.cancel);
         recycler_view = findViewById(R.id.recycler_view);
+        linearlayout = findViewById(R.id.linearlayout);
+        iv_fullscreen = findViewById(R.id.iv_fullscreen);
 
         if (supportMapFragment != null) {
             supportMapFragment.getMapAsync(this);
@@ -121,7 +119,7 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
         preferences = PreferenceManager.getDefaultSharedPreferences(GoogleMapActivityv1.this);
 
         if (preferences.contains("customerid")) {
-            databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name + "/" + preferences.getInt("customerid", 0));
+            databaseReference = firebaseDatabase.getReference(Constants.firebase_database_name /*+ "/" + preferences.getInt("customerid", 0)*/);
         }
 
         LocalBroadcastManager.getInstance(GoogleMapActivityv1.this).registerReceiver(rec1, new IntentFilter("notifymap"));
@@ -134,6 +132,17 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
         /*DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;*/
+
+        /*iv_fullscreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int width = linearlayout.getWidth();
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                LinearLayout.LayoutParams ll_params = new LinearLayout.LayoutParams(displayMetrics.widthPixels, displayMetrics.heightPixels);
+                linearlayout.setLayoutParams(ll_params);
+            }
+        });*/
 
 
     }
@@ -178,8 +187,11 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
                 for (DataSnapshot children : dataSnapshot.getChildren()) {
                     if (children != null) {
                         FirebaseLiveLocation firebaseLiveLocation = children.getValue(FirebaseLiveLocation.class);
-                        firebaseList_search.add(firebaseLiveLocation.getStaff_name() + " (Staff id: " + firebaseLiveLocation.getStaff_id() + ")");
-                        setMarker(children, "");
+
+                        if (firebaseLiveLocation != null && (firebaseLiveLocation.getAllow_tracking() == 1)) {
+                            firebaseList_search.add(firebaseLiveLocation.getStaff_name() + " (Staff id: " + firebaseLiveLocation.getStaff_id() + ")");
+                            setMarker(children, "");
+                        }
                     }
 
                 }
@@ -381,11 +393,15 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
                             if (fll != null) {
 
                                 if (fll.getStaff_id() == Integer.parseInt(querystring.split(":")[1].trim().split("\\)")[0])) {
-                                    setOfficeMarker();
-                                    LatLng latLng = new LatLng(fll.getLatitude(), fll.getLongitude());
-                                    setMarker(dataSnapshot, "");
-                                    //draw_routes(latLng_office, latLng, fll.getTransport_mode(), String.valueOf(fll.getStaff_id()));
-                                    googlemap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f));
+
+                                    if (fll.getAllow_tracking() == 1) {
+                                        setOfficeMarker();
+                                        LatLng latLng = new LatLng(fll.getLatitude(), fll.getLongitude());
+                                        setMarker(dataSnapshot, "");
+                                        //draw_routes(latLng_office, latLng, fll.getTransport_mode(), String.valueOf(fll.getStaff_id()));
+                                        googlemap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f));
+                                        set_location_history(fll);
+                                    }
                                 }
                             }
                         }
@@ -399,9 +415,31 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
 
                     }
                 });
+            }else{
+                Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
             }
         }
 
+    }
+
+    private void set_location_history(FirebaseLiveLocation firebaseLiveLocation) {
+        databaseReference.child(String.valueOf(firebaseLiveLocation.getStaff_id())).child(String.valueOf(DateUtils.getDate()))
+                .child("locationhistory").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    for(DataSnapshot children: dataSnapshot.getChildren()){
+                        setHistoryMarker(children.getValue(LocationHistoryModel.class));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        //do later
     }
 
 
@@ -518,6 +556,19 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
         //Log.d("key for marker ", key + "" );
     }
 
+    private void setHistoryMarker(LocationHistoryModel locationHistoryModel) {
+        LatLng latLng = new LatLng(locationHistoryModel.getLatitude(), locationHistoryModel.getLongitude());
+
+        IconGenerator iconFactory = new IconGenerator(GoogleMapActivityv1.this);
+        MarkerOptions markerOptions = new MarkerOptions().
+                icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromViewHistory(locationHistoryModel.getCurrent_time())))
+                .position(latLng)
+                .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+        googlemap.addMarker(markerOptions);
+        googlemap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f));
+
+    }
+
     private Bitmap getMarkerBitmapFromView(String staff_id, String staff_name, String photo_url) {
 
         View customMarkerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_mapmarker_layout, null);
@@ -547,6 +598,29 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
             builder.build().load(photo_url).memoryPolicy(MemoryPolicy.NO_CACHE)
                     .networkPolicy(NetworkPolicy.NO_CACHE).into(markerImageView);*//*
         }*/
+
+        customMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
+        customMarkerView.buildDrawingCache();
+        Bitmap returnedBitmap = Bitmap.createBitmap(customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(returnedBitmap);
+        canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        Drawable drawable = customMarkerView.getBackground();
+        if (drawable != null)
+            drawable.draw(canvas);
+        customMarkerView.draw(canvas);
+        return returnedBitmap;
+    }
+
+    private Bitmap getMarkerBitmapFromViewHistory(String current_time) {
+
+        View customMarkerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_location_history, null);
+        CircularImageView markerImageView = customMarkerView.findViewById(R.id.iv_marker);
+        TextView tv_marker = customMarkerView.findViewById(R.id.tv_marker);
+        markerImageView.setImageResource(R.mipmap.map_marker);
+
+        tv_marker.setText(current_time);
 
         customMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
@@ -776,8 +850,8 @@ public class GoogleMapActivityv1 extends FragmentActivity implements OnMapReadyC
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null && intent.hasExtra("querystring")) {
-                searchLocation(Objects.requireNonNull(intent.getStringExtra("querystring")));
                 actv_search.setText(intent.getStringExtra("querystring"));
+                searchLocation(Objects.requireNonNull(intent.getStringExtra("querystring")));
                 /*pos = intent.getIntExtra("pos", 0);
                 try {
                     LatLng latLng = new LatLng(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("long",0));

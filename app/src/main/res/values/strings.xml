@@ -134,5 +134,6 @@
     <string name="putonhold">Put On Hold</string>
     <string name="notification_text">Your tracking is live</string>
     <string name="enable_location">Kindly enable your location for better tracking</string>
+    <string name="unable_to_locate_user">We are unable to locate the staff at the moment. Please try in sometime</string>
 
 </resources>

@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission. ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
 
     <application
         android:name=".DensoftApp"
@@ -53,9 +55,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service
+        <!--<service
             android:name=".location_utilities.LocationMonitoringService"
-            android:enabled="true" />
+            android:enabled="true" />-->
 
         <activity android:name=".MarkAttendanceActivity" />
         <activity
@@ -74,7 +76,7 @@
         </activity>
 
         <service
-            android:name=".location_utilities.LocationTrackerService"
+            android:name=".background_service.LocationTrackerService"
             android:enabled="true"
             android:exported="true" />
 

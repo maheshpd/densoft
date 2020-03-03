@@ -1,4 +1,4 @@
-package com.densoftinfotech.densoftpaysmart.location_utilities;
+package com.densoftinfotech.densoftpaysmart.background_service;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -16,46 +16,72 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 
-import com.densoftinfotech.densoftpaysmart.LiveTrackingActivityv1;
 import com.densoftinfotech.densoftpaysmart.R;
+import com.densoftinfotech.densoftpaysmart.app_utilities.AutoCounter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
+import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
+import com.densoftinfotech.densoftpaysmart.location_utilities.MapConstants;
+import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
 import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
+import com.densoftinfotech.densoftpaysmart.model.LocationHistoryModel;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.EventListener;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
 import static com.densoftinfotech.densoftpaysmart.app_utilities.Constants.staffDetails;
+import static com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils.getTime;
 
 public class LocationTrackerService extends Service {
 
     private static final String TAG = LocationTrackerService.class.getSimpleName();
     private static String channel_id = "nidhikamath";
     SharedPreferences preferences;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
+    TimerTask scanTask;
+    final Handler handler = new Handler();
+    Timer t = new Timer();
+    String stop = "stop";
+
+    DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name/* + "/" + preferences.getInt("customerid", 0) + "/" +
+                preferences.getInt("staffid", 0)*/);
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -66,28 +92,23 @@ public class LocationTrackerService extends Service {
     public void onCreate() {
         super.onCreate();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Log.d("called ", "onCreate");
+        registerReceiver(stopReceiver, new IntentFilter(stop));
         buildNotification();
         loginToFirebase();
+        start_timer_for_location_history(this);
     }
 
     private void buildNotification() {
-        String stop = "stop";
-        registerReceiver(stopReceiver, new IntentFilter(stop));
-        PendingIntent broadcastIntent = PendingIntent.getBroadcast(
-                this, 0, new Intent(stop), PendingIntent.FLAG_UPDATE_CURRENT);
-        // Create the persistent notification
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel_id)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.notification_text))
-                .setOngoing(true)
-                .setContentIntent(broadcastIntent)
-                .setSmallIcon(R.drawable.ic_tracker);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(broadcastIntent);
-        } else {
-            startForeground(1, builder.build());
+        if(DateUtils.within_office_hours()){
+            Log.d("called ", "build notification enable");
+            enable_tracking();
+        }else {
+            Log.d("called ", "build notification disable");
+            disable_tracking();
         }
+
     }
 
     private void startForeground(PendingIntent broadcastIntent) {
@@ -102,7 +123,6 @@ public class LocationTrackerService extends Service {
                 mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
                 notificationManager.createNotificationChannel(mChannel);
             }
-
 
             mBuilder = new NotificationCompat.Builder(this, channel_id);
             mBuilder.setContentTitle(getString(R.string.app_name))
@@ -120,7 +140,8 @@ public class LocationTrackerService extends Service {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "received stop broadcast");
             // Stop the service when the notification is tapped
-            unregisterReceiver(stopReceiver);
+            stopForeground(true);
+            //unregisterReceiver(stopReceiver);
             stopSelf();
         }
     };
@@ -131,23 +152,23 @@ public class LocationTrackerService extends Service {
     }
 
     private void requestLocationUpdates() {
-        // Functionality coming next step
 
+        // Functionality coming next step
         LocationRequest request = new LocationRequest();
-        request.setInterval(10000);
-        request.setFastestInterval(5000);
+        request.setInterval(MapConstants.location_request_interval);
+        request.setFastestInterval(MapConstants.location_request_fastestinterval);
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);
-        final String path = Constants.firebase_database_name + "/" + preferences.getInt("customerid", 0) + "/" +
-                preferences.getInt("staffid", 0);
+
         int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+
         if (permission == PackageManager.PERMISSION_GRANTED) {
             client.requestLocationUpdates(request, new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference(path);
+
                     Location location = locationResult.getLastLocation();
-                    if (location != null) {
+                    if (location != null && preferences.getInt("staffid", 0) != 0) {
 
                         ref.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -161,7 +182,7 @@ public class LocationTrackerService extends Service {
                                         Log.d("diff ", "in m " + d);
 
                                         //update after the user travels 150 m from the current distance
-                                        if (d > 150) {
+                                        if (d > MapConstants.distance_greater_than) {
                                             HashMap<String, Object> firebaselive = new HashMap<>();
                                             firebaselive.put("staff_id", preferences.getInt("staffid", 0));
 
@@ -177,8 +198,7 @@ public class LocationTrackerService extends Service {
                                             }
 
                                             firebaselive.put("timestamp", System.currentTimeMillis());
-
-                                            ref.updateChildren(firebaselive);
+                                            ref.child(String.valueOf(preferences.getInt("staffid", 0))).updateChildren(firebaselive);
                                         }
                                     }
                                 }
@@ -190,60 +210,14 @@ public class LocationTrackerService extends Service {
                             }
                         });
 
-                        /*ref.child("timestamp").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                Long timestamp = dataSnapshot.getValue(Long.class);
-                                Long timenow = System.currentTimeMillis();
-
-                                if(timestamp!=null){
-                                    long diff = DateUtils.getDateDiff(timenow, timestamp, TimeUnit.MILLISECONDS);
-                                    Log.d("timestamp", timestamp + " now " + System.currentTimeMillis() + " diff " + diff);
-
-                                    //updates in every 30 seconds
-
-
-                                    if(diff>30000){
-                                        HashMap<String, Object> firebaselive = new HashMap<>();
-                                        firebaselive.put("staff_id", preferences.getInt("staffid", 0));
-
-                                        if(location.getLatitude()!=0){
-                                            firebaselive.put("latitude", location.getLatitude());
-                                        }
-                                        if(location.getLongitude()!=0){
-                                            firebaselive.put("longitude", location.getLongitude());
-                                        }
-
-                                        if(!getAddress(location).equals("")) {
-                                            firebaselive.put("address", getAddress(location));
-                                        }
-
-                                        firebaselive.put("timestamp", timenow);
-
-                                        if(!dataSnapshot.exists()){
-                                            ref.setValue(firebaselive);
-                                        }else{
-                                            ref.updateChildren(firebaselive);
-                                        }
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });*/
-
-                        //Log.d(TAG, "location update " + location);
-
                     }
 
                     save_to_db(location);
                 }
             }, null);
+
         }
+
 
     }
 
@@ -299,13 +273,147 @@ public class LocationTrackerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getAction() != null) {
             if (intent.getAction().equals("stop")) {
-                Log.i("Recevied", "stop Foreground Intent ");
+
+                try {
+
+                    if (!DateUtils.within_office_hours()) {
+                        //unregisterReceiver(stopReceiver);
+                        HashMap<String, Object> update = new HashMap<>();
+                        update.put("allow_tracking", 0);
+                        ref.child(String.valueOf(preferences.getInt("staffid", 0))).updateChildren(update);
+                        stopForeground(true);
+                        stopSelf();
+                    }
+                /*Log.i("Recevied", "stop Foreground Intent ");
                 unregisterReceiver(stopReceiver);
                 stopForeground(true);
-                stopSelf();
-                // your start service code
+                stopSelf();*/
+                    // your start service code
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return super.onStartCommand(intent, flags, startId);
     }
+
+    private void start_timer_for_location_history(Context context) {
+        scanTask = new TimerTask() {
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+
+                        if(DateUtils.within_office_hours()){
+                            UserLocation location = new UserLocation(context);
+                            if (InternetUtils.getInstance(context).available()) {
+                                Query lastQuery = ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterCurrentVal()));
+                                ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterCurrentVal())).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            //for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                            LocationHistoryModel locationHistoryModel = dataSnapshot.getValue(LocationHistoryModel.class);
+                                            if (locationHistoryModel != null) {
+                                                //long time_diff = DateUtils.getDateDiff(System.currentTimeMillis(), locationHistoryModel.getTimestamp(), TimeUnit.MILLISECONDS);
+
+                                                if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
+                                                    HashMap<String, Object> firebaselive = new HashMap<>();
+                                                    firebaselive.put("timestamp", System.currentTimeMillis());
+                                                    firebaselive.put("latitude", location.getLatitude());
+                                                    firebaselive.put("longitude", location.getLongitude());
+                                                    firebaselive.put("address", location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
+                                                    firebaselive.put("current_time", getTime(System.currentTimeMillis()));
+                                                    firebaselive.put("angle", 0);
+                                                    ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterPlusOne())).setValue(firebaselive)
+                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+
+                                                                }
+                                                            });
+                                                }
+                                            }
+                                            //}
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            } else {
+                                if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
+                                    HashMap<String, Object> firebaselive = new HashMap<>();
+                                    firebaselive.put("timestamp", System.currentTimeMillis());
+                                    firebaselive.put("latitude", location.getLatitude());
+                                    firebaselive.put("longitude", location.getLongitude());
+                                    firebaselive.put("address", location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
+                                    firebaselive.put("current_time", getTime(System.currentTimeMillis()));
+                                    firebaselive.put("angle", 0);
+
+                                }
+
+                            }
+                        }else{
+                            disable_tracking();
+                        }
+                    }
+                });
+            }
+        };
+
+
+        t.schedule(scanTask, 300, MapConstants.update_after_every);
+
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        try {
+            if (DateUtils.within_office_hours()) {
+                enable_tracking();
+            }else{
+                disable_tracking();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void enable_tracking(){
+        HashMap<String, Object> update = new HashMap<>();
+        update.put("allow_tracking", 1);
+        ref.child(String.valueOf(preferences.getInt("staffid", 0))).updateChildren(update);
+        PendingIntent broadcastIntent = PendingIntent.getBroadcast(
+                this, 0, new Intent(stop), PendingIntent.FLAG_UPDATE_CURRENT);
+        // Create the persistent notification
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel_id)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.notification_text))
+                .setOngoing(true)
+                .setContentIntent(broadcastIntent)
+                .setSmallIcon(R.drawable.ic_tracker);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(broadcastIntent);
+        } else {
+            startForeground(1, builder.build());
+        }
+    }
+
+    private void disable_tracking() {
+        HashMap<String, Object> update = new HashMap<>();
+        update.put("allow_tracking", 0);
+        ref.child(String.valueOf(preferences.getInt("staffid", 0))).updateChildren(update);
+
+        stopForeground(true);
+        //unregisterReceiver(stopReceiver);
+        stopSelf();
+        //unregisterReceiver(stopReceiver);
+    }
+
 }

@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 public class FirebaseLiveLocation implements Serializable/* implements ClusterItem*/{
     private int staff_id = 0;
     private String staff_name = "";
+    private String email = "";
+    private String mobile = "";
     private double latitude = 0;
     private double longitude = 0;
     private String address = "";
@@ -17,6 +19,7 @@ public class FirebaseLiveLocation implements Serializable/* implements ClusterIt
     private String estimated_distance = "";
     private String estimated_time = "";
     private long timestamp = 0;
+    private double angle = 0;
 
     public FirebaseLiveLocation(){
 
@@ -50,6 +53,22 @@ public class FirebaseLiveLocation implements Serializable/* implements ClusterIt
 
     public void setStaff_name(String staff_name) {
         this.staff_name = staff_name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public double getLatitude() {
@@ -130,6 +149,14 @@ public class FirebaseLiveLocation implements Serializable/* implements ClusterIt
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
     }
 
     /*String title = "";

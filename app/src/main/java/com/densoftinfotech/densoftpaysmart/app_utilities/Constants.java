@@ -31,7 +31,7 @@ public class Constants {
 
     public static int count_before_firstpos = 0;
 
-    public static String firebase_database_name = "LiveTracking";
+    public static String firebase_database_name = "revo-educare";
     public static long LOCATION_INTERVAL = 10000;
     public static long FASTEST_LOCATION_INTERVAL = 5000;
 

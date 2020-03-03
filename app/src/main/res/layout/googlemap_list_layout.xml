@@ -48,7 +48,8 @@
             android:layout_height="wrap_content"
             android:padding="3dp"
             android:textColor="@color/darkgray"
-            android:textSize="12sp"/>
+            android:textSize="12sp"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/tv_estimated_time"

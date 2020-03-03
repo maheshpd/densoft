@@ -121,8 +121,8 @@ public class GoogleMapAdapter extends RecyclerView.Adapter<GoogleMapAdapter.MyVi
 
         holder.tv_estimated_time.setText("");*/
 
-        holder.tv_estimated_distance.setText(String.format("Estimated distance: %.2f  kms",DateUtils.distance(Constants.current_loc_latitude, Constants.current_loc_longitude, firebaseLiveLocations.get(i).getLatitude(),
-                firebaseLiveLocations.get(i).getLongitude(), 'K')));
+        /*holder.tv_estimated_distance.setText(String.format("Estimated distance: %.2f  kms",DateUtils.distance(Constants.current_loc_latitude, Constants.current_loc_longitude, firebaseLiveLocations.get(i).getLatitude(),
+                firebaseLiveLocations.get(i).getLongitude(), 'K')));*/
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
