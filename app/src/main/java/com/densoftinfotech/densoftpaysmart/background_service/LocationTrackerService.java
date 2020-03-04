@@ -18,7 +18,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.util.Log;
 
 import com.densoftinfotech.densoftpaysmart.R;
@@ -42,24 +41,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -73,12 +67,15 @@ public class LocationTrackerService extends Service {
 
     private static final String TAG = LocationTrackerService.class.getSimpleName();
     private static String channel_id = "nidhikamath";
-    SharedPreferences preferences;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
-    TimerTask scanTask;
-    final Handler handler = new Handler();
-    Timer t = new Timer();
-    String stop = "stop";
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
+    private TimerTask scanTask;
+    private final Handler handler = new Handler();
+    private Timer t = new Timer();
+    private String stop = "stop";
+    private int temp_no = 0;
+    private int i = 0;
 
     DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name/* + "/" + preferences.getInt("customerid", 0) + "/" +
                 preferences.getInt("staffid", 0)*/);
@@ -101,10 +98,10 @@ public class LocationTrackerService extends Service {
 
     private void buildNotification() {
 
-        if(DateUtils.within_office_hours()){
+        if (DateUtils.within_office_hours()) {
             Log.d("called ", "build notification enable");
             enable_tracking();
-        }else {
+        } else {
             Log.d("called ", "build notification disable");
             disable_tracking();
         }
@@ -138,7 +135,7 @@ public class LocationTrackerService extends Service {
     protected BroadcastReceiver stopReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "received stop broadcast");
+            Log.d("called ", "received stop broadcast");
             // Stop the service when the notification is tapped
             stopForeground(true);
             //unregisterReceiver(stopReceiver);
@@ -303,13 +300,18 @@ public class LocationTrackerService extends Service {
                 handler.post(new Runnable() {
                     public void run() {
 
-                        if(DateUtils.within_office_hours()){
+                        if (DateUtils.within_office_hours()) {
                             UserLocation location = new UserLocation(context);
+                            //Query lastQuery = ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterCurrentVal()));
                             if (InternetUtils.getInstance(context).available()) {
-                                Query lastQuery = ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterCurrentVal()));
-                                ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterCurrentVal())).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                                checkDataToPushExists();
+
+                                temp_no = AutoCounter.getCounterPlusOne();
+                                ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(temp_no)).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        //temp_no = AutoCounter.getCounterCurrentVal();
                                         if (dataSnapshot.exists()) {
                                             //for (DataSnapshot child : dataSnapshot.getChildren()) {
                                             LocationHistoryModel locationHistoryModel = dataSnapshot.getValue(LocationHistoryModel.class);
@@ -324,16 +326,74 @@ public class LocationTrackerService extends Service {
                                                     firebaselive.put("address", location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
                                                     firebaselive.put("current_time", getTime(System.currentTimeMillis()));
                                                     firebaselive.put("angle", 0);
-                                                    ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterPlusOne())).setValue(firebaselive)
+
+                                                    ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(temp_no)).setValue(firebaselive)
+                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+
+                                                                    Log.d("preference ", "success location model " + temp_no);
+                                                                    addNode(null);
+
+                                                                    //add null object on success because the node is already added
+
+                                                                }
+                                                            })
                                                             .addOnFailureListener(new OnFailureListener() {
                                                                 @Override
                                                                 public void onFailure(@NonNull Exception e) {
-
+                                                                    //set history model in case failed
+                                                                    LocationHistoryModel historyModel = new LocationHistoryModel();
+                                                                    historyModel.setTimestamp(System.currentTimeMillis());
+                                                                    historyModel.setLatitude(location.getLatitude());
+                                                                    historyModel.setLongitude(location.getLongitude());
+                                                                    historyModel.setAddress(location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
+                                                                    historyModel.setCurrent_time(getTime(System.currentTimeMillis()));
+                                                                    historyModel.setAngle(0);
+                                                                    Log.d("preference ", " failure location model " + temp_no);
+                                                                    addNode(historyModel);
                                                                 }
                                                             });
                                                 }
                                             }
                                             //}
+                                        } else {
+                                            HashMap<String, Object> firebaselive = new HashMap<>();
+                                            firebaselive.put("timestamp", System.currentTimeMillis());
+                                            firebaselive.put("latitude", location.getLatitude());
+                                            firebaselive.put("longitude", location.getLongitude());
+                                            firebaselive.put("address", location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
+                                            firebaselive.put("current_time", getTime(System.currentTimeMillis()));
+                                            firebaselive.put("angle", 0);
+                                            ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory")
+                                                    .child(String.valueOf(temp_no)).setValue(firebaselive)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+
+                                                            Log.d("preference ", "success location model " + temp_no);
+                                                            addNode(null);
+
+                                                            //add null object on success because the node is already added
+
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            //set history model in case failed
+                                                            LocationHistoryModel historyModel = new LocationHistoryModel();
+                                                            historyModel.setTimestamp(System.currentTimeMillis());
+                                                            historyModel.setLatitude(location.getLatitude());
+                                                            historyModel.setLongitude(location.getLongitude());
+                                                            historyModel.setAddress(location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
+                                                            historyModel.setCurrent_time(getTime(System.currentTimeMillis()));
+                                                            historyModel.setAngle(0);
+                                                            Log.d("preference ", " failure location model " + temp_no);
+                                                            addNode(historyModel);
+                                                        }
+                                                    });
+
                                         }
                                     }
 
@@ -343,19 +403,21 @@ public class LocationTrackerService extends Service {
                                     }
                                 });
                             } else {
+                                temp_no = AutoCounter.getCounterPlusOne();
                                 if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
-                                    HashMap<String, Object> firebaselive = new HashMap<>();
-                                    firebaselive.put("timestamp", System.currentTimeMillis());
-                                    firebaselive.put("latitude", location.getLatitude());
-                                    firebaselive.put("longitude", location.getLongitude());
-                                    firebaselive.put("address", location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
-                                    firebaselive.put("current_time", getTime(System.currentTimeMillis()));
-                                    firebaselive.put("angle", 0);
+                                    LocationHistoryModel historyModel = new LocationHistoryModel();
+                                    historyModel.setTimestamp(System.currentTimeMillis());
+                                    historyModel.setLatitude(location.getLatitude());
+                                    historyModel.setLongitude(location.getLongitude());
+                                    historyModel.setAddress(location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
+                                    historyModel.setCurrent_time(getTime(System.currentTimeMillis()));
+                                    historyModel.setAngle(0);
 
+                                    addNode(historyModel);
+                                    Log.d("preference ", "location model no internet " + temp_no);
                                 }
-
                             }
-                        }else{
+                        } else {
                             disable_tracking();
                         }
                     }
@@ -368,7 +430,6 @@ public class LocationTrackerService extends Service {
 
     }
 
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -376,7 +437,7 @@ public class LocationTrackerService extends Service {
         try {
             if (DateUtils.within_office_hours()) {
                 enable_tracking();
-            }else{
+            } else {
                 disable_tracking();
             }
         } catch (Exception e) {
@@ -384,36 +445,119 @@ public class LocationTrackerService extends Service {
         }
     }
 
-    private void enable_tracking(){
-        HashMap<String, Object> update = new HashMap<>();
-        update.put("allow_tracking", 1);
-        ref.child(String.valueOf(preferences.getInt("staffid", 0))).updateChildren(update);
-        PendingIntent broadcastIntent = PendingIntent.getBroadcast(
-                this, 0, new Intent(stop), PendingIntent.FLAG_UPDATE_CURRENT);
-        // Create the persistent notification
+    private void enable_tracking() {
+        if (preferences.getInt("staffid", 0) != 0) {
+            HashMap<String, Object> update = new HashMap<>();
+            update.put("allow_tracking", 1);
+            ref.child(String.valueOf(preferences.getInt("staffid", 0))).updateChildren(update);
+            PendingIntent broadcastIntent = PendingIntent.getBroadcast(
+                    this, 0, new Intent(stop), PendingIntent.FLAG_UPDATE_CURRENT);
+            // Create the persistent notification
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel_id)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.notification_text))
-                .setOngoing(true)
-                .setContentIntent(broadcastIntent)
-                .setSmallIcon(R.drawable.ic_tracker);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(broadcastIntent);
-        } else {
-            startForeground(1, builder.build());
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel_id)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText(getString(R.string.notification_text))
+                    .setOngoing(true)
+                    .setContentIntent(broadcastIntent)
+                    .setSmallIcon(R.drawable.ic_tracker);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForeground(broadcastIntent);
+            } else {
+                startForeground(1, builder.build());
+            }
         }
     }
 
     private void disable_tracking() {
-        HashMap<String, Object> update = new HashMap<>();
-        update.put("allow_tracking", 0);
-        ref.child(String.valueOf(preferences.getInt("staffid", 0))).updateChildren(update);
+        if (preferences.getInt("staffid", 0) != 0) {
+            HashMap<String, Object> update = new HashMap<>();
+            update.put("allow_tracking", 0);
+            ref.child(String.valueOf(preferences.getInt("staffid", 0))).updateChildren(update);
 
-        stopForeground(true);
-        //unregisterReceiver(stopReceiver);
-        stopSelf();
-        //unregisterReceiver(stopReceiver);
+            stopForeground(true);
+            stopSelf();
+        }
     }
+
+
+    private void addNode(LocationHistoryModel locationHistoryModel) {
+        if (preferences != null) {
+            editor = preferences.edit();
+            Gson gson = new Gson();
+
+            if (preferences.contains("locationmodels") && !preferences.getString("locationmodels", "").trim().equals("")) {
+                String locationmodels = preferences.getString("locationmodels", "");
+                Type type = new TypeToken<ArrayList<LocationHistoryModel>>() {
+                }.getType();
+                ArrayList<LocationHistoryModel> userMode = gson.fromJson(locationmodels, type);
+                userMode.add(locationHistoryModel);
+                String stringput = gson.toJson(userMode);
+                editor.putString("locationmodels", stringput);
+                editor.apply();
+            } else {
+                ArrayList<LocationHistoryModel> locationHistoryModels = new ArrayList<>();
+                locationHistoryModels.add(locationHistoryModel);
+                String stringput = gson.toJson(locationHistoryModels);
+                editor.putString("locationmodels", stringput);
+                editor.apply();
+            }
+
+        }
+    }
+
+    private void checkDataToPushExists() {
+
+        try{
+            if (preferences.contains("locationmodels") && !preferences.getString("locationmodels", "").trim().equals("")) {
+
+                String loc = preferences.getString("locationmodels", "");
+                if (!loc.trim().equals("")) {
+                    Gson gson = new Gson();
+                    Type type = new TypeToken<ArrayList<LocationHistoryModel>>() {
+                    }.getType();
+                    ArrayList<LocationHistoryModel> locupdate = gson.fromJson(loc, type);
+
+                    int size = locupdate.size();
+                    for (i = (size-1); i>=0; i--) {
+
+
+                        if(locupdate.get(i)!=null){
+
+                            ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(i)).setValue(locupdate.get(i))
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+
+                                            try {
+                                                Log.d("preference ", "success offline location model " + i);
+
+                                                locupdate.set(i, null);
+
+                                                String stringput = gson.toJson(locupdate);
+                                                editor.putString("locationmodels", stringput);
+                                                editor.apply();
+
+                                                Log.d("preference updated ", preferences.getString("locationmodels", ""));
+                                                //add null object on success because the node is already added
+                                            }catch (Exception e){
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+                                    });
+                        }
+                        if(i==0){
+                            break;
+                        }
+
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
 
 }

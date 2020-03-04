@@ -218,13 +218,13 @@ public class LiveTrackingActivityv1 extends CommonActivity {
 
 
                 if (!dataSnapshot.exists()) {
-                    databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).setValue(firebaseLiveLocationMap);
-                    databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterPlusOne())).updateChildren(firebaselive);
+                    //databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).setValue(firebaseLiveLocationMap);
+                    //databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterPlusOne())).updateChildren(firebaselive);
 
                 } else {
                     //if (firebaseLiveLocation != null && (Double.parseDouble(latitude) >= 17.3)) {
-                    databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).updateChildren(firebaseLiveLocationMap);
-                    databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterPlusOne())).updateChildren(firebaselive);
+                    //databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).updateChildren(firebaseLiveLocationMap);
+                    //databaseReference.child(String.valueOf(sharedPreferences.getInt("staffid", 0))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterPlusOne())).updateChildren(firebaselive);
                     //}
 
                 }

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
@@ -50,6 +51,8 @@ public class LoginActivity extends CommonActivity {
     Button btn_login;
     @BindView(R.id.et_customerid)
     EditText et_customerid;
+    @BindView(R.id.switchbutton)
+    Switch switchbutton;
 
     private SharedPreferences preferences;
     private SharedPreferences.Editor edit;
@@ -81,9 +84,13 @@ public class LoginActivity extends CommonActivity {
             @Override
             public void onClick(View view) {
                 if (checkfor_noblankparam()) {
-
                     if(InternetUtils.getInstance(LoginActivity.this).available())
-                        get_login_data();
+                        if(switchbutton.isChecked()){
+                            get_login_data();
+                            btn_login.setEnabled(false);
+                        }else{
+                            Toast.makeText(LoginActivity.this, getResources().getString(R.string.allowtrack), Toast.LENGTH_SHORT).show();
+                        }
                     else
                         Toast.makeText(LoginActivity.this, getResources().getString(R.string.pleasecheckinternet), Toast.LENGTH_SHORT).show();
                 }

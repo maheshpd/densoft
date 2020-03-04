@@ -16,7 +16,9 @@ import com.densoftinfotech.densoftpaysmart.adapter.QuickActionsAdapter;
 import com.densoftinfotech.densoftpaysmart.adapter.SalarySlipAdapter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
+import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
+import com.densoftinfotech.densoftpaysmart.app_utilities.ServiceUtils;
 import com.densoftinfotech.densoftpaysmart.app_utilities.SnapHelperOneByOne;
 import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService;
 import com.densoftinfotech.densoftpaysmart.model.QuickActions;
@@ -104,9 +106,11 @@ public class MainActivity extends CommonActivity {
 
         ButterKnife.bind(this);
 
+        //Log.d("preference is ", preferences.getString("locationmodels", ""));
         staffDetails = getStaffDetails(MainActivity.this);
 
         databaseReference = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name /*+ "/" + preferences.getInt("customerid", 0)*/);
+
 
         if(staffDetails!=null){
             Constants.staffid = staffDetails.getStaffId();
@@ -117,6 +121,8 @@ public class MainActivity extends CommonActivity {
                 Picasso.get().load(staffDetails.getStaffPhoto()).error(R.mipmap.ic_launcher).into(iv_profile);
             }
         }
+
+        checkServiceRunning();
 
         if(InternetUtils.getInstance(MainActivity.this).available()){
             if(staffDetails!=null){
@@ -173,7 +179,12 @@ public class MainActivity extends CommonActivity {
         //quickActions.add(new QuickActions("Travel Claims", R.mipmap.travel_claims));
         quickActions.add(new QuickActions("Leaves", R.mipmap.leaves));
         quickActions.add(new QuickActions("Team", R.mipmap.team));
-        quickActions.add(new QuickActions("Live Tracking", R.mipmap.map_marker));
+
+        if (preferences != null && preferences.contains("deletestaffid")) {
+            if (preferences.getString("deletestaffid", "").equalsIgnoreCase("5448") || preferences.getString("deletestaffid", "").equalsIgnoreCase("5499")) {
+                quickActions.add(new QuickActions("Live Tracking", R.mipmap.map_marker));
+            }
+        }
 
         /*for (int i = 0; i < QuickActionsArray.names.length; i++) {
             quickActions.add(new QuickActions(QuickActionsArray.names[i], QuickActionsArray.image[i]));
@@ -199,6 +210,17 @@ public class MainActivity extends CommonActivity {
                     }
                 });
 
+    }
+
+    private void checkServiceRunning() {
+        if(ServiceUtils.isServiceRunning(LocationTrackerService.class.getName(), MainActivity.this)){
+            //Log.d("service ", "running");
+        }else{
+            if(DateUtils.within_office_hours()){
+                startService(new Intent(MainActivity.this, LocationTrackerService.class));
+            }
+            //Log.d("service ", " not running");
+        }
     }
 
     private void get_salary_data(int staffid) {

@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
@@ -91,7 +90,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
         try {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                Log.d(TAG, "== Error On onConnected() Permission not granted");
+                //Log.d("LocationMonitoringService ", "== Error On onConnected() Permission not granted");
                 //Permission not granted by user so cancel the further execution.
 
                 return;
@@ -99,7 +98,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
             LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient, mLocationRequest, this);
 
-            Log.d(TAG, "Connected to Google API");
+            //Log.d(TAG, "Connected to Google API");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,16 +111,16 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
      */
     @Override
     public void onConnectionSuspended(int i) {
-        Log.d(TAG, "Connection suspended");
+        //Log.d(TAG, "Connection suspended");
     }
 
     //to get the location change
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "Location changed");
+        //Log.d(TAG, "Location changed");
 
         if (location != null) {
-            Log.d(TAG, "== location != null");
+            //Log.d(TAG, "== location != null");
 
             //Send result to activities
             sendMessageToUI(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude()));
@@ -133,7 +132,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
         try {
 
-            Log.d(TAG, "Sending info...");
+            //Log.d(TAG, "Sending info...");
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             if (sharedPreferences.contains("staffid")) {
 
@@ -188,7 +187,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(TAG, "Failed to connect to Google API");
+        //Log.d(TAG, "Failed to connect to Google API");
 
     }
 
@@ -212,7 +211,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
                         firebaseLiveLocationMap.put("longitude", String.valueOf(userLocation.getLongitude()));
                         firebaseLiveLocationMap.put("address", userLocation.getAddress());
                         databaseReference.child(String.valueOf(staffid)).updateChildren(firebaseLiveLocationMap);
-                        Log.d("location map ", firebaseLiveLocationMap.toString());
+                        //Log.d("location map ", firebaseLiveLocationMap.toString());
                     }
 
                 }

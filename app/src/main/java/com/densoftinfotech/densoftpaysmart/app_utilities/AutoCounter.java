@@ -16,7 +16,14 @@ public class AutoCounter {
         return counter.getAndIncrement();
     }
 
-    public static int getCounterCurrentVal() {
-        return counter1.get();
+    public static int getPlusOneCounter() {
+        if (counter1.get() != 0) {
+            counter1.incrementAndGet();
+        }
+        return counter.incrementAndGet();
     }
+
+    /*public static int getCounterCurrentVal() {
+        return counter1.get();
+    }*/
 }
