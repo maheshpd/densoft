@@ -18,6 +18,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.densoftinfotech.densoftpaysmart.DensoftApp;
 import com.densoftinfotech.densoftpaysmart.R;
 
 import java.io.IOException;

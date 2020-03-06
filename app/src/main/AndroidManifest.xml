@@ -7,8 +7,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission. ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <application
         android:name=".DensoftApp"
@@ -76,14 +76,20 @@
         </activity>
 
         <service
-            android:name=".background_service.LocationTrackerService"
+            android:name=".background_service.LocationTrackerService1"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".LiveTrackingActivityv1"/>
+        <activity android:name=".LiveTrackingActivityv1" />
 
-        <activity android:name=".GoogleMapActivityv1"/>
+        <activity android:name=".GoogleMapActivityv1" />
 
+        <!-- Launches your service on device boot-up -->
+        <receiver android:name=".app_utilities.AutoStart">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

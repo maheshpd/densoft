@@ -2,6 +2,7 @@ package com.densoftinfotech.densoftpaysmart;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -21,6 +22,7 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
 import com.densoftinfotech.densoftpaysmart.app_utilities.ServiceUtils;
 import com.densoftinfotech.densoftpaysmart.app_utilities.SnapHelperOneByOne;
 import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService;
+import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService1;
 import com.densoftinfotech.densoftpaysmart.model.QuickActions;
 import com.densoftinfotech.densoftpaysmart.model.SalarySlip;
 import com.densoftinfotech.densoftpaysmart.model.StaffDetails;
@@ -156,7 +158,7 @@ public class MainActivity extends CommonActivity {
             @Override
             public void onClick(View view) {
 
-                Intent stopIntent = new Intent(MainActivity.this, LocationTrackerService.class);
+                Intent stopIntent = new Intent(MainActivity.this, LocationTrackerService1.class);
                 stopIntent.setAction("stop");
                 stopService(stopIntent);
 
@@ -213,14 +215,22 @@ public class MainActivity extends CommonActivity {
     }
 
     private void checkServiceRunning() {
-        if(ServiceUtils.isServiceRunning(LocationTrackerService.class.getName(), MainActivity.this)){
+        if(ServiceUtils.isServiceRunning(LocationTrackerService1.class.getName(), MainActivity.this)){
             //Log.d("service ", "running");
         }else{
             if(DateUtils.within_office_hours()){
-                startService(new Intent(MainActivity.this, LocationTrackerService.class));
+                startService(new Intent(MainActivity.this, LocationTrackerService1.class));
+                setServiceActivated(true);
             }
             //Log.d("service ", " not running");
         }
+    }
+
+    public void setServiceActivated(boolean activated) {
+        SharedPreferences sharedPreferences = this.getSharedPreferences("servicePrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefEditor = sharedPreferences.edit();
+        prefEditor.putBoolean("serviceActivated", activated);
+        prefEditor.apply();
     }
 
     private void get_salary_data(int staffid) {

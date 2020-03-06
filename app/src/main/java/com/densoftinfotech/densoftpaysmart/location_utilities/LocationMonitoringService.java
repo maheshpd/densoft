@@ -13,6 +13,7 @@ import android.os.IBinder;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService;
+import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService1;
 import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.common.ConnectionResult;
@@ -153,7 +154,7 @@ public class LocationMonitoringService extends Service implements GoogleApiClien
                     }
 
                     try{
-                        Intent stopIntent = new Intent(this, LocationTrackerService.class);
+                        Intent stopIntent = new Intent(this, LocationTrackerService1.class);
                         stopIntent.setAction("stop");
                         startService(stopIntent);
                     }catch (Exception e){

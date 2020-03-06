@@ -20,6 +20,7 @@ import com.densoftinfotech.densoftpaysmart.app_utilities.CommonActivity;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService;
+import com.densoftinfotech.densoftpaysmart.background_service.LocationTrackerService1;
 import com.densoftinfotech.densoftpaysmart.location_utilities.MapConstants;
 import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
 import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
@@ -236,7 +237,7 @@ public class LiveTrackingActivityv1 extends CommonActivity {
             }
         });
 
-        startService(new Intent(LiveTrackingActivityv1.this, LocationTrackerService.class));
+        startService(new Intent(LiveTrackingActivityv1.this, LocationTrackerService1.class));
 
 
     }

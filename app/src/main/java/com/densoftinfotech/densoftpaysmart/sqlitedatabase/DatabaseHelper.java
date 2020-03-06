@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
+import com.densoftinfotech.densoftpaysmart.model.LocalTrack;
 import com.densoftinfotech.densoftpaysmart.model.NotificationReceived;
 
 import org.json.JSONException;
@@ -25,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_NOTIFICATION = "table_notification";
     public static final String TABLE_ATTENDANCE = "table_attendance";
     public static final String TABLE_FIREBASE_LIVE_LOCATION = "table_firebase_live_location";
+    public static final String TABLE_TRACK = "table_track";
 
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
@@ -47,7 +49,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ALLOW_TRACKING = "allow_tracking";
     public static final String TRANSPORT_MODE = "transport_mode";
 
-
+    public static final String KEY = "key";
+    public static final String VALUE = "value";
+    public static final String DATE = "date";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -76,8 +80,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " INTEGER DEFAULT 0," + STAFF_NAME + " TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT,"
                 + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + ALLOW_TRACKING + " INTEGER NOT NULL," + TRANSPORT_MODE + " TEXT," + SAVEDTIME + " TEXT)";
         db.execSQL(query_liveupdates);
-    }
 
+        String query_trackdata = "CREATE TABLE IF NOT EXISTS" + TABLE_TRACK + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + KEY + " TEXT," + VALUE + "TEXT,"
+                + DATE + " TEXT)";
+        db.execSQL(query_trackdata);
+    }
 
     public void createtablenotification() {
         try {
@@ -102,7 +109,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
-
     public void createtable_location() {
         try {
             SQLiteDatabase db = getWritableDatabase();
@@ -113,6 +119,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void TrackTable() {
+        SQLiteDatabase db = getWritableDatabase();
+        String query_button = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTENDANCE + "("
+                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " INTEGER DEFAULT 0," + CHECK_IN_TIME + " TEXT," + CHECK_OUT_TIME + " TEXT," + TODAY_DATE + " TEXT," + SAVEDTIME + " TEXT)";
+        db.execSQL(query_button);
+
+    }
+
+    public void saveTrackData(String key, String value, String date) {
+        long index = 0;
+        TrackTable();
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues c = new ContentValues();
+        c.put(KEY, key);
+        c.put(value, value);
+        c.put(date, date);
+        db.insert(TABLE_TRACK, null, c);
+//        db.insertWithOnConflict(TABLE_TRACK,null,c,SQLiteDatabase.CONFLICT_REPLACE);
+
     }
 
     public long savenotificationData(String title, String description, String big_picture) {
@@ -138,7 +165,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             createtable_location();
             SQLiteDatabase db = getWritableDatabase();
-            Cursor c1 = db.rawQuery("SELECT * FROM "+TABLE_FIREBASE_LIVE_LOCATION, null);
+            Cursor c1 = db.rawQuery("SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION, null);
             if (c1.getCount() == 0) {
                 try {
 
@@ -224,19 +251,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Cursor c = db.rawQuery(query, null);
             c.moveToFirst();
             //status 0 for checkin, 1 for checkout
-            if(status == 0){
+            if (status == 0) {
                 if (c.getCount() == 0) {
                     return true;
-                }else{
+                } else {
                     return c.getString(2) == null || (c.getString(2).equalsIgnoreCase("0"));
                 }
-            }else if(status == 1){
+            } else if (status == 1) {
                 if (c.getCount() == 0) {
                     return true;
-                }else{
+                } else {
                     return c.getString(3) == null || (c.getString(3).equalsIgnoreCase("0"));
                 }
-            }else{
+            } else {
                 return c.getCount() > 0 && c.getString(2) != null;
             }
 
@@ -247,7 +274,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public String check_sqliteDate(){
+    public String check_sqliteDate() {
         createTable_forAttendance();
         String today_date = Constants.today_date;
         try {
@@ -256,7 +283,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Cursor c = db.rawQuery(query, null);
             c.moveToFirst();
 
-            if(c.getCount()>0)
+            if (c.getCount() > 0)
                 today_date = c.getString(4);
 
         } catch (Exception e) {
@@ -302,10 +329,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<FirebaseLiveLocation> list = new ArrayList<FirebaseLiveLocation>();
         try {
             SQLiteDatabase db = getReadableDatabase();
-            String query = "SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION + " WHERE STAFF_ID = " +staffid;
+            String query = "SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION + " WHERE STAFF_ID = " + staffid;
             Cursor c = db.rawQuery(query, null);
 
-            if(c.getCount()>0){
+            if (c.getCount() > 0) {
                 if (c.moveToFirst()) {
                     do {
                         JSONObject obj = new JSONObject();
@@ -315,11 +342,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             obj.put("latitude", c.getString(3));
                             obj.put("longitude", c.getString(4));
                             obj.put("address", c.getString(5));
-                            obj.put("workinghours", c.getString(6)+"-"+c.getString(7));
+                            obj.put("workinghours", c.getString(6) + "-" + c.getString(7));
                             obj.put("allow_tracking", c.getInt(8));
                             obj.put("transport_mode", c.getString(9));
                             //Log.d("obj_notification", "obj " + obj.toString());
-                            list.add(new FirebaseLiveLocation(c.getInt(1), c.getString(2), Double.parseDouble(c.getString(3)), Double.parseDouble(c.getString(4)), c.getString(5), (c.getString(6)+"-"+c.getString(7)), c.getInt(8),
+                            list.add(new FirebaseLiveLocation(c.getInt(1), c.getString(2), Double.parseDouble(c.getString(3)), Double.parseDouble(c.getString(4)), c.getString(5), (c.getString(6) + "-" + c.getString(7)), c.getInt(8),
                                     c.getString(9), "", System.currentTimeMillis()));
                         } catch (JSONException e) {
                             // TODO Auto-generated catch block
@@ -336,18 +363,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    public String get_latitude(int staffid){
+    public String get_latitude(int staffid) {
         createtable_location();
         String latitude = "";
         try {
             SQLiteDatabase db = getReadableDatabase();
-            String query = "SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION + " WHERE STAFF_ID = " +staffid;
+            String query = "SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION + " WHERE STAFF_ID = " + staffid;
             Cursor c = db.rawQuery(query, null);
 
-            if(c.getCount()>0){
+            if (c.getCount() > 0) {
                 if (c.moveToFirst()) {
                     do {
-                            latitude = c.getString(3);
+                        latitude = c.getString(3);
 
                     } while (c.moveToNext());
                 }
@@ -359,15 +386,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return latitude;
     }
 
-    public String get_longitude(int staffid){
+    public ArrayList<LocalTrack> list(String date) {
+
+        ArrayList<LocalTrack> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_TRACK + "WHERE DATE = " + date;
+        Cursor c = db.rawQuery(query, null);
+
+        if (c.getCount() > 0) {
+            if (c.moveToFirst()) {
+                do {
+                    list.add(new LocalTrack(c.getColumnName(1), c.getColumnName(2), c.getColumnName(3)));
+                } while (c.moveToFirst());
+            }
+        }
+        return list;
+    }
+
+
+    public String get_longitude(int staffid) {
         createtable_location();
         String longitude = "";
         try {
             SQLiteDatabase db = getReadableDatabase();
-            String query = "SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION + " WHERE STAFF_ID = " +staffid;
+            String query = "SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION + " WHERE STAFF_ID = " + staffid;
             Cursor c = db.rawQuery(query, null);
 
-            if(c.getCount()>0){
+            if (c.getCount() > 0) {
                 if (c.moveToFirst()) {
                     do {
                         longitude = c.getString(4);
@@ -392,12 +437,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteEntry(String table, int staffid)
-    {
+    public void deleteEntry(String table, int staffid) {
 
         if (table.equals(TABLE_NOTIFICATION)) {
             createtablenotification();
-        }else {
+        } else {
             createtable_location();
         }
         SQLiteDatabase db = getWritableDatabase();

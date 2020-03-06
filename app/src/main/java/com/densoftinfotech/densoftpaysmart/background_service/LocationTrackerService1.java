@@ -12,22 +12,34 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.densoftinfotech.densoftpaysmart.DensoftApp;
+import com.densoftinfotech.densoftpaysmart.MainActivity;
 import com.densoftinfotech.densoftpaysmart.R;
 import com.densoftinfotech.densoftpaysmart.app_utilities.AutoCounter;
 import com.densoftinfotech.densoftpaysmart.app_utilities.Constants;
 import com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils;
 import com.densoftinfotech.densoftpaysmart.app_utilities.InternetUtils;
+import com.densoftinfotech.densoftpaysmart.helper.TrackHelper;
+
+
 import com.densoftinfotech.densoftpaysmart.location_utilities.MapConstants;
 import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
 import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
+import com.densoftinfotech.densoftpaysmart.model.LocalTrack;
 import com.densoftinfotech.densoftpaysmart.model.LocationHistoryModel;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -45,6 +57,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
@@ -52,20 +66,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.ConsoleHandler;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
+import io.realm.Realm;
 
 import static com.densoftinfotech.densoftpaysmart.app_utilities.Constants.staffDetails;
 import static com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils.getTime;
+import static com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper.DATE;
+import static com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper.TABLE_TRACK;
 
-public class LocationTrackerService extends Service {
+public class LocationTrackerService1 extends Service {
 
-    private static final String TAG = LocationTrackerService.class.getSimpleName();
+    private static final String TAG = LocationTrackerService1.class.getSimpleName();
     private static String channel_id = "nidhikamath";
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
@@ -76,6 +95,11 @@ public class LocationTrackerService extends Service {
     private String stop = "stop";
     private int temp_no = 0;
     private int i = 0;
+    Context context;
+    UserLocation location;
+
+    Realm realm;
+    TrackHelper helper;
 
     DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.firebase_database_name/* + "/" + preferences.getInt("customerid", 0) + "/" +
                 preferences.getInt("staffid", 0)*/);
@@ -89,11 +113,24 @@ public class LocationTrackerService extends Service {
     public void onCreate() {
         super.onCreate();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        context = this;
+        context = this.getBaseContext();
         Log.d("called ", "onCreate");
+
+        realm = Realm.getDefaultInstance();
+        helper = new TrackHelper(realm);
+        helper.selectDB();
+
+
+        location = new UserLocation(context);
+
         registerReceiver(stopReceiver, new IntentFilter(stop));
         buildNotification();
         loginToFirebase();
-        start_timer_for_location_history(this);
+//        start_timer_for_location_history(this);
+        startTimeOneMinute();
+
+
     }
 
     private void buildNotification() {
@@ -214,8 +251,6 @@ public class LocationTrackerService extends Service {
             }, null);
 
         }
-
-
     }
 
     private void save_to_db(Location location) {
@@ -248,11 +283,9 @@ public class LocationTrackerService extends Service {
                         builder.append(addressStr);
                         builder.append(" ");
                     }
-
                     Address obj = address.get(0);
-                    add = obj.getAddressLine(0);               //Address386, SVS Rd, Sane Guruji Premises, opposite Siddhi Vinayak Temple, Dadar West, Prabhadevi, Mumbai, Maharashtra 400028, India
+                    add = obj.getAddressLine(0); //Address386, SVS Rd, Sane Guruji Premises, opposite Siddhi Vinayak Temple, Dadar West, Prabhadevi, Mumbai, Maharashtra 400028, India
                     Log.d("Address", " " + add);
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -294,127 +327,55 @@ public class LocationTrackerService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+
+    private void startTimeOneMinute() {
+
+        Timer timerObj = new Timer();
+        timerObj.scheduleAtFixedRate(new MyTimerTask(), 300, 60000);
+
+    }
+
+
     private void start_timer_for_location_history(Context context) {
         scanTask = new TimerTask() {
             public void run() {
                 handler.post(new Runnable() {
                     public void run() {
 
+
                         if (DateUtils.within_office_hours()) {
                             UserLocation location = new UserLocation(context);
-                            //Query lastQuery = ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(AutoCounter.getCounterCurrentVal()));
+                            temp_no = AutoCounter.getCounterPlusOne();
+
+                            HashMap<String, Object> firebaselive = new HashMap<>();
+
+                            firebaselive.put("timestamp", System.currentTimeMillis());
+                            firebaselive.put("latitude", location.getLatitude());
+                            firebaselive.put("longitude", location.getLongitude());
+                            firebaselive.put("address", location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
+                            firebaselive.put("current_time", getTime(System.currentTimeMillis()));
+                            firebaselive.put("angle", 0);
+//                            firebaseValue.put(String.valueOf(temp_no),firebaselive);
+
                             if (InternetUtils.getInstance(context).available()) {
-
-                                checkDataToPushExists();
-
-                                temp_no = AutoCounter.getCounterPlusOne();
-                                ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(temp_no)).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        //temp_no = AutoCounter.getCounterCurrentVal();
-                                        if (dataSnapshot.exists()) {
-                                            //for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                            LocationHistoryModel locationHistoryModel = dataSnapshot.getValue(LocationHistoryModel.class);
-                                            if (locationHistoryModel != null) {
-                                                //long time_diff = DateUtils.getDateDiff(System.currentTimeMillis(), locationHistoryModel.getTimestamp(), TimeUnit.MILLISECONDS);
-
-                                                if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
-                                                    HashMap<String, Object> firebaselive = new HashMap<>();
-                                                    firebaselive.put("timestamp", System.currentTimeMillis());
-                                                    firebaselive.put("latitude", location.getLatitude());
-                                                    firebaselive.put("longitude", location.getLongitude());
-                                                    firebaselive.put("address", location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
-                                                    firebaselive.put("current_time", getTime(System.currentTimeMillis()));
-                                                    firebaselive.put("angle", 0);
-
-                                                    ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(temp_no)).setValue(firebaselive)
-                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-
-                                                                    Log.d("preference ", "success location model " + temp_no);
-                                                                    addNode(null);
-
-                                                                    //add null object on success because the node is already added
-                                                                }
-                                                            })
-                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    //set history model in case failed
-                                                                    LocationHistoryModel historyModel = new LocationHistoryModel();
-                                                                    historyModel.setTimestamp(System.currentTimeMillis());
-                                                                    historyModel.setLatitude(location.getLatitude());
-                                                                    historyModel.setLongitude(location.getLongitude());
-                                                                    historyModel.setAddress(location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
-                                                                    historyModel.setCurrent_time(getTime(System.currentTimeMillis()));
-                                                                    historyModel.setAngle(0);
-                                                                    Log.d("preference ", " failure location model " + temp_no);
-                                                                    addNode(historyModel);
-                                                                }
-                                                            });
-                                                }
-                                            }
-                                            //}
-                                        } else {
-                                            HashMap<String, Object> firebaselive = new HashMap<>();
-                                            firebaselive.put("timestamp", System.currentTimeMillis());
-                                            firebaselive.put("latitude", location.getLatitude());
-                                            firebaselive.put("longitude", location.getLongitude());
-                                            firebaselive.put("address", location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
-                                            firebaselive.put("current_time", getTime(System.currentTimeMillis()));
-                                            firebaselive.put("angle", 0);
-                                            ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory")
-                                                    .child(String.valueOf(temp_no)).setValue(firebaselive)
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-
-                                                            Log.d("preference ", "success location model " + temp_no);
-                                                            addNode(null);
-
-                                                            //add null object on success because the node is already added
-
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            //set history model in case failed
-                                                            LocationHistoryModel historyModel = new LocationHistoryModel();
-                                                            historyModel.setTimestamp(System.currentTimeMillis());
-                                                            historyModel.setLatitude(location.getLatitude());
-                                                            historyModel.setLongitude(location.getLongitude());
-                                                            historyModel.setAddress(location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
-                                                            historyModel.setCurrent_time(getTime(System.currentTimeMillis()));
-                                                            historyModel.setAngle(0);
-                                                            Log.d("preference ", " failure location model " + temp_no);
-                                                            addNode(historyModel);
-                                                        }
-                                                    });
-
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                            } else {
-                                temp_no = AutoCounter.getCounterPlusOne();
+                                // checkDataToPushExists();
+                                getallofflinedata();
                                 if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
-                                    LocationHistoryModel historyModel = new LocationHistoryModel();
-                                    historyModel.setTimestamp(System.currentTimeMillis());
-                                    historyModel.setLatitude(location.getLatitude());
-                                    historyModel.setLongitude(location.getLongitude());
-                                    historyModel.setAddress(location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
-                                    historyModel.setCurrent_time(getTime(System.currentTimeMillis()));
-                                    historyModel.setAngle(0);
 
-                                    addNode(historyModel);
-                                    Log.d("preference ", "location model no internet " + temp_no);
+
+
+
+                                } else {
+                                    if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
+
+                                        //addDataToOffline(String.valueOf(temp_no),firebaseValue);
+                                        // addNode(historyModel);
+                                        Log.d("preference ", "location model no internet " + temp_no);
+                                    }
                                 }
+
+                            } else {
+
                             }
                         } else {
                             disable_tracking();
@@ -423,11 +384,71 @@ public class LocationTrackerService extends Service {
                 });
             }
         };
-
-
         t.schedule(scanTask, 300, MapConstants.update_after_every);
 
     }
+
+
+    private void addDataToOffline(Map<String, Object> inputMap, String time,String date) {
+        JSONObject jsonObject = new JSONObject(inputMap);
+        String jsonString = jsonObject.toString();
+        DatabaseHelper.getInstance(context).saveTrackData(time,jsonString,date);
+
+    }
+
+
+
+
+
+    private void addDataIntoFirebase(HashMap firebaseValuelive, String timerPoint, String date) {
+
+
+        ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(date).child("locationhistory")
+                .child(timerPoint).setValue(firebaseValuelive).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                DeleteFromSqlite(timerPoint,date);
+                Log.d("preference ", "success location model " + temp_no);
+
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+               addDataToOffline(firebaseValuelive,timerPoint,date);
+            }
+        });
+    }
+
+
+    public void DeleteFromSqlite(String time, String date) {
+        SQLiteDatabase db = DatabaseHelper.getInstance(context).getReadableDatabase();
+        String query = "Delete FROM " + DatabaseHelper.TABLE_TRACK + "WHERE KEY = " + time + " AND DATE " + date;
+        Cursor c = db.rawQuery(query, null);
+    }
+
+    public Void getallofflinedata() {
+
+        SQLiteDatabase db = DatabaseHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT * FROM " + DatabaseHelper.TABLE_TRACK  ;
+        Cursor c = db.rawQuery(query, null);
+
+        if (c.getCount() > 0) {
+            if (c.moveToFirst()) {
+                do {
+
+                    String cg = c.getColumnName(1);
+
+                    HashMap<String, Object> firebaselive = new HashMap<>();
+                    firebaselive.put("timestamp", System.currentTimeMillis());
+                    addDataIntoFirebase(firebaselive,c.getColumnName(2),c.getColumnName(3));
+                } while (c.moveToFirst());
+            }
+        }
+
+        return null;
+    }
+
 
     @Override
     public void onDestroy() {
@@ -480,6 +501,14 @@ public class LocationTrackerService extends Service {
 
 
     private void addNode(LocationHistoryModel locationHistoryModel) {
+
+//        HashMap<String, Object> share1 = new HashMap<>();
+//        HashMap<String, Object> share2 = new HashMap<>();
+//        HashMap<String, Object> share3 = new HashMap<>();
+//
+//        share1.put("data",nodeindex)
+
+
         if (preferences != null) {
             editor = preferences.edit();
             Gson gson = new Gson();
@@ -506,7 +535,7 @@ public class LocationTrackerService extends Service {
 
     private void checkDataToPushExists() {
 
-        try{
+        try {
             if (preferences.contains("locationmodels") && !preferences.getString("locationmodels", "").trim().equals("")) {
 
                 String loc = preferences.getString("locationmodels", "");
@@ -517,10 +546,10 @@ public class LocationTrackerService extends Service {
                     ArrayList<LocationHistoryModel> locupdate = gson.fromJson(loc, type);
 
                     int size = locupdate.size();
-                    for (i = (size-1); i>=0; i--) {
+                    for (i = (size - 1); i >= 0; i--) {
 
 
-                        if(locupdate.get(i)!=null){
+                        if (locupdate.get(i) != null) {
 
                             ref.child(String.valueOf(String.valueOf(preferences.getInt("staffid", 0)))).child(String.valueOf(DateUtils.getDate())).child("locationhistory").child(String.valueOf(i)).setValue(locupdate.get(i))
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -535,27 +564,71 @@ public class LocationTrackerService extends Service {
                                                 String stringput = gson.toJson(locupdate);
                                                 editor.putString("locationmodels", stringput);
                                                 editor.apply();
-
                                                 Log.d("preference updated ", preferences.getString("locationmodels", ""));
                                                 //add null object on success because the node is already added
-                                            }catch (Exception e){
+                                            } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
 
                                         }
                                     });
-                        }
-                        if(i==0){
+                        } else if (i == 0) {
                             break;
                         }
 
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+
+    public class MyTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            if (DateUtils.within_office_hours()) {
+                temp_no = AutoCounter.getCounterPlusOne();
+
+                HashMap<String, Object> firebaselive = new HashMap<>();
+
+                firebaselive.put("timestamp", System.currentTimeMillis());
+                firebaselive.put("latitude", location.getLatitude());
+                firebaselive.put("longitude", location.getLongitude());
+                firebaselive.put("address", location.getAddress_fromLatLng(location.getLatitude(), location.getLongitude()));
+                firebaselive.put("current_time", getTime(System.currentTimeMillis()));
+                firebaselive.put("angle", 0);
+
+                String date = getTime(System.currentTimeMillis());
+                String spliteDate = date.replace(":", "");
+
+
+                if (InternetUtils.getInstance(context).available()) {
+                    // checkDataToPushExists();
+//                    getallofflinedata();
+
+                    if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
+
+                        addDataIntoFirebase(firebaselive, spliteDate, String.valueOf(DateUtils.getDate()));
+
+                    } else {
+                        if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
+
+                            addDataToOffline(firebaselive,spliteDate,String.valueOf(DateUtils.getDate()));
+                            Log.d("preference ", "location model no internet " + temp_no);
+                        }
+                    }
+
+                } else {
+                    addDataToOffline(firebaselive,spliteDate,String.valueOf(DateUtils.getDate()));
+                }
+            } else {
+                disable_tracking();
+            }
+        }
     }
 
 
