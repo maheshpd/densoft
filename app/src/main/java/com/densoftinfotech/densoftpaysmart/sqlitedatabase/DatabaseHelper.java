@@ -94,7 +94,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL(query_notification);
         } catch (Exception e) {
             e.printStackTrace();
-            //Comment
+
         }
     }
 
