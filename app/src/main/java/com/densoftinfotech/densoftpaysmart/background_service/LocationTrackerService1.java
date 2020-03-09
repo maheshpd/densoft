@@ -41,7 +41,10 @@ import com.densoftinfotech.densoftpaysmart.location_utilities.UserLocation;
 import com.densoftinfotech.densoftpaysmart.model.FirebaseLiveLocation;
 import com.densoftinfotech.densoftpaysmart.model.LocalTrack;
 import com.densoftinfotech.densoftpaysmart.model.LocationHistoryModel;
+import com.densoftinfotech.densoftpaysmart.model.NotificationReceived;
 import com.densoftinfotech.densoftpaysmart.sqlitedatabase.DatabaseHelper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -57,8 +60,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
@@ -76,6 +81,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import io.realm.Realm;
+
 
 import static com.densoftinfotech.densoftpaysmart.app_utilities.Constants.staffDetails;
 import static com.densoftinfotech.densoftpaysmart.app_utilities.DateUtils.getTime;
@@ -363,8 +369,6 @@ public class LocationTrackerService1 extends Service {
                                 if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
 
 
-
-
                                 } else {
                                     if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
 
@@ -389,15 +393,12 @@ public class LocationTrackerService1 extends Service {
     }
 
 
-    private void addDataToOffline(Map<String, Object> inputMap, String time,String date) {
+    private void addDataToOffline(Map<String, Object> inputMap, String time, String date) {
         JSONObject jsonObject = new JSONObject(inputMap);
         String jsonString = jsonObject.toString();
-        DatabaseHelper.getInstance(context).saveTrackData(time,jsonString,date);
+        DatabaseHelper.getInstance(context).saveTrackData(time, jsonString, date);
 
     }
-
-
-
 
 
     private void addDataIntoFirebase(HashMap firebaseValuelive, String timerPoint, String date) {
@@ -407,48 +408,109 @@ public class LocationTrackerService1 extends Service {
                 .child(timerPoint).setValue(firebaseValuelive).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                DeleteFromSqlite(timerPoint,date);
+                DeleteFromSqlite(Integer.parseInt(timerPoint), Integer.parseInt(date));
                 Log.d("preference ", "success location model " + temp_no);
-
-
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-               addDataToOffline(firebaseValuelive,timerPoint,date);
+                addDataToOffline(firebaseValuelive, timerPoint, date);
             }
         });
     }
 
-
-    public void DeleteFromSqlite(String time, String date) {
+    public void DeleteFromSqlite(int time, int date) {
         SQLiteDatabase db = DatabaseHelper.getInstance(context).getReadableDatabase();
-        String query = "Delete FROM " + DatabaseHelper.TABLE_TRACK + "WHERE KEY = " + time + " AND DATE " + date;
+        String query = "Delete FROM " + DatabaseHelper.TABLE_TRACK + " WHERE keys = " + time + " AND date = " + date;
         Cursor c = db.rawQuery(query, null);
+        while (c.moveToNext()) {
+            Toast.makeText(context, "delete", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    public Void getallofflinedata() {
-
-        SQLiteDatabase db = DatabaseHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT * FROM " + DatabaseHelper.TABLE_TRACK  ;
-        Cursor c = db.rawQuery(query, null);
-
-        if (c.getCount() > 0) {
-            if (c.moveToFirst()) {
-                do {
-
-                    String cg = c.getColumnName(1);
-
-                    HashMap<String, Object> firebaselive = new HashMap<>();
-                    firebaselive.put("timestamp", System.currentTimeMillis());
-                    addDataIntoFirebase(firebaselive,c.getColumnName(2),c.getColumnName(3));
-                } while (c.moveToFirst());
-            }
+    public void getallofflinedata() {
+        Cursor res = DatabaseHelper.getInstance(this).getAllData();
+        if (res.getCount() == 0) {
+            return;
         }
 
-        return null;
+        while (res.moveToNext()) {
+            String key = res.getString(1);
+            String value = res.getString(2);
+            String date = res.getString(3);
+
+            try {
+                Map<String, Object> response = new ObjectMapper().readValue(value, HashMap.class);
+
+                String address = response.get("address").toString();
+                String latitude = response.get("latitude").toString();
+                String angle = response.get("angle").toString();
+                String current_time = response.get("current_time").toString();
+                String timestamp = response.get("timestamp").toString();
+                String longitude = response.get("longitude").toString();
+
+                HashMap<String, Object> firebaselive = new HashMap<>();
+                firebaselive.put("address", address);
+                firebaselive.put("angle", angle);
+                firebaselive.put("latitude", latitude);
+                firebaselive.put("current_time", current_time);
+                firebaselive.put("timestamp", timestamp);
+                firebaselive.put("longitude", longitude);
+                addDataIntoFirebase(firebaselive, key, date);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
     }
 
+
+//        SQLiteDatabase db = DatabaseHelper.getInstance(context).getWritableDatabase();
+//        String query = "SELECT * FROM " + DatabaseHelper.TABLE_TRACK  ;
+//        Cursor c = db.rawQuery(query, null);
+//
+//        if (c.moveToFirst()) {
+//
+//            String jsonValue = c.getString(2);
+
+
+//            String jsonValue = c.getColumnName(2);
+//            try {
+//                Map<String, Object> carMap = jsonValue.readValue(new File(
+//                        c.getColumnName(2)), new TypeReference<Map<String, Object>>() {
+//                });
+//
+//                System.out.println("address : " + carMap.get("address"));
+//                System.out.println("angle : " + carMap.get("angle"));
+//                System.out.println("latitude : " + carMap.get("latitude"));
+//                System.out.println("longitude : " + carMap.get("longitude"));
+//                System.out.println("timestamp : " + carMap.get("timestamp"));
+//                System.out.println("current_time : " + carMap.get("current_time"));
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        ObjectMapper mapper = new ObjectMapper();
+
+
+//        return c;
+
+//        if (c.getCount() > 0) {
+//            if (c.moveToFirst()) {
+//
+//
+//            }
+
+//                do {
+//                    String cg = c.getColumnName(1);
+//
+//                } while (c.moveToFirst());
+//            }
+//        }
+
+//    }
 
     @Override
     public void onDestroy() {
@@ -608,7 +670,7 @@ public class LocationTrackerService1 extends Service {
 
                 if (InternetUtils.getInstance(context).available()) {
                     // checkDataToPushExists();
-//                    getallofflinedata();
+                    getallofflinedata();
 
                     if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
 
@@ -617,13 +679,13 @@ public class LocationTrackerService1 extends Service {
                     } else {
                         if (location != null && location.getLatitude() != 0 && location.getLongitude() != 0) {
 
-                            addDataToOffline(firebaselive,spliteDate,String.valueOf(DateUtils.getDate()));
+                            addDataToOffline(firebaselive, spliteDate, String.valueOf(DateUtils.getDate()));
                             Log.d("preference ", "location model no internet " + temp_no);
                         }
                     }
 
                 } else {
-                    addDataToOffline(firebaselive,spliteDate,String.valueOf(DateUtils.getDate()));
+                    addDataToOffline(firebaselive, spliteDate, String.valueOf(DateUtils.getDate()));
                 }
             } else {
                 disable_tracking();

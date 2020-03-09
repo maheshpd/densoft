@@ -49,7 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ALLOW_TRACKING = "allow_tracking";
     public static final String TRANSPORT_MODE = "transport_mode";
 
-    public static final String KEY = "key";
+    public static final String KEY = "keys";
     public static final String VALUE = "value";
     public static final String DATE = "date";
 
@@ -81,8 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + ADDRESS + " TEXT," + WORKING_HOUR_FROM + " TEXT," + WORKING_HOUR_TO + " TEXT," + ALLOW_TRACKING + " INTEGER NOT NULL," + TRANSPORT_MODE + " TEXT," + SAVEDTIME + " TEXT)";
         db.execSQL(query_liveupdates);
 
-        String query_trackdata = "CREATE TABLE IF NOT EXISTS" + TABLE_TRACK + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + KEY + " TEXT," + VALUE + "TEXT,"
-                + DATE + " TEXT)";
+        String query_trackdata = "CREATE TABLE IF NOT EXISTS " + TABLE_TRACK + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,id TEXT,value TEXT,date TEXT )";
         db.execSQL(query_trackdata);
     }
 
@@ -110,6 +109,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
+
     public void createtable_location() {
         try {
             SQLiteDatabase db = getWritableDatabase();
@@ -124,23 +124,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void TrackTable() {
         SQLiteDatabase db = getWritableDatabase();
-        String query_button = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTENDANCE + "("
-                + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + STAFF_ID + " INTEGER DEFAULT 0," + CHECK_IN_TIME + " TEXT," + CHECK_OUT_TIME + " TEXT," + TODAY_DATE + " TEXT," + SAVEDTIME + " TEXT)";
-        db.execSQL(query_button);
-
+        String query_trackdata = "CREATE TABLE IF NOT EXISTS " + TABLE_TRACK + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,keys TEXT,value TEXT,date TEXT )";
+        db.execSQL(query_trackdata);
     }
 
-    public void saveTrackData(String key, String value, String date) {
-        long index = 0;
+    public boolean saveTrackData(String key, String values, String dates) {
         TrackTable();
         SQLiteDatabase db = getWritableDatabase();
         ContentValues c = new ContentValues();
         c.put(KEY, key);
-        c.put(value, value);
-        c.put(date, date);
-        db.insert(TABLE_TRACK, null, c);
-//        db.insertWithOnConflict(TABLE_TRACK,null,c,SQLiteDatabase.CONFLICT_REPLACE);
+        c.put(VALUE, values);
+        c.put(DATE, dates);
+        long result = db.insert(TABLE_TRACK, null, c);
 
+        if (result == -1)
+            return false;
+        else
+            return true;
     }
 
     public long savenotificationData(String title, String description, String big_picture) {
@@ -161,6 +161,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return index;
     }
 
+    public Cursor getAllData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + DatabaseHelper.TABLE_TRACK;
+        Cursor c = db.rawQuery(query, null);
+        return c;
+    }
+
+
     public long save_location(ContentValues c, int staffid) {
         long index = 0;
         try {
@@ -169,7 +177,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Cursor c1 = db.rawQuery("SELECT * FROM " + TABLE_FIREBASE_LIVE_LOCATION, null);
             if (c1.getCount() == 0) {
                 try {
-
                     index = db.insertWithOnConflict(TABLE_FIREBASE_LIVE_LOCATION, null, c, SQLiteDatabase.CONFLICT_REPLACE);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -177,7 +184,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } else {
                 db.update(TABLE_FIREBASE_LIVE_LOCATION, c, "STAFF_ID=" + staffid, null);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

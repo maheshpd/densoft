@@ -242,6 +242,35 @@ public class LiveTrackingActivityv1 extends CommonActivity {
 
     }
 
+    //try {
+//        SQLiteDatabase db = getReadableDatabase();
+//        String query = "SELECT * FROM " + TABLE_NOTIFICATION + " WHERE " + DELETED + " =0";
+//        Cursor c = db.rawQuery(query, null);
+//        if (c.moveToFirst()) {
+//            do {
+//                JSONObject obj = new JSONObject();
+//                try {
+//                    obj.put("id", c.getLong(0));
+//                    obj.put("title", c.getString(1));
+//                    obj.put("description", c.getString(2));
+//                    obj.put("big_picture", c.getString(3));
+//                    obj.put("deleted", c.getString(4));
+//                    //Log.d("obj_notification", "obj " + obj.toString());
+//                    list.add(new NotificationReceived(obj));
+//                } catch (JSONException e) {
+//                    // TODO Auto-generated catch block
+//                    e.printStackTrace();
+//                    //Log.e("error1", "error1" + e);
+//                }
+//            } while (c.moveToNext());
+//        }
+//    } catch (Exception e) {
+//        e.printStackTrace();
+//    }
+
+
+
+
     @Override
     public void onResume() {
         super.onResume();

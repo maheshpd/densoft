@@ -14,7 +14,7 @@ public class Constants {
     public static String ip = "api.densoftinfotech.in";
     //public static String ip = "demo.paysmart.net.in";
     //public static String ip = "physio.paysmart.net.in";
-    public static String db_name = "densoftpaysmart";
+    public static String db_name = "densoftpaysmart.db";
     public static final String table_staff_details = "table_staff_details";
     public static int staffid = 0;
     public static String current_year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
